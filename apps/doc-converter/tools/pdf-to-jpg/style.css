@@ -1,0 +1,39 @@
+/* PDF-to-JPG specific overrides */
+.page-card {
+  position: relative;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  animation: fadeUp 0.3s ease both;
+  transition: border-color var(--tr);
+}
+.page-card:hover { border-color: var(--clr-border-hover); }
+
+.page-card canvas {
+  width: 100%; display: block;
+  background: #fff;
+}
+.page-card__footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.5rem 0.7rem;
+  background: var(--clr-surface-2);
+}
+.page-card__num {
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--clr-text-muted);
+}
+.page-card__dl {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--c-bright);
+  text-decoration: none;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(15,240,188,0.2);
+  border-radius: 100px;
+  transition: background var(--tr), border-color var(--tr);
+}
+.page-card__dl:hover {
+  background: rgba(15,240,188,0.08);
+  border-color: rgba(15,240,188,0.5);
+}

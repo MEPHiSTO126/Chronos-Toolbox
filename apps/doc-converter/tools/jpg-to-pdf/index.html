@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert JPG, PNG or WebP images into a single PDF file. Free, private, runs entirely in your browser." />
+  <title>JPG to PDF · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/black-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <!-- jsPDF via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <img class="logo-wordmark" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" height="20" />
+        <span class="logo-text-fallback" aria-hidden="true">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Doc Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>JPG to PDF</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🖼️</span>
+    <h1 class="tool-hero__title">JPG to <span>PDF</span></h1>
+
+    <p class="tool-hero__subtitle">Upload images, arrange them in order, and download a single PDF. Supports JPG, PNG, and WebP.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload images">
+      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple aria-label="Select image files" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop images here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · JPG, PNG, WebP</p>
+    </div>
+
+    <!-- Preview grid -->
+    <div class="preview-area" id="preview-area" style="display:none;">
+      <div class="preview-area__header">
+        <span class="preview-area__title" id="preview-label">0 images · drag to reorder</span>
+        <button class="btn-secondary" id="btn-add-more" style="padding:0.4rem 1rem;font-size:0.82rem;">+ Add More</button>
+        <input type="file" id="add-more-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none;" aria-label="Add more images" />
+      </div>
+      <div class="preview-grid" id="preview-grid" aria-label="Image list" role="list"></div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-panel" id="options-panel" style="display:none;">
+      <p class="options-panel__title">PDF Options</p>
+      <div class="options-row">
+        <div class="option-group">
+          <label for="opt-size">Page Size</label>
+          <select id="opt-size">
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+            <option value="a3">A3</option>
+            <option value="fit">Fit to Image</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="opt-orient">Orientation</label>
+          <select id="opt-orient">
+            <option value="auto">Auto (per image)</option>
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="opt-margin">Margin</label>
+          <select id="opt-margin">
+            <option value="0">No margin</option>
+            <option value="10" selected>Small (10mm)</option>
+            <option value="20">Medium (20mm)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar" id="action-bar" style="display:none;">
+      <button class="btn-primary" id="btn-convert" disabled>Convert to PDF</button>
+      <button class="btn-secondary" id="btn-clear">Clear All</button>
+      <span class="file-count" id="file-count"></span>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Processing…</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-area" id="result-area">
+      <div class="result-card">
+        <span class="result-card__icon" aria-hidden="true">✅</span>
+        <p class="result-card__title">Your PDF is ready!</p>
+        <p class="result-card__meta" id="result-meta"></p>
+        <a class="btn-download" id="btn-download" download="chronos-converted.pdf">
+          ⬇ Download PDF
+        </a>
+        <br />
+        <button class="btn-convert-again" id="btn-again">Convert another batch</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally in your browser — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+/* Rotate PDF — page grid styles */
+.rotate-controls {
+  display: flex; flex-wrap: wrap; gap: 0.6rem;
+  margin-top: 1.5rem; align-items: center;
+}
+.rot-btn {
+  font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+  padding: 0.45rem 1rem;
+  background: var(--clr-surface); color: var(--clr-text-sub);
+  border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: color var(--tr), border-color var(--tr);
+}
+.rot-btn:hover { color: var(--c-rose); border-color: var(--c-rose); }
+.select-hint { font-size: 0.82rem; color: var(--clr-text-muted); flex: 1; }
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem; margin-top: 1.25rem;
+}
+.page-thumb {
+  background: var(--clr-surface);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  transition: border-color var(--tr);
+  animation: fadeUp 0.3s ease both;
+  user-select: none;
+}
+.page-thumb.selected { border-color: var(--c-rose); }
+.page-thumb canvas { width: 100%; display: block; background: #fff; }
+.page-thumb__footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  background: var(--clr-surface-2);
+  font-size: 0.7rem;
+}
+.page-thumb__num { color: var(--clr-text-muted); font-weight: 600; }
+.page-thumb__rot { color: var(--c-rose); font-weight: 700; }

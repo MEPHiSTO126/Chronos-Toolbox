@@ -1,0 +1,10 @@
+{
+  "name": "@chronos/home",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chronos Toolbox — hub landing page linking to all tools.",
+  "scripts": {
+    "dev": "npx serve . --listen 3000",
+    "build": "echo \"Static app — no build step needed.\""
+  }
+}

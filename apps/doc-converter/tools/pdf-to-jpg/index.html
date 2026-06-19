@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert every page of a PDF into high-quality JPG images. Free, private, runs entirely in your browser." />
+  <title>PDF to JPG · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/pdf-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <img class="logo-wordmark" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" height="20" />
+        <span class="logo-text-fallback" aria-hidden="true">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Doc Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>PDF to JPG</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">📄</span>
+    <h1 class="tool-hero__title">PDF to <span>JPG</span></h1>
+    <p class="tool-hero__subtitle">Upload a PDF and extract every page as a high-quality image. Download them all at once or pick individual pages.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload a PDF file">
+      <input type="file" id="file-input" accept="application/pdf" aria-label="Select PDF file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your PDF here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PDF only</p>
+    </div>
+
+    <!-- Options (shown after file chosen) -->
+    <div class="options-panel" id="options-panel" style="display:none;">
+      <p class="options-panel__title">Output Options</p>
+      <div class="options-row">
+        <div class="option-group">
+          <label for="opt-quality">Image Quality</label>
+          <select id="opt-quality">
+            <option value="1.5">Standard (fast)</option>
+            <option value="2" selected>High</option>
+            <option value="3">Ultra (slow)</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="opt-format">Format</label>
+          <select id="opt-format">
+            <option value="jpeg" selected>JPG</option>
+            <option value="png">PNG</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="opt-pages">Pages</label>
+          <select id="opt-pages">
+            <option value="all" selected>All pages</option>
+            <option value="range">Page range…</option>
+          </select>
+        </div>
+      </div>
+      <!-- Range input, hidden by default -->
+      <div id="range-row" style="display:none; margin-top:1rem;">
+        <div class="option-group" style="max-width:260px;">
+          <label for="opt-range">Range (e.g. 1-3, 5, 7-9)</label>
+          <input type="text" id="opt-range" placeholder="e.g. 1-3, 5" style="font-family:inherit;font-size:0.85rem;background:var(--clr-surface-2);color:var(--clr-text-primary);border:1px solid var(--clr-border);border-radius:var(--radius-sm);padding:0.45rem 0.75rem;outline:none;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar" id="action-bar" style="display:none;">
+      <button class="btn-primary" id="btn-convert">Convert to Images</button>
+      <button class="btn-secondary" id="btn-clear">Clear</button>
+      <span class="file-count" id="file-info"></span>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Rendering pages…</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <!-- Extracted pages grid -->
+    <div id="pages-area" style="display:none; margin-top:2rem;">
+      <div class="preview-area__header">
+        <span class="preview-area__title" id="pages-label"></span>
+        <button class="btn-primary" id="btn-download-all" style="padding:0.55rem 1.3rem;font-size:0.88rem;">⬇ Download All</button>
+      </div>
+      <div class="preview-grid" id="pages-grid" aria-label="Extracted pages" role="list"></div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "@chronos/qr-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Generate QR codes from any text or URL.",
+  "scripts": {
+    "dev": "echo \"Add your dev server command here\"",
+    "build": "echo \"Add your build command here\""
+  }
+}

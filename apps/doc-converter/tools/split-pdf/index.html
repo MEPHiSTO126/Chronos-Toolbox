@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Split a PDF into individual pages or custom page ranges. Free, private, runs entirely in your browser." />
+  <title>Split PDF · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Doc Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Split PDF</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">✂️</span>
+    <h1 class="tool-hero__title">Split <span>PDF</span></h1>
+    <p class="tool-hero__subtitle">Extract every page as a separate PDF, or pull out a specific page range.</p>
+  </section>
+
+  <main class="workspace">
+
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload a PDF">
+      <input type="file" id="file-input" accept="application/pdf" aria-label="Select PDF file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your PDF here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PDF only</p>
+    </div>
+
+    <div class="options-panel" id="options-panel" style="display:none;">
+      <p class="options-panel__title">Split Options</p>
+      <div class="options-row">
+        <div class="option-group">
+          <label for="opt-mode">Mode</label>
+          <select id="opt-mode">
+            <option value="all">Every page (separate PDFs)</option>
+            <option value="range">Custom range</option>
+          </select>
+        </div>
+        <div class="option-group" id="range-group" style="display:none;">
+          <label for="opt-range">Page range (e.g. 1-3, 5, 7-9)</label>
+          <input type="text" id="opt-range" placeholder="e.g. 1-3, 5"
+            style="font-family:inherit;font-size:0.85rem;background:var(--clr-surface-2);color:var(--clr-text-primary);border:1px solid var(--clr-border);border-radius:var(--radius-sm);padding:0.45rem 0.75rem;outline:none;" />
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar" id="action-bar" style="display:none;">
+      <button class="btn-primary" id="btn-split">Split PDF</button>
+      <button class="btn-secondary" id="btn-clear">Clear</button>
+      <span class="file-count" id="file-info"></span>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Splitting…</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <div class="result-area" id="result-area">
+      <div class="result-card">
+        <span class="result-card__icon" aria-hidden="true">✅</span>
+        <p class="result-card__title">Split complete!</p>
+        <p class="result-card__meta" id="result-meta"></p>
+        <a class="btn-download" id="btn-download">⬇ Download ZIP</a>
+        <br />
+        <button class="btn-convert-again" id="btn-again">Split another PDF</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Nothing is uploaded — all processing is local.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

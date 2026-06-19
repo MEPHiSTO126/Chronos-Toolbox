@@ -1,0 +1,361 @@
+/* ============================================================
+   CHRONOS TOOLBOX — Home Hub
+   Palette: #0E1D21 · #122E34 · #2E3D47 · #677E8A · #ABAFB5 · #E0B4B2
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c-bg:      #0E1D21;
+  --c-surface: #122E34;
+  --c-raised:  #1a3840;
+  --c-border:  #2E3D47;
+  --c-steel:   #677E8A;
+  --c-silver:  #ABAFB5;
+  --c-rose:    #E0B4B2;
+  --c-white:   #f0f4f5;
+
+  --clr-accent:       var(--c-rose);
+  --clr-text-primary: var(--c-white);
+  --clr-text-sub:     var(--c-silver);
+  --clr-text-muted:   var(--c-steel);
+
+  --clr-status-wip:     #c0956a;
+  --clr-status-planned: #4a5e6a;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --font: 'Outfit', system-ui, sans-serif;
+  --tr: 0.22s ease;
+
+  --shadow-card: 0 4px 28px rgba(0,0,0,0.38);
+  --shadow-glow: 0 0 40px rgba(224,180,178,0.12);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--c-bg);
+  color: var(--c-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Subtle ambient radial background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 65% -10%, rgba(103,126,138,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at -5% 85%,  rgba(224,180,178,0.07) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(14,29,33,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--c-border);
+}
+.header-inner {
+  max-width: 1180px; margin: 0 auto;
+  padding: 0 2rem; height: 66px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* Logo: toolbox icon + text only */
+.logo {
+  display: flex; align-items: center; gap: 0.65rem;
+  text-decoration: none;
+}
+.logo-toolbox {
+  width: 30px; height: 30px;
+  object-fit: contain;
+  filter: invert(1) brightness(0.82);
+  flex-shrink: 0;
+}
+.logo-text {
+  font-size: 1rem; font-weight: 700;
+  color: var(--c-white);
+  letter-spacing: -0.01em;
+}
+.logo-text strong { color: var(--c-rose); font-weight: 800; }
+
+/* Nav */
+.header-nav {
+  display: flex; align-items: center; gap: 0.25rem;
+}
+.nav-link {
+  color: var(--c-steel);
+  text-decoration: none;
+  font-size: 0.875rem; font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--tr), background var(--tr);
+}
+.nav-link:hover { color: var(--c-white); background: rgba(255,255,255,0.04); }
+.nav-link--github {
+  display: flex; align-items: center; gap: 0.4rem;
+  border: 1px solid var(--c-border);
+  color: var(--c-silver);
+  transition: color var(--tr), border-color var(--tr), background var(--tr);
+}
+.nav-link--github:hover {
+  color: var(--c-white);
+  border-color: var(--c-steel);
+  background: rgba(255,255,255,0.04);
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  position: relative; z-index: 1;
+  max-width: 760px; margin: 0 auto;
+  padding: 6rem 2rem 4.5rem;
+  text-align: center;
+  animation: fadeUp 0.55s ease both;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--c-rose);
+  background: rgba(224,180,178,0.08);
+  border: 1px solid rgba(224,180,178,0.2);
+  border-radius: 100px;
+  padding: 0.3rem 0.85rem;
+  margin-bottom: 1.75rem;
+}
+.hero-title {
+  font-size: clamp(2.4rem, 5.5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+.hero-title em { font-style: normal; color: var(--c-rose); }
+.hero-sub {
+  margin-top: 1.25rem;
+  font-size: 1.05rem; line-height: 1.7;
+  color: var(--c-silver);
+  max-width: 520px; margin-left: auto; margin-right: auto;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  margin-top: 2.25rem;
+  padding: 0.8rem 1.75rem;
+  background: var(--c-rose);
+  color: var(--c-bg);
+  font-size: 0.95rem; font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: background var(--tr), transform var(--tr), box-shadow var(--tr);
+  box-shadow: 0 4px 20px rgba(224,180,178,0.22);
+}
+.hero-cta:hover {
+  background: #ead0ce;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(224,180,178,0.32);
+}
+/* Double arrow on hero CTA */
+.arrow-pair {
+  display: inline-flex; align-items: center;
+  gap: 0px;
+  transition: gap var(--tr);
+}
+.arrow-pair img {
+  width: 12px; height: 12px;
+  object-fit: contain;
+  filter: brightness(0); /* make black to match bg text color */
+  opacity: 0.85;
+}
+.hero-cta:hover .arrow-pair { gap: 4px; }
+
+/* ── Tools section ────────────────────────────────────────── */
+.tools-section {
+  position: relative; z-index: 1;
+  max-width: 1180px; margin: 0 auto;
+  padding: 0 2rem 8rem;
+}
+.section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--c-border);
+}
+.section-title {
+  font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--c-steel);
+}
+.section-count {
+  font-size: 0.7rem;
+  color: rgba(103,126,138,0.5);
+  letter-spacing: 0.04em;
+}
+
+/* ── Tool Cards — premium vertical cards ─────────────────── */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.tool-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--tr), border-color var(--tr), box-shadow var(--tr);
+  overflow: hidden;
+  animation: fadeUp 0.45s ease both;
+}
+/* Subtle gradient sheen on hover */
+.tool-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(224,180,178,0.04) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity var(--tr);
+  pointer-events: none;
+}
+.tool-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--c-steel);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+.tool-card:hover::before { opacity: 1; }
+
+/* Stagger */
+.tool-card:nth-child(1) { animation-delay: 0.05s; }
+.tool-card:nth-child(2) { animation-delay: 0.11s; }
+.tool-card:nth-child(3) { animation-delay: 0.17s; }
+.tool-card:nth-child(4) { animation-delay: 0.23s; }
+
+/* Dimmed "coming soon" */
+.tool-card--soon {
+  opacity: 0.45; pointer-events: none;
+}
+
+/* Icon */
+.tool-card__icon {
+  width: 52px; height: 52px; flex-shrink: 0;
+  background: var(--c-raised);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: border-color var(--tr), transform var(--tr);
+}
+.tool-card__icon img {
+  width: 30px; height: 30px; object-fit: contain;
+}
+.tool-card__icon--emoji { font-size: 1.4rem; }
+.tool-card:hover .tool-card__icon {
+  border-color: var(--c-rose);
+  transform: scale(1.07) rotate(-3deg);
+}
+
+/* Tags */
+.tool-card__tags {
+  display: flex; flex-wrap: wrap; gap: 0.35rem;
+}
+.tag {
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--c-silver);
+  background: rgba(103,126,138,0.12);
+  border: 1px solid rgba(103,126,138,0.2);
+  border-radius: 4px;
+  padding: 0.18rem 0.5rem;
+}
+
+/* Body */
+.tool-card__body { flex: 1; }
+.tool-card__title {
+  font-size: 1.05rem; font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35rem;
+}
+.tool-card__desc {
+  font-size: 0.84rem;
+  color: var(--c-steel);
+  line-height: 1.58;
+}
+
+/* Status badge */
+.tool-card__status {
+  position: absolute; top: 1.1rem; right: 1.1rem;
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border-radius: 4px; padding: 0.2rem 0.55rem;
+}
+.tool-card__status--wip {
+  color: var(--clr-status-wip);
+  background: rgba(192,149,106,0.12);
+  border: 1px solid rgba(192,149,106,0.3);
+}
+.tool-card__status--planned {
+  color: var(--clr-status-planned);
+  background: rgba(74,94,106,0.15);
+  border: 1px solid rgba(74,94,106,0.3);
+}
+
+/* CTA row with double-arrow */
+.tool-card__cta {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  color: var(--c-rose);
+  font-size: 0.85rem; font-weight: 600;
+  margin-top: 0.25rem;
+}
+.tool-card:hover .tool-card__cta .arrow-pair { gap: 5px; }
+.tool-card__cta .arrow-pair img {
+  width: 11px; height: 11px;
+  object-fit: contain;
+  /* Tint to rose — use CSS color via filter */
+  filter: invert(79%) sepia(14%) saturate(400%) hue-rotate(320deg) brightness(105%);
+  opacity: 0.9;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.site-footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--c-border);
+}
+.footer-logo {
+  display: block; margin: 0 auto 0.75rem;
+  height: 32px; opacity: 0.5;
+  filter: invert(1);
+  object-fit: contain;
+}
+.footer-text {
+  font-size: 0.82rem; color: var(--c-steel);
+}
+.footer-text a { color: var(--c-rose); text-decoration: none; }
+.footer-text a:hover { text-decoration: underline; }
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .hero { padding: 4rem 1.5rem 3rem; }
+  .tools-section { padding: 0 1.5rem 5rem; }
+  .header-inner { padding: 0 1.5rem; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .nav-link:not(.nav-link--github) { display: none; }
+}

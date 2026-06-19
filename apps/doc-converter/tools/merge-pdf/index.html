@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Merge multiple PDF files into one document. Free, private, runs entirely in your browser." />
+  <title>Merge PDF · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Doc Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Merge PDF</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🔀</span>
+    <h1 class="tool-hero__title">Merge <span>PDF</span></h1>
+    <p class="tool-hero__subtitle">Upload multiple PDF files, arrange them in order, and download as a single document.</p>
+  </section>
+
+  <main class="workspace">
+
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload PDF files">
+      <input type="file" id="file-input" accept="application/pdf" multiple aria-label="Select PDF files" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop PDF files here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · Multiple files supported</p>
+    </div>
+
+    <div class="preview-area" id="preview-area" style="display:none;">
+      <div class="preview-area__header">
+        <span class="preview-area__title" id="preview-label">0 files · drag to reorder</span>
+        <button class="btn-secondary" id="btn-add-more" style="padding:0.4rem 1rem;font-size:0.82rem;">+ Add More</button>
+        <input type="file" id="add-more-input" accept="application/pdf" multiple style="display:none;" aria-label="Add more PDFs" />
+      </div>
+      <div class="pdf-file-list" id="pdf-file-list" role="list" aria-label="PDF files to merge"></div>
+    </div>
+
+    <div class="action-bar" id="action-bar" style="display:none;">
+      <button class="btn-primary" id="btn-merge" disabled>Merge PDFs</button>
+      <button class="btn-secondary" id="btn-clear">Clear All</button>
+      <span class="file-count" id="file-count"></span>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Merging…</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <div class="result-area" id="result-area">
+      <div class="result-card">
+        <span class="result-card__icon" aria-hidden="true">✅</span>
+        <p class="result-card__title">Merged PDF ready!</p>
+        <p class="result-card__meta" id="result-meta"></p>
+        <a class="btn-download" id="btn-download" download="merged.pdf">⬇ Download PDF</a>
+        <br />
+        <button class="btn-convert-again" id="btn-again">Merge another batch</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Nothing is uploaded — all processing is local.</p>
+  </footer>
+
+  <style>
+    .pdf-file-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+    .pdf-file-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md); cursor: grab;
+      transition: border-color var(--tr), background var(--tr);
+      animation: fadeUp 0.25s ease both;
+    }
+    .pdf-file-item:active { cursor: grabbing; }
+    .pdf-file-item.dragging { opacity: 0.35; }
+    .pdf-file-item.drag-target { border-color: var(--c-rose); background: rgba(224,180,178,0.04); }
+    .pdf-file-item__drag { color: var(--clr-text-muted); font-size: 1rem; user-select: none; }
+    .pdf-file-item__num {
+      font-size: 0.7rem; font-weight: 700; color: var(--c-rose);
+      width: 20px; text-align: center; flex-shrink: 0;
+    }
+    .pdf-file-item__name { flex: 1; font-size: 0.85rem; color: var(--clr-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pdf-file-item__size { font-size: 0.75rem; color: var(--clr-text-muted); flex-shrink: 0; }
+    .pdf-file-item__remove {
+      background: none; border: none; color: var(--clr-text-muted);
+      cursor: pointer; font-size: 0.9rem; padding: 0.1rem 0.25rem;
+      transition: color var(--tr);
+    }
+    .pdf-file-item__remove:hover { color: var(--clr-danger); }
+  </style>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

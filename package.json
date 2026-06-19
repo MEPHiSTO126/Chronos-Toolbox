@@ -1,0 +1,16 @@
+{
+  "name": "chronos-toolbox",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A suite of everyday web-based utility tools.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:home": "npm run dev --workspace=apps/home",
+    "dev:doc-converter": "npm run dev --workspace=apps/doc-converter",
+    "dev:image-editor": "npm run dev --workspace=apps/image-editor",
+    "dev:qr-generator": "npm run dev --workspace=apps/qr-generator"
+  }
+}

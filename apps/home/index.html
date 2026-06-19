@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chronos Toolbox — a suite of fast, clean, everyday web-based utility tools. Convert documents, edit images, generate QR codes and more." />
+  <title>Chronos Toolbox</title>
+  <!-- White logo as the tab/title icon -->
+  <link rel="icon" type="image/png" href="../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+
+      <!-- Toolbox icon + brand text only (no spiral wordmark) -->
+      <a href="#" class="logo" id="logo-home" aria-label="Chronos Toolbox home">
+        <img
+          class="logo-toolbox"
+          src="../../packages/images/tool-box.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+
+      <nav class="header-nav" aria-label="Site navigation">
+        <a href="#tools" class="nav-link" id="nav-tools">Tools</a>
+        <a
+          href="https://github.com/MEPHiSTO126/Chronos-Toolbox"
+          target="_blank"
+          rel="noopener"
+          class="nav-link nav-link--github"
+          id="github-link"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero ───────────────────────────────────────────── -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-eyebrow">✦ Open Source &nbsp;·&nbsp; Always Free</div>
+    <h1 id="hero-heading" class="hero-title">
+      Every tool you need,<br /><em>right here.</em>
+    </h1>
+    <p class="hero-sub">
+      A growing suite of clean, fast, browser-based utilities. No sign-ups. No installs. Just tools that work.
+    </p>
+    <a href="#tools" class="hero-cta" id="explore-tools-btn">
+      Browse tools
+      <span class="arrow-pair" aria-hidden="true">
+        <img src="../../packages/images/right-arrow.png" alt="" />
+        <img src="../../packages/images/right-arrow.png" alt="" />
+      </span>
+    </a>
+  </section>
+
+  <!-- ── Tools ──────────────────────────────────────────── -->
+  <main id="tools" class="tools-section" aria-labelledby="tools-heading">
+
+    <div class="section-header">
+      <h2 id="tools-heading" class="section-title">All Tools</h2>
+      <span class="section-count">4 tools</span>
+    </div>
+
+    <div class="tools-grid" role="list">
+
+      <!-- Doc Converter -->
+      <a class="tool-card" href="../doc-converter/index.html" role="listitem" id="card-doc-converter" aria-label="Open Doc Converter">
+        <div class="tool-card__icon">
+          <img src="../../packages/images/pdf-logo.png" alt="" aria-hidden="true" />
+        </div>
+        <div class="tool-card__tags">
+          <span class="tag">PDF</span>
+          <span class="tag">Word</span>
+          <span class="tag">Audio</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">Doc Converter</p>
+          <p class="tool-card__desc">Convert between PDF, Word, JPG and audio formats — all processed locally in your browser.</p>
+        </div>
+        <span class="tool-card__cta">
+          Open Tool
+          <span class="arrow-pair" aria-hidden="true">
+            <img src="../../packages/images/right-arrow.png" alt="" />
+            <img src="../../packages/images/right-arrow.png" alt="" />
+          </span>
+        </span>
+        <span class="tool-card__status tool-card__status--wip">In Progress</span>
+      </a>
+
+      <!-- Image Editor -->
+      <a class="tool-card" href="../image-editor/index.html" role="listitem" id="card-image-editor" aria-label="Open Image Editor">
+        <div class="tool-card__icon tool-card__icon--emoji">🖼️</div>
+        <div class="tool-card__tags">
+          <span class="tag">Brightness</span>
+          <span class="tag">Resize</span>
+          <span class="tag">Filters</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">Image Editor</p>
+          <p class="tool-card__desc">Adjust brightness, contrast, saturation. Crop, resize and apply filters — no server uploads.</p>
+        </div>
+        <span class="tool-card__cta">
+          Open Tool
+          <span class="arrow-pair" aria-hidden="true">
+            <img src="../../packages/images/right-arrow.png" alt="" />
+            <img src="../../packages/images/right-arrow.png" alt="" />
+          </span>
+        </span>
+        <span class="tool-card__status tool-card__status--planned">Planned</span>
+      </a>
+
+      <!-- QR Generator -->
+      <a class="tool-card" href="../qr-generator/index.html" role="listitem" id="card-qr-generator" aria-label="Open QR Generator">
+        <div class="tool-card__icon">
+          <img src="../../packages/images/qr-code.png" alt="" aria-hidden="true" style="filter:invert(0.65) sepia(0.2);" />
+        </div>
+        <div class="tool-card__tags">
+          <span class="tag">QR Code</span>
+          <span class="tag">URL</span>
+          <span class="tag">Export</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">QR Generator</p>
+          <p class="tool-card__desc">Turn any URL, text or contact info into a scannable QR code. Export as PNG or SVG.</p>
+        </div>
+        <span class="tool-card__cta">
+          Open Tool
+          <span class="arrow-pair" aria-hidden="true">
+            <img src="../../packages/images/right-arrow.png" alt="" />
+            <img src="../../packages/images/right-arrow.png" alt="" />
+          </span>
+        </span>
+        <span class="tool-card__status tool-card__status--planned">Planned</span>
+      </a>
+
+      <!-- Coming soon -->
+      <div class="tool-card tool-card--soon" role="listitem" id="card-coming-soon" aria-label="More tools coming soon">
+        <div class="tool-card__icon tool-card__icon--emoji">✦</div>
+        <div class="tool-card__tags">
+          <span class="tag">Coming Soon</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">More tools on the way</p>
+          <p class="tool-card__desc">The toolbox is always growing. Check back for new utilities regularly.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <!-- Brand logo in footer -->
+    <img
+      class="footer-logo"
+      src="../../packages/images/white-logo.png"
+      alt="Chronos Toolbox"
+    />
+    <p class="footer-text">
+      Built with ☕ &nbsp;·&nbsp;
+      <a href="https://github.com/MEPHiSTO126/Chronos-Toolbox" target="_blank" rel="noopener" id="footer-github-link">
+        View on GitHub
+      </a>
+    </p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
