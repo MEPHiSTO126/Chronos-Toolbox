@@ -13,9 +13,19 @@ from pdf2docx import Converter
 
 app = FastAPI(title="Chronos Toolbox Backend")
 
+import os
+
+frontend_url = os.environ.get("FRONTEND_URL")
+origins = [frontend_url] if frontend_url else ["*"]
+# Also allow local dev
+if "http://localhost:5500" not in origins:
+    origins.append("http://localhost:5500")
+if "http://127.0.0.1:5500" not in origins:
+    origins.append("http://127.0.0.1:5500")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
