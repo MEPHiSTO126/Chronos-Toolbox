@@ -27,13 +27,14 @@ Chronos-Toolbox/
 │   │       ├── page-deleter/       ← Browser
 │   │       ├── rearrange-pdf/      ← Browser
 │   │       └── pdf-to-audio/       ← Browser
-│   ├── backend/                # FastAPI server (Python) — handles heavy conversions
 │   ├── image-editor/           # 🔜 Planned
 │   └── qr-generator/           # 🔜 Planned
 │
 └── packages/
     └── images/                 # Shared brand assets (logos, icons)
 ```
+
+> **Note:** The backend Python API has been moved to its own private repository (`Chronos-Backend`) to keep this frontend repository strictly client-side and clean.
 
 ---
 
@@ -68,27 +69,7 @@ Open any `index.html` directly in your browser. No build step needed — it's va
 
 ### Backend
 
-Requires **Python 3.11+**.
-
-```bash
-cd apps/backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-The server starts at `http://localhost:8000`.  
-API docs are auto-generated at `http://localhost:8000/docs`.
-
-> **Windows note:** Word-to-PDF uses `docx2pdf` locally (requires Microsoft Word installed).  
-> PowerPoint-to-PDF requires LibreOffice on Windows, or use Docker.
-
-### Backend via Docker (recommended for PowerPoint + cross-platform)
-
-```bash
-cd apps/backend
-docker build -t chronos-backend .
-docker run -p 8000:8000 chronos-backend
-```
+The backend is housed in a separate private repository. If you have access, run it using Python/Uvicorn or Docker as detailed in its own `README.md`.
 
 ---
 
@@ -103,7 +84,7 @@ docker run -p 8000:8000 chronos-backend
 
 ### Backend → Render
 
-See the detailed guide in [`apps/backend/DEPLOY.md`](apps/backend/DEPLOY.md).
+The backend is deployed automatically to Render from the private `Chronos-Backend` repository.
 
 ---
 

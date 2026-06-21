@@ -1,7 +1,7 @@
 'use strict';
 
 // Change to your deployed backend URL in production
-const API_URL = 'https://chronos-toolbox.onrender.com/convert/word-to-pdf';
+const API_URL = 'https://toolbox-backend-76dc.onrender.com/convert/word-to-pdf';
 
 const dropzone    = document.getElementById('dropzone');
 const fileInput   = document.getElementById('file-input');
