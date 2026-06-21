@@ -1,5 +1,5 @@
 'use strict';
-const API_URL = 'http://localhost:8000/convert/pptx-to-pdf';
+const API_URL = 'https://chronos-toolbox.onrender.com/convert/pptx-to-pdf';
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('file-input');
