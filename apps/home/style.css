@@ -97,13 +97,13 @@ body::before {
   transition: color var(--tr), background var(--tr);
 }
 .nav-link:hover { color: var(--c-white); background: rgba(255,255,255,0.04); }
-.nav-link--github {
+.nav-link--portfolio {
   display: flex; align-items: center; gap: 0.4rem;
   border: 1px solid var(--c-border);
   color: var(--c-silver);
   transition: color var(--tr), border-color var(--tr), background var(--tr);
 }
-.nav-link--github:hover {
+.nav-link--portfolio:hover {
   color: var(--c-white);
   border-color: var(--c-steel);
   background: rgba(255,255,255,0.04);
@@ -357,5 +357,5 @@ body::before {
   .tools-section { padding: 0 1.5rem 5rem; }
   .header-inner { padding: 0 1.5rem; }
   .tools-grid { grid-template-columns: 1fr; }
-  .nav-link:not(.nav-link--github) { display: none; }
+  .nav-link:not(.nav-link--portfolio) { display: none; }
 }
