@@ -94,13 +94,13 @@
   <section class="tool-hero">
     <span class="tool-hero__icon" aria-hidden="true">🔊</span>
     <h1 class="tool-hero__title">PDF to <span>Audio</span></h1>
-    <p class="tool-hero__subtitle">Upload a PDF and listen to it read aloud — great for hands-free reading on the go.</p>
+    <p class="tool-hero__subtitle">Upload one or more PDFs and listen to them read aloud — great for hands-free reading on the go.</p>
   </section>
 
   <main class="workspace">
 
     <div class="dropzone" id="dropzone" role="button" aria-label="Upload a PDF">
-      <input type="file" id="file-input" accept="application/pdf" aria-label="Select PDF file" />
+      <input type="file" id="file-input" accept="application/pdf" multiple aria-label="Select PDF files" />
       <span class="dropzone__icon" aria-hidden="true">📂</span>
       <p class="dropzone__title">Drop your PDF here</p>
       <p class="dropzone__sub">or <span>click to browse</span> · PDF only</p>
@@ -118,6 +118,7 @@
     <div id="player-area" style="display:none;">
       <div class="player-card">
         <p class="player-title" id="player-title">—</p>
+        <p id="queue-info" style="font-size:0.78rem;color:var(--c-rose);font-weight:600;margin-bottom:0.2rem;display:none;"></p>
         <p class="player-page-info" id="player-page-info">Page 1 of 1</p>
 
         <div class="player-controls">
@@ -149,8 +150,9 @@
         </div>
       </div>
 
-      <div style="margin-top:1rem; text-align:center;">
-        <button class="btn-convert-again" id="btn-new-file">Load a different PDF</button>
+      <div style="margin-top:1rem; text-align:center; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <button class="btn-convert-again" id="btn-next-file" style="display:none;">⏭ Skip to Next PDF</button>
+        <button class="btn-convert-again" id="btn-new-file">Load different PDFs</button>
       </div>
     </div>
 
