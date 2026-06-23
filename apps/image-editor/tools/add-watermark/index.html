@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Add customizable text or image/logo watermarks to protect your photos. Free, private, processes entirely in your browser." />
+  <title>Add Watermark · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    /* Relative canvas container wrapper */
+    .editor-canvas-wrapper {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      user-select: none;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      background-image: repeating-linear-gradient(45deg, #122e34 25%, transparent 25%, transparent 75%, #122e34 75%, #122e34), repeating-linear-gradient(45deg, #122e34 25%, #0e1d21 25%, #0e1d21 75%, #122e34 75%, #122e34);
+      background-position: 0 0, 9px 9px;
+      background-size: 18px 18px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    #preview-img {
+      max-width: 100%;
+      max-height: 420px;
+      display: block;
+      pointer-events: none;
+    }
+    .watermark-overlay-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    /* Draggable Watermark Node */
+    .draggable-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: move;
+      border: 1px dashed var(--c-rose);
+      background: rgba(224, 180, 178, 0.08);
+      user-select: none;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+    
+    .draggable-watermark img {
+      max-width: 100%;
+      max-height: 100%;
+      pointer-events: none;
+    }
+    .draggable-watermark span {
+      white-space: nowrap;
+      font-weight: 600;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    /* Input switcher styling */
+    .type-switcher {
+      display: flex;
+      border-bottom: 1px solid var(--clr-border);
+      margin-bottom: 1.25rem;
+    }
+    .type-btn {
+      flex: 1;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--c-steel);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0.75rem;
+      cursor: pointer;
+      text-align: center;
+      transition: color var(--tr), border-color var(--tr);
+    }
+    .type-btn:hover { color: var(--c-white); }
+    .type-btn.active { color: var(--c-rose); border-bottom-color: var(--c-rose); }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Watermark</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🔒</span>
+    <h1 class="tool-hero__title">Add <span>Watermark</span></h1>
+    <p class="tool-hero__subtitle">Protect your content with custom text tags or graphic logo overlays with live position dragging and rotation.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload source image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select source image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your main image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
+    </div>
+
+    <!-- Workspace view (shown after load) -->
+    <div id="editor-section" style="display:none; margin-top:1.5rem;">
+      <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:2rem; align-items: start;">
+        
+        <!-- Preview Column -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:1rem;">
+          <div class="editor-canvas-wrapper" id="canvas-wrapper">
+            <img id="preview-img" alt="Workspace Source" />
+            <div class="watermark-overlay-container" id="overlay-container">
+              <!-- Draggable watermark block -->
+              <div class="draggable-watermark" id="watermark-block">
+                <span id="wm-text-node">© WATERMARK</span>
+                <img id="wm-image-node" style="display:none;" alt="Watermark Logo" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Column -->
+        <div class="options-panel" style="margin-top:0; padding:1.25rem;">
+          
+          <!-- Watermark Type Switcher -->
+          <div class="type-switcher">
+            <button class="type-btn active" data-type="text" id="type-text">Text Watermark</button>
+            <button class="type-btn" data-type="image" id="type-image">Logo / Image</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- TEXT TAB CONTROLS -->
+            <div id="controls-text">
+              <div class="control-row">
+                <label for="wm-text" style="display:block; margin-bottom:0.35rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Watermark Text</label>
+                <input type="text" id="wm-text" value="© Chronos Toolbox" style="width:100%; font-family:inherit; font-size:0.85rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.45rem 0.6rem; outline:none;" />
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.75rem;">
+                <div>
+                  <label for="wm-font" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Font Family</label>
+                  <select id="wm-font" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none;">
+                    <option value="Outfit">Outfit</option>
+                    <option value="Arial">Arial</option>
+                    <option value="'Courier New'">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="wm-color" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Color</label>
+                  <input type="color" id="wm-color" value="#ffffff" style="width:100%; height:32px; border:none; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- IMAGE TAB CONTROLS -->
+            <div id="controls-image" style="display:none;">
+              <label style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Upload Logo Image</label>
+              <input type="file" id="wm-file-input" accept="image/*" style="font-family:inherit; font-size:0.8rem;" />
+            </div>
+
+            <!-- COMMON CONTROLS -->
+            <!-- Size / Scale Slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Scale / Size</span><span id="val-wm-size">32px</span></div>
+              <input type="range" id="wm-size" min="10" max="250" value="32" />
+            </div>
+
+            <!-- Opacity Slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Opacity</span><span id="val-wm-opacity">50%</span></div>
+              <input type="range" id="wm-opacity" min="5" max="100" value="50" />
+            </div>
+
+            <!-- Rotation Slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Rotation angle</span><span id="val-wm-rotation">0°</span></div>
+              <input type="range" id="wm-rotation" min="0" max="360" value="0" />
+            </div>
+
+            <!-- Export format -->
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
+              <div style="flex:1; min-width:110px;">
+                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
+                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none; cursor:pointer;">
+                  <option value="jpeg">JPG</option>
+                  <option value="png" selected>PNG</option>
+                  <option value="webp">WEBP</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:160px;" id="quality-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
+                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
+                </div>
+                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Download Watermarked</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Crop your images into clean circles or ovals with transparent backgrounds. Free, private, processes entirely in your browser." />
+  <title>Round / Circle Crop · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    /* Styling for circle crop canvas view */
+    .preview-canvas-container {
+      width: 100%;
+      max-height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--clr-border);
+      padding: 1.5rem;
+      overflow: hidden;
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #preview-canvas {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Circle Crop</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">⭕</span>
+    <h1 class="tool-hero__title">Round / <span>Circle Crop</span></h1>
+    <p class="tool-hero__subtitle">Crop photos to a perfect circle shape, exporting transparent PNG profile avatars.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
+    </div>
+
+    <!-- Workspace view (shown after load) -->
+    <div id="editor-section" style="display:none; margin-top:1.5rem;">
+      <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:2rem; align-items: start;">
+        
+        <!-- Preview Column -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          <div class="preview-canvas-container">
+            <canvas id="preview-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Controls Column -->
+        <div class="options-panel" style="margin-top:0;">
+          <p class="options-panel__title" style="margin-bottom:1rem;">Circle Dimensions</p>
+          
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Center X slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Center X Position</span><span id="val-center-x">0px</span></div>
+              <input type="range" id="center-x" min="0" max="500" value="0" />
+            </div>
+
+            <!-- Center Y slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Center Y Position</span><span id="val-center-y">0px</span></div>
+              <input type="range" id="center-y" min="0" max="500" value="0" />
+            </div>
+
+            <!-- Radius slider -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Circle Radius</span><span id="val-radius">50px</span></div>
+              <input type="range" id="crop-radius" min="10" max="250" value="50" />
+            </div>
+
+            <!-- Output Format (transparency only makes sense for PNG/WEBP) -->
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
+              <div style="flex:1; min-width:110px;">
+                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
+                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none; cursor:pointer;">
+                  <option value="png" selected>PNG (Transp.)</option>
+                  <option value="webp">WEBP (Transp.)</option>
+                  <option value="jpeg">JPG (White BG)</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:160px;" id="quality-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
+                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
+                </div>
+                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Download Cropped</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -27,7 +27,7 @@ Chronos-Toolbox/
 │   │       ├── page-deleter/       ← Browser
 │   │       ├── rearrange-pdf/      ← Browser
 │   │       └── pdf-to-audio/       ← Browser
-│   ├── image-editor/           # 11 image tools (Convert, Resize, Filters...)
+│   ├── image-editor/           # 12 image tools (Convert, Resize, Filters...)
 │   │   └── tools/
 │   │       ├── image-converter/    ← Browser
 │   │       ├── heic-to-jpg/        ← Browser
@@ -39,7 +39,8 @@ Chronos-Toolbox/
 │   │       ├── add-border/         ← Browser
 │   │       ├── round-crop/         ← Browser
 │   │       ├── combine-images/     ← Browser
-│   │       └── add-watermark/      ← Browser
+│   │       ├── add-watermark/      ← Browser
+│   │       └── filter-adder/       ← Browser
 │   └── qr-generator/           # 🔜 Planned
 │
 └── packages/
@@ -83,6 +84,7 @@ Chronos-Toolbox/
 | Round / Circle Crop| 🌐 Browser | Clip image to circles for avatars |
 | Combine Images | 🌐 Browser | Layout multiple images in grids/vertical/horizontal |
 | Add Watermark | 🌐 Browser | Apply repeating/single watermark stamps |
+| Filter Adder | 🌐 Browser | Design custom color filters using a 4x5 color matrix |
 
 > **Browser tools** use client-side APIs (Canvas, `pdf-lib`, `PDF.js`, `heic2any`) — files never leave your device.  
 > **Backend tools** send the file to the FastAPI server, which converts and returns the result immediately. No files are stored.

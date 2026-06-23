@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Rotate images 90, 180 degrees or flip them vertically/horizontally. Free, private, processes entirely in your browser." />
+  <title>Rotate & Flip · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    /* Styling for rotation canvas view */
+    .preview-canvas-container {
+      width: 100%;
+      max-height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--clr-border);
+      padding: 1.5rem;
+      overflow: hidden;
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #preview-canvas {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      border-radius: 4px;
+      transition: transform 0.25s ease;
+    }
+    .action-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      flex: 1;
+      min-width: 110px;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--c-silver);
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: color var(--tr), border-color var(--tr), background var(--tr);
+    }
+    .action-btn:hover {
+      color: var(--c-white);
+      border-color: var(--c-steel);
+      background: rgba(255,255,255,0.02);
+    }
+    .action-btn.active {
+      color: var(--c-rose);
+      border-color: var(--c-rose);
+      background: rgba(224,180,178,0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Rotate & Flip</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🔄</span>
+    <h1 class="tool-hero__title">Rotate & <span>Flip</span></h1>
+    <p class="tool-hero__subtitle">Rotate images clockwise/counterclockwise or mirror them along horizontal/vertical axes.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
+    </div>
+
+    <!-- Workspace view (shown after load) -->
+    <div id="editor-section" style="display:none; margin-top:1.5rem;">
+      <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:2rem; align-items: start;">
+        
+        <!-- Preview Column -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          <div class="preview-canvas-container">
+            <canvas id="preview-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Controls Column -->
+        <div class="options-panel" style="margin-top:0;">
+          <p class="options-panel__title" style="margin-bottom:1rem;">Transform Options</p>
+          
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Rotate Options -->
+            <div>
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Rotate Image</label>
+              <div class="action-btn-group">
+                <button class="action-btn" id="btn-rot-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  Rotate -90°
+                </button>
+                <button class="action-btn" id="btn-rot-right">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38L7.56 2.5"/></svg>
+                  Rotate +90°
+                </button>
+              </div>
+            </div>
+
+            <!-- Flip Options -->
+            <div>
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Flip / Mirror</label>
+              <div class="action-btn-group">
+                <button class="action-btn" id="btn-flip-h">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M20 12H4M16 8l4 4-4 4M8 8l-4 4 4 4"/></svg>
+                  Horizontal
+                </button>
+                <button class="action-btn" id="btn-flip-v">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M12 4l-4 4h8M12 20l-4-4h8"/></svg>
+                  Vertical
+                </button>
+              </div>
+            </div>
+
+            <!-- Reset Angle -->
+            <div>
+              <button class="action-btn" id="btn-reset" style="width:100%; border-style:dashed;">Reset Transform</button>
+            </div>
+
+            <!-- Output Format -->
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
+              <div style="flex:1; min-width:110px;">
+                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
+                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none;">
+                  <option value="jpeg">JPG</option>
+                  <option value="png" selected>PNG</option>
+                  <option value="webp">WEBP</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:160px;" id="quality-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
+                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
+                </div>
+                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Download Image</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

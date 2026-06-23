@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Add solid, inset, rounded borders or drop shadows to your images. Free, private, processes entirely in your browser." />
+  <title>Add Border / Frame · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    /* Preview area styling */
+    .preview-canvas-container {
+      width: 100%;
+      max-height: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--clr-border);
+      padding: 1.5rem;
+      overflow: hidden;
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #preview-canvas {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Add Border</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🖼️</span>
+    <h1 class="tool-hero__title">Add Border / <span>Frame</span></h1>
+    <p class="tool-hero__subtitle">Frame your photos with solid outer borders, inset lines, rounded corners, or elegant drop shadows.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
+    </div>
+
+    <!-- Workspace view (shown after load) -->
+    <div id="editor-section" style="display:none; margin-top:1.5rem;">
+      <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:2rem; align-items: start;">
+        
+        <!-- Preview Column -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          <div class="preview-canvas-container">
+            <canvas id="preview-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Controls Column -->
+        <div class="options-panel" style="margin-top:0;">
+          <p class="options-panel__title" style="margin-bottom:1rem;">Border Customization</p>
+          
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Border Type -->
+            <div>
+              <label for="border-type" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Border Position / Style</label>
+              <select id="border-type" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none; cursor:pointer;">
+                <option value="solid" selected>Solid (Outer Frame)</option>
+                <option value="inset">Inset (Draw Inside Image)</option>
+                <option value="shadow">Drop Shadow Frame</option>
+              </select>
+            </div>
+
+            <!-- Border Width -->
+            <div class="control-row" id="row-width">
+              <div class="control-row__header"><span>Border Width</span><span id="val-border-width">20px</span></div>
+              <input type="range" id="border-width" min="1" max="150" value="20" />
+            </div>
+
+            <!-- Border Color -->
+            <div id="row-color">
+              <label for="border-color" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Border Color</label>
+              <input type="color" id="border-color" value="#ffffff" style="width:100%; height:32px; border:none; background:transparent; cursor:pointer;" />
+            </div>
+
+            <!-- Border Radius / Corner Roundness -->
+            <div class="control-row">
+              <div class="control-row__header"><span>Corner Roundness (Radius)</span><span id="val-border-radius">0px</span></div>
+              <input type="range" id="border-radius" min="0" max="100" value="0" />
+            </div>
+
+            <!-- Export Settings -->
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
+              <div style="flex:1; min-width:110px;">
+                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
+                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none;">
+                  <option value="jpeg">JPG</option>
+                  <option value="png" selected>PNG (Transp.)</option>
+                  <option value="webp">WEBP</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:160px;" id="quality-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
+                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
+                </div>
+                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Download Framed</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

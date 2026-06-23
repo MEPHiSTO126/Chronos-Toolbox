@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert Apple HEIC/HEIF photos to standard JPG images. Free, private, runs entirely in your browser." />
+  <title>HEIC to JPG · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- heic2any for HEIC decoding -->
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>HEIC to JPG</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">📱</span>
+    <h1 class="tool-hero__title">HEIC to <span>JPG</span></h1>
+    <p class="tool-hero__subtitle">Convert iPhone HEIC and HEIF photos to high-quality standard JPG images locally.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload HEIC files">
+      <input type="file" id="file-input" accept=".heic,.heif" multiple aria-label="Select HEIC/HEIF files" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your HEIC files here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · .heic or .heif format</p>
+    </div>
+
+    <!-- Previews list before conversion -->
+    <div class="preview-area" id="input-preview-area" style="display:none; margin-top:2rem;">
+      <div class="preview-area__header">
+        <span class="preview-area__title" id="input-count-label">Selected Files</span>
+      </div>
+      <div class="preview-grid" id="input-preview-grid" role="list"></div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-panel" id="options-panel" style="display:none;">
+      <p class="options-panel__title">Output Options</p>
+      <div class="options-row" style="display:flex; flex-wrap:wrap; gap:1.5rem;">
+        <div class="option-group" style="flex:1; min-width:260px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <label for="opt-quality" style="font-size:0.85rem; font-weight:600; color:var(--clr-text-sub);">JPG Compression Quality</label>
+            <span id="quality-val" style="font-size:0.82rem; font-weight:700; color:var(--c-rose);">85%</span>
+          </div>
+          <input type="range" id="opt-quality" min="10" max="100" value="85" style="width:100%; accent-color:var(--c-rose); cursor:pointer; height:6px; border-radius:3px; background:var(--clr-surface-2);" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar" id="action-bar" style="display:none; margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+      <button class="btn-primary" id="btn-convert" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Convert to JPG</button>
+      <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear All</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-wrap" style="display:none; margin-top:2rem;">
+      <div class="progress-label" style="display:flex; justify-content:space-between; font-size:0.82rem; color:var(--clr-text-sub); margin-bottom:0.5rem;">
+        <span id="progress-text">Decoding HEIC…</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg" style="width:100%; height:6px; background:var(--clr-surface-2); border-radius:100px; overflow:hidden;">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%; height:100%; background:var(--c-rose); transition:width 0.15s ease;"></div>
+      </div>
+    </div>
+
+    <!-- Output preview area -->
+    <div class="preview-area" id="output-area" style="display:none; margin-top:2.5rem;">
+      <div class="preview-area__header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <span class="preview-area__title" id="output-label">Converted JPG Files</span>
+        <button class="btn-primary" id="btn-download-all" style="font-family:inherit; font-weight:600; font-size:0.85rem; border-radius:var(--radius-sm); padding:0.5rem 1.2rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">⬇ Download ZIP</button>
+      </div>
+      <div class="preview-grid" id="output-grid" role="list"></div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Crop and resize images online with precision. Free, private, and processes entirely in your browser." />
+  <title>Crop & Resize · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <!-- CropperJS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <style>
+    /* Cropper overrides for Chronos aesthetics */
+    .cropper-container {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .cropper-bg {
+      background-image: repeating-linear-gradient(45deg, #122e34 25%, transparent 25%, transparent 75%, #122e34 75%, #122e34), repeating-linear-gradient(45deg, #122e34 25%, #0e1d21 25%, #0e1d21 75%, #122e34 75%, #122e34);
+      background-position: 0 0, 9px 9px;
+      background-size: 18px 18px;
+    }
+    .cropper-view-box {
+      outline: 2px solid var(--c-rose);
+      outline-color: var(--c-rose);
+    }
+    .cropper-line, .cropper-point {
+      background-color: var(--c-rose);
+    }
+    .cropper-point.point-se {
+      width: 10px; height: 10px; opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Crop & Resize</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">📐</span>
+    <h1 class="tool-hero__title">Crop & <span>Resize</span></h1>
+    <p class="tool-hero__subtitle">Crop with aspect ratio locking or resize to exact pixel dimension outputs.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
+    </div>
+
+    <!-- Edit Section (Shown after upload) -->
+    <div id="editor-section" style="display:none; margin-top:2rem;">
+      <div style="display:grid; grid-template-columns: 1fr; gap:2rem; max-width:960px;">
+        
+        <!-- Cropper Box -->
+        <div style="width:100%; display:flex; justify-content:center;">
+          <div style="width:100%; max-height:480px; position:relative; overflow:hidden;">
+            <img id="image-to-edit" style="max-width:100%; max-height:480px; display:block;" alt="Upload Preview" />
+          </div>
+        </div>
+
+        <!-- Controls panel -->
+        <div class="options-panel" style="margin-top:0;">
+          <p class="options-panel__title" style="margin-bottom:1rem;">Adjustment Options</p>
+          
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Crop aspect ratios -->
+            <div>
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Crop Aspect Ratio</label>
+              <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+                <button class="filter-btn active" data-ratio="NaN" id="ratio-free">Free</button>
+                <button class="filter-btn" data-ratio="1" id="ratio-1-1">1:1 Square</button>
+                <button class="filter-btn" data-ratio="1.3333" id="ratio-4-3">4:3 Standard</button>
+                <button class="filter-btn" data-ratio="1.7777" id="ratio-16-9">16:9 Widescreen</button>
+                <button class="filter-btn" data-ratio="0.5625" id="ratio-9-16">9:16 Portrait</button>
+              </div>
+            </div>
+
+            <!-- Resize inputs -->
+            <div>
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Resize Dimensions (Pixels)</label>
+              <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                  <span style="font-size:0.8rem; color:var(--clr-text-muted);">W:</span>
+                  <input type="number" id="resize-w" placeholder="Width" style="width:90px; font-family:inherit; font-size:0.85rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.45rem 0.6rem; outline:none;" />
+                </div>
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                  <span style="font-size:0.8rem; color:var(--clr-text-muted);">H:</span>
+                  <input type="number" id="resize-h" placeholder="Height" style="width:90px; font-family:inherit; font-size:0.85rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.45rem 0.6rem; outline:none;" />
+                </div>
+                <label style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:var(--clr-text-sub); cursor:pointer; user-select:none;">
+                  <input type="checkbox" id="resize-aspect" checked style="accent-color:var(--c-rose); cursor:pointer;" /> Lock Aspect Ratio
+                </label>
+              </div>
+            </div>
+
+            <!-- Output settings -->
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
+              <div style="flex:1; min-width:140px;">
+                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
+                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none;">
+                  <option value="jpeg">JPG</option>
+                  <option value="png" selected>PNG</option>
+                  <option value="webp">WEBP</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:180px;" id="quality-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
+                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
+                </div>
+                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Export & Download</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally — nothing is uploaded.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
