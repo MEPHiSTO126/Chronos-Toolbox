@@ -55,6 +55,15 @@ btnConvert.addEventListener('click', async () => {
   actionBar.style.display = 'none';
   progressWrap.classList.add('visible');
 
+  let progress = 0;
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-pct').textContent = '0%';
+  const progressInterval = setInterval(() => {
+    progress += (95 - progress) * 0.05;
+    document.getElementById('progress-bar').style.width = `${progress}%`;
+    document.getElementById('progress-pct').textContent = `${Math.round(progress)}%`;
+  }, 200);
+
   const formData = new FormData();
   selectedFiles.forEach(f => formData.append('files', f));
 
@@ -80,12 +89,19 @@ btnConvert.addEventListener('click', async () => {
     btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF File'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;
+    
+    clearInterval(progressInterval);
+    document.getElementById('progress-bar').style.width = '100%';
+    document.getElementById('progress-pct').textContent = '100%';
+    await new Promise(r => setTimeout(r, 400));
+    
     progressWrap.classList.remove('visible');
     resultArea.classList.add('visible');
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (err) {
     console.error(err);
     toast('Conversion failed. Make sure the backend server is running.', true);
+    clearInterval(progressInterval);
     progressWrap.classList.remove('visible');
     actionBar.style.display = 'flex';
   }
