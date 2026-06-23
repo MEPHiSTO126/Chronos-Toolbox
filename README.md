@@ -27,7 +27,19 @@ Chronos-Toolbox/
 │   │       ├── page-deleter/       ← Browser
 │   │       ├── rearrange-pdf/      ← Browser
 │   │       └── pdf-to-audio/       ← Browser
-│   ├── image-editor/           # 🔜 Planned
+│   ├── image-editor/           # 11 image tools (Convert, Resize, Filters...)
+│   │   └── tools/
+│   │       ├── image-converter/    ← Browser
+│   │       ├── heic-to-jpg/        ← Browser
+│   │       ├── crop-resize/        ← Browser
+│   │       ├── filters-effects/    ← Browser
+│   │       ├── rotate-flip/        ← Browser
+│   │       ├── compress-image/     ← Browser
+│   │       ├── add-text/           ← Browser
+│   │       ├── add-border/         ← Browser
+│   │       ├── round-crop/         ← Browser
+│   │       ├── combine-images/     ← Browser
+│   │       └── add-watermark/      ← Browser
 │   └── qr-generator/           # 🔜 Planned
 │
 └── packages/
@@ -56,7 +68,23 @@ Chronos-Toolbox/
 | Rearrange PDF | 🌐 Browser | — |
 | PDF to Audio | 🌐 Browser | ✅ Queue |
 
-> **Browser tools** use `pdf-lib` and `PDF.js` — files never leave your device.  
+### Image Editor (`apps/image-editor`)
+
+| Tool | Processing | Description |
+|---|---|---|
+| Image Converter | 🌐 Browser | Convert between PNG, JPG, and WEBP formats |
+| HEIC to JPG | 🌐 Browser | Convert Apple HEIC/HEIF images to standard JPG |
+| Crop & Resize | 🌐 Browser | Crop with drag handles & scale dimensions |
+| Filters & Effects | 🌐 Browser | Custom adjustments (brightness, blur) + watermark |
+| Rotate & Flip | 🌐 Browser | Rotate angles & mirror images |
+| Compress Image | 🌐 Browser | Reduce file size via quality parameters |
+| Add Text to Image | 🌐 Browser | Overlay custom drag-positionable text |
+| Add Border / Frame | 🌐 Browser | Add colored border frame options |
+| Round / Circle Crop| 🌐 Browser | Clip image to circles for avatars |
+| Combine Images | 🌐 Browser | Layout multiple images in grids/vertical/horizontal |
+| Add Watermark | 🌐 Browser | Apply repeating/single watermark stamps |
+
+> **Browser tools** use client-side APIs (Canvas, `pdf-lib`, `PDF.js`, `heic2any`) — files never leave your device.  
 > **Backend tools** send the file to the FastAPI server, which converts and returns the result immediately. No files are stored.
 
 ---
@@ -94,6 +122,7 @@ The backend is deployed automatically to Render from the private `Chronos-Backen
 |---|---|
 | Frontend | Vanilla HTML, CSS, JavaScript |
 | PDF manipulation | `pdf-lib`, `PDF.js`, `JSZip` |
+| Image manipulation | HTML5 Canvas API, `heic2any` (HEIC decoder) |
 | Backend | Python 3.11, FastAPI, Uvicorn |
 | PDF → Word | `pdf2docx` |
 | Word/PPTX → PDF | LibreOffice headless (Docker) / `docx2pdf` (Windows) |
