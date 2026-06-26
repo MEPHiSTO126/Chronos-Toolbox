@@ -48,6 +48,48 @@ function reset() {
   progressWrap.classList.remove('visible');
 }
 
+// ── Wake-up Helper ──────────────────────────────────────────────
+async function ensureBackendAwake() {
+  const origin = new URL(API_URL).origin;
+  const progressText = document.getElementById('progress-text');
+  const maxAttempts = 20;
+  const delayMs = 3000;
+
+  if (progressText) {
+    progressText.textContent = 'Waking up the server (this may take up to a minute)...';
+  }
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      // Use mode: 'no-cors' to avoid CORS issues during wake-up checks
+      await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (progressText) {
+        progressText.textContent = 'Uploading and converting...';
+      }
+      return true;
+    } catch (e) {
+      console.warn(`Wake attempt ${attempt} failed:`, e);
+    }
+    if (attempt < maxAttempts) {
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  return false;
+}
+
+// Initial preemptive wake trigger on page load
+(async () => {
+  try {
+    const origin = new URL(API_URL).origin;
+    await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors' });
+  } catch (e) {
+    // Ignore error
+  }
+})();
+
 // ── Convert ─────────────────────────────────────────────────────
 btnConvert.addEventListener('click', async () => {
   if (!selectedFiles.length) return;
@@ -68,6 +110,11 @@ btnConvert.addEventListener('click', async () => {
   selectedFiles.forEach(f => formData.append('files', f));
 
   try {
+    const awake = await ensureBackendAwake();
+    if (!awake) {
+      throw new Error('Backend server did not wake up in time.');
+    }
+
     const response = await fetch(API_URL, { method: 'POST', body: formData });
     if (!response.ok) {
       const err = await response.text();
