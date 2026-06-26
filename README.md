@@ -41,7 +41,18 @@ Chronos-Toolbox/
 │   │       ├── combine-images/     ← Browser
 │   │       ├── add-watermark/      ← Browser
 │   │       └── filter-adder/       ← Browser
-│   └── qr-generator/           # 🔜 Planned
+│   ├── qr-generator/           # 🔜 Planned
+│   └── media-converter/        # 🔜 Planned Media Tools (Video & Audio)
+│       └── tools/
+│           ├── video-to-audio/     ← Backend
+│           ├── audio-to-text/      ← Backend
+│           ├── multiply-audio/     ← Browser
+│           ├── vocal-splitter/     ← Backend
+│           ├── social-downloader/  ← Backend
+│           ├── compress-video/     ← Backend
+│           ├── video-gif/          ← Backend
+│           ├── video-converter/    ← Backend
+│           └── audio-manipulator/  ← Browser
 │
 └── packages/
     └── images/                 # Shared brand assets (logos, icons)
@@ -86,7 +97,21 @@ Chronos-Toolbox/
 | Add Watermark | 🌐 Browser | Apply repeating/single watermark stamps |
 | Filter Adder | 🌐 Browser | Design custom color filters using a 4x5 color matrix |
 
-> **Browser tools** use client-side APIs (Canvas, `pdf-lib`, `PDF.js`, `heic2any`) — files never leave your device.  
+### Media Converter (`apps/media-converter`) 🔜 Planned
+
+| Tool | Processing | Description |
+|---|---|---|
+| Video to Audio | 🖥️ Backend | Extract audio tracks (MP3/WAV) from video files |
+| Audio to Text | 🖥️ Backend | Transcribe spoken words in audio to text files |
+| Multiply Audio | 🌐 Browser | Loop and overlay audio onto itself N times |
+| Vocal Splitter | 🖥️ Backend | Separate vocals from background music/accompaniment |
+| Social Downloader | 🖥️ Backend | Download video/audio from Twitter, YouTube, TikTok, Instagram, etc. |
+| Compress Video | 🖥️ Backend | Reduce video size by adjusting bitrate & resolution |
+| Video ↔ GIF | 🖥️ Backend | Convert videos to GIF animations and vice versa |
+| Video Converter | 🖥️ Backend | Convert between MP4, WebM, MKV, AVI, and MOV |
+| Audio Manipulator | 🌐 Browser | Trim, fade, change amplitude (volume), and speed |
+
+> **Browser tools** use client-side APIs (Canvas, `pdf-lib`, `PDF.js`, `heic2any`, Web Audio API) — files never leave your device.  
 > **Backend tools** send the file to the FastAPI server, which converts and returns the result immediately. No files are stored.
 
 ---
@@ -128,6 +153,7 @@ The backend is deployed automatically to Render from the private `Chronos-Backen
 | Backend | Python 3.11, FastAPI, Uvicorn |
 | PDF → Word | `pdf2docx` |
 | Word/PPTX → PDF | LibreOffice headless (Docker) / `docx2pdf` (Windows) |
+| Video / Audio backend | FFmpeg, `yt-dlp`, Whisper, Spleeter/Demucs |
 | Containerisation | Docker |
 | Frontend hosting | Vercel |
 | Backend hosting | Render |
