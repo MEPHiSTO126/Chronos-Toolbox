@@ -42,7 +42,7 @@ Chronos-Toolbox/
 │   │       ├── add-watermark/      ← Browser
 │   │       └── filter-adder/       ← Browser
 │   ├── qr-generator/           # 🔜 Planned
-│   └── media-converter/        # 🔜 Planned Media Tools (Video & Audio)
+│   └── media-converter/        # Media Tools (Video & Audio)
 │       └── tools/
 │           ├── video-to-audio/     ← Backend
 │           ├── audio-to-text/      ← Backend
@@ -50,7 +50,7 @@ Chronos-Toolbox/
 │           ├── vocal-splitter/     ← Backend
 │           ├── social-downloader/  ← Backend
 │           ├── compress-video/     ← Backend
-│           ├── video-gif/          ← Backend
+│           ├── video-to-gif/       ← Backend
 │           ├── video-converter/    ← Backend
 │           └── audio-manipulator/  ← Browser
 │
@@ -97,7 +97,7 @@ Chronos-Toolbox/
 | Add Watermark | 🌐 Browser | Apply repeating/single watermark stamps |
 | Filter Adder | 🌐 Browser | Design custom color filters using a 4x5 color matrix |
 
-### Media Converter (`apps/media-converter`) 🔜 Planned
+### Media Converter (`apps/media-converter`)
 
 | Tool | Processing | Description |
 |---|---|---|

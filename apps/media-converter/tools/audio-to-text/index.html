@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert speech to text. Transcribe audio files and voice notes into written text transcripts." />
+  <title>Audio to Text · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    .audio-preview-wrap {
+      margin-top: 1rem;
+      background: var(--clr-surface-2);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--clr-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .audio-player-element {
+      width: 100%;
+      height: 40px;
+      outline: none;
+    }
+    .transcript-box {
+      width: 100%;
+      min-height: 180px;
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      color: var(--c-white);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      padding: 1rem;
+      resize: vertical;
+      outline: none;
+      margin: 1rem 0;
+      line-height: 1.6;
+    }
+    .btn-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--c-rose);
+      background: rgba(162,123,255,0.08);
+      border: 1px solid rgba(162,123,255,0.25);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      transition: background var(--tr), color var(--tr);
+      margin-bottom: 1.5rem;
+    }
+    .btn-copy:hover {
+      background: var(--c-rose);
+      color: var(--c-bg);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Media Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Audio to Text</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🎙️</span>
+    <h1 class="tool-hero__title">Audio to <span>Text</span></h1>
+    <p class="tool-hero__subtitle">Transcribe voice recordings and audio files into accurate text transcripts.</p>
+  </section>
+
+  <main class="workspace">
+    <!-- Upload Dropzone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an audio file">
+      <input type="file" id="file-input" accept="audio/*" aria-label="Select audio file" />
+      <span class="dropzone__icon" aria-hidden="true">🎙️</span>
+      <p class="dropzone__title">Drop your audio file here</p>
+      <p class="dropzone__sub">or <span>click to browse</span></p>
+    </div>
+
+    <!-- File Meta Container -->
+    <div class="file-meta-container" id="file-meta-container" style="display: none;">
+      <span class="file-meta-icon">🔊</span>
+      <div class="file-meta-details">
+        <p class="file-meta-name" id="file-name">filename.mp3</p>
+        <p class="file-meta-size" id="file-size">0.0 MB</p>
+        <div class="audio-preview-wrap">
+          <p style="font-size: 0.78rem; font-weight: 600; color: var(--clr-text-sub);">Preview Source:</p>
+          <audio class="audio-player-element" id="audio-preview" controls></audio>
+        </div>
+      </div>
+      <button class="btn-remove-file" id="btn-remove">Remove</button>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar" id="action-bar" style="display: none; justify-content: center;">
+      <button class="btn-primary" id="btn-transcribe">Generate Transcript</button>
+    </div>
+
+    <!-- Progress Wrap -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Waking up the server (this may take up to a minute)...</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <!-- Result Area -->
+    <div class="result-area" id="result-area">
+      <div class="result-card" style="text-align: left; max-width: 680px; margin: 0 auto;">
+        <span class="result-card__icon" aria-hidden="true" style="text-align: center;">📝</span>
+        <p class="result-card__title" style="text-align: center;">Transcription complete!</p>
+        <p class="result-card__meta" id="result-meta" style="text-align: center;">Word count: 0</p>
+        
+        <textarea class="transcript-box" id="transcript-content" readonly></textarea>
+        
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-copy" id="btn-copy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy Text
+          </button>
+          <a class="btn-download" id="btn-download" download="transcript.txt" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; border-radius: var(--radius-sm);">⬇ Download TXT</a>
+        </div>
+        
+        <div style="text-align: center;">
+          <button class="btn-convert-again" id="btn-again">Transcribe another file</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed ephemerally on Render Cloud.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
