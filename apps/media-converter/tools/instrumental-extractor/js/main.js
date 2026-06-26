@@ -1,12 +1,12 @@
 /**
- * Chronos Toolbox — Video to GIF & Back
- * Backend-integrated tool that converts Video to GIF or GIF to MP4.
+ * Chronos Toolbox — Instrumental Extractor
+ * Backend-integrated tool that isolates instrumentals from uploaded audio using FFmpeg filters.
  */
 
 // ── API URL configuration ────────────────────────────────
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com';
-const API_URL = `${BASE_URL}/media/video-to-gif`;
+const API_URL = `${BASE_URL}/media/instrumental-extractor`;
 
 // ── DOM Elements ──────────────────────────────────────────
 const dropzone             = document.getElementById('dropzone');
@@ -14,18 +14,17 @@ const fileInput            = document.getElementById('file-input');
 const fileMetaContainer    = document.getElementById('file-meta-container');
 const fileNameEl           = document.getElementById('file-name');
 const fileSizeEl           = document.getElementById('file-size');
-const metaIcon             = document.getElementById('meta-icon');
+const audioPreview         = document.getElementById('audio-preview');
 const btnRemove            = document.getElementById('btn-remove');
 const actionBar            = document.getElementById('action-bar');
-const btnConvert           = document.getElementById('btn-convert');
+const btnExtract           = document.getElementById('btn-extract');
 const progressWrap         = document.getElementById('progress-wrap');
 const progressText         = document.getElementById('progress-text');
 const progressPct          = document.getElementById('progress-pct');
 const progressBar          = document.getElementById('progress-bar');
 const resultArea           = document.getElementById('result-area');
 const resultMeta           = document.getElementById('result-meta');
-const videoResultPreview   = document.getElementById('video-result-preview');
-const gifResultPreview     = document.getElementById('gif-result-preview');
+const audioResultPreview   = document.getElementById('audio-result-preview');
 const btnDownload          = document.getElementById('btn-download');
 const btnAgain             = document.getElementById('btn-again');
 
@@ -91,25 +90,15 @@ btnAgain.addEventListener('click', resetState);
 
 // ── File Selection Handler ──────────────────────────────
 function handleFileSelect(file) {
-  const isGif = file.name.toLowerCase().endsWith('.gif');
-  const isVideo = file.type.startsWith('video/');
-
-  if (!isGif && !isVideo) {
-    showToast('Please select a valid video file or a GIF image.', true);
+  if (!file.type.startsWith('audio/')) {
+    showToast('Please select a valid audio file.', true);
     return;
   }
 
   selectedFile = file;
   fileNameEl.textContent = file.name;
   fileSizeEl.textContent = formatBytes(file.size);
-
-  if (isGif) {
-    metaIcon.textContent = '🖼️';
-    btnConvert.textContent = 'Convert GIF to MP4';
-  } else {
-    metaIcon.textContent = '🎞️';
-    btnConvert.textContent = 'Convert Video to GIF';
-  }
+  audioPreview.src = URL.createObjectURL(file);
 
   dropzone.style.display = 'none';
   fileMetaContainer.style.display = 'flex';
@@ -120,10 +109,8 @@ function handleFileSelect(file) {
 function resetState() {
   selectedFile = null;
   fileInput.value = '';
-  videoResultPreview.src = '';
-  gifResultPreview.src = '';
-  videoResultPreview.style.display = 'none';
-  gifResultPreview.style.display = 'none';
+  audioPreview.src = '';
+  audioResultPreview.src = '';
   if (btnDownload.href) {
     URL.revokeObjectURL(btnDownload.href);
     btnDownload.removeAttribute('href');
@@ -147,6 +134,7 @@ async function ensureBackendAwake() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500);
       
+      // Fire two wake-up pings in quick succession to kickstart the Render container
       const p1 = fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
       const p2 = new Promise(r => setTimeout(r, 400)).then(() => 
         fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal })
@@ -154,7 +142,7 @@ async function ensureBackendAwake() {
       
       await Promise.all([p1, p2]);
       clearTimeout(timeoutId);
-      progressText.textContent = 'Converting file frames...';
+      progressText.textContent = 'Extracting instrumentals...';
       return true;
     } catch (e) {
       console.warn(`Wake attempt ${attempt} failed:`, e);
@@ -177,12 +165,9 @@ async function ensureBackendAwake() {
   }
 })();
 
-// ── Convert Button Handler ──────────────────────────────────
-btnConvert.addEventListener('click', async () => {
+// ── Extract Button Handler ──────────────────────────────────
+btnExtract.addEventListener('click', async () => {
   if (!selectedFile) return;
-
-  const isGifInput = selectedFile.name.toLowerCase().endsWith('.gif');
-  const outExt = isGifInput ? '.mp4' : '.gif';
 
   actionBar.style.display = 'none';
   btnRemove.disabled = true;
@@ -215,19 +200,10 @@ btnConvert.addEventListener('click', async () => {
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
 
-    // Update result card previews
-    if (outExt === '.gif') {
-      gifResultPreview.src = url;
-      gifResultPreview.style.display = 'block';
-      videoResultPreview.style.display = 'none';
-    } else {
-      videoResultPreview.src = url;
-      videoResultPreview.style.display = 'block';
-      gifResultPreview.style.display = 'none';
-    }
-
+    // Update result card
+    audioResultPreview.src = url;
     btnDownload.href = url;
-    btnDownload.download = selectedFile.name.replace(/\.[^/.]+$/, "") + outExt;
+    btnDownload.download = selectedFile.name.replace(/\.[^/.]+$/, "") + "_instrumental.wav";
     resultMeta.textContent = `File size: ${formatBytes(blob.size)}`;
 
     clearInterval(progressInterval);
@@ -237,10 +213,10 @@ btnConvert.addEventListener('click', async () => {
 
     progressWrap.classList.remove('visible');
     resultArea.classList.add('visible');
-    showToast('Conversion complete!');
+    showToast('Instrumental extraction successful!');
   } catch (err) {
     console.error(err);
-    showToast(err.message || 'Failed to convert file.', true);
+    showToast(err.message || 'Failed to extract instrumental.', true);
     clearInterval(progressInterval);
     progressWrap.classList.remove('visible');
     actionBar.style.display = 'flex';

@@ -134,7 +134,13 @@ async function ensureBackendAwake() {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500);
-      await fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+      
+      const p1 = fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+      const p2 = new Promise(r => setTimeout(r, 400)).then(() => 
+        fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal })
+      );
+      
+      await Promise.all([p1, p2]);
       clearTimeout(timeoutId);
       progressText.textContent = 'Compressing video frames...';
       return true;
@@ -148,10 +154,12 @@ async function ensureBackendAwake() {
   return false;
 }
 
-// Preemptive wake trigger on page load
+// Preemptive double wake trigger on page load
 (async () => {
   try {
-    await fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors' });
+    fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+    await new Promise(r => setTimeout(r, 500));
+    fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors' }).catch(() => {});
   } catch (e) {
     // Ignore error
   }

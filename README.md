@@ -48,6 +48,7 @@ Chronos-Toolbox/
 │           ├── audio-to-text/      ← Backend
 │           ├── multiply-audio/     ← Browser
 │           ├── vocal-splitter/     ← Backend
+│           ├── instrumental-extractor/ ← Backend
 │           ├── social-downloader/  ← Backend
 │           ├── compress-video/     ← Backend
 │           ├── video-to-gif/       ← Backend
@@ -105,6 +106,7 @@ Chronos-Toolbox/
 | Audio to Text | 🖥️ Backend | Transcribe spoken words in audio to text files |
 | Multiply Audio | 🌐 Browser | Loop and overlay audio onto itself N times |
 | Vocal Splitter | 🖥️ Backend | Separate vocals from background music/accompaniment |
+| Instrumental Extractor | 🖥️ Backend | Extract background music/instrumentals from any song |
 | Social Downloader | 🖥️ Backend | Download video/audio from Twitter, YouTube, TikTok, Instagram, etc. |
 | Compress Video | 🖥️ Backend | Reduce video size by adjusting bitrate & resolution |
 | Video ↔ GIF | 🖥️ Backend | Convert videos to GIF animations and vice versa |
