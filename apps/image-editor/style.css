@@ -77,7 +77,7 @@ body::before {
 .logo-toolbox {
   width: 24px; height: 24px;
   object-fit: contain;
-  filter: invert(1) brightness(0.8);
+  filter: invert(53%) sepia(85%) saturate(2461%) hue-rotate(320deg) brightness(102%) contrast(101%);
 }
 .logo-text { font-size: 0.9rem; font-weight: 700; color: var(--c-white); }
 .logo-text strong { color: var(--c-rose); }

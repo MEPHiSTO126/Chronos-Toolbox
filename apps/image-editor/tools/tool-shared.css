@@ -81,7 +81,7 @@ body {
 .logo-toolbox {
   width: 22px; height: 22px;
   object-fit: contain;
-  filter: invert(1) brightness(0.8);
+  filter: invert(53%) sepia(85%) saturate(2461%) hue-rotate(320deg) brightness(102%) contrast(101%);
 }
 .logo-wordmark { height: 20px; object-fit: contain; }
 .logo-text-fallback { font-size: 0.88rem; font-weight: 600; }

@@ -81,7 +81,7 @@ body {
 .logo-toolbox {
   width: 22px; height: 22px;
   object-fit: contain;
-  filter: invert(1) brightness(0.8);
+  filter: invert(54%) sepia(91%) saturate(2400%) hue-rotate(235deg) brightness(101%) contrast(101%);
 }
 .logo-text-fallback { font-size: 0.88rem; font-weight: 600; }
 .logo-text-fallback strong { color: var(--c-rose); }
