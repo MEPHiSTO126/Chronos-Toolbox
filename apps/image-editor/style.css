@@ -6,14 +6,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-bg:      #0E1D21;
-  --c-surface: #122E34;
-  --c-raised:  #1a3840;
-  --c-border:  #2E3D47;
-  --c-steel:   #677E8A;
-  --c-silver:  #ABAFB5;
-  --c-rose:    #E0B4B2;
-  --c-white:   #f0f4f5;
+  --c-bg:      #0F0C0E;
+  --c-surface: #1A1116;
+  --c-raised:  #261821;
+  --c-border:  #3C2232;
+  --c-steel:   #8E6B81;
+  --c-silver:  #CBB6C3;
+  --c-rose:    #FF7E9F;
+  --c-white:   #F7F2F5;
 
   --clr-bg:           var(--c-bg);
   --clr-surface:      var(--c-surface);
@@ -28,7 +28,7 @@
   /* Badge colours */
   --badge-pdf:   #c0524a;
   --badge-word:  #4a85b8;
-  --badge-img:   #7a6aaa;
+  --badge-img:   #FF7E9F;
   --badge-audio: #4a9a70;
   --badge-lite:  var(--c-steel);
   --badge-heic:  #b89a6a;
@@ -53,14 +53,14 @@ body {
 body::before {
   content: '';
   position: fixed; inset: 0;
-  background: radial-gradient(ellipse 70% 40% at 80% -5%, rgba(103,126,138,0.07) 0%, transparent 60%);
+  background: radial-gradient(ellipse 70% 40% at 80% -5%, rgba(255,126,159,0.06) 0%, transparent 60%);
   pointer-events: none; z-index: 0;
 }
 
 /* ── Header ───────────────────────────────────────────────── */
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(14,29,33,0.9);
+  background: rgba(15,12,14,0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--c-border);
@@ -100,7 +100,7 @@ body::before {
 }
 .btn-back:hover {
   color: var(--c-rose); border-color: var(--c-steel);
-  background: rgba(224,180,178,0.05);
+  background: rgba(255,126,159,0.05);
 }
 /* Back arrow: two right-arrows flipped */
 .back-arrow-pair {
@@ -126,7 +126,7 @@ body::before {
 .hero-icon {
   font-size: 3.2rem;
   display: inline-block; margin-bottom: 1rem;
-  filter: drop-shadow(0 4px 16px rgba(224,180,178,0.25));
+  filter: drop-shadow(0 4px 16px rgba(255,126,159,0.25));
 }
 .hero-title {
   font-size: clamp(1.8rem, 4vw, 2.8rem);
@@ -193,13 +193,13 @@ body::before {
   content: '';
   position: absolute; inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(224,180,178,0.05) 0%, transparent 55%);
+  background: linear-gradient(135deg, rgba(255,126,159,0.05) 0%, transparent 55%);
   opacity: 0; transition: opacity var(--tr); pointer-events: none;
 }
 .tool-card:hover {
   transform: translateY(-5px);
   border-color: var(--c-steel);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.32), 0 0 40px rgba(224,180,178,0.1);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.32), 0 0 40px rgba(255,126,159,0.1);
 }
 .tool-card:hover::before { opacity: 1; }
 

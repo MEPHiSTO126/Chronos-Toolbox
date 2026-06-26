@@ -6,14 +6,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-bg:      #0E1D21;
-  --c-surface: #122E34;
-  --c-raised:  #1a3840;
-  --c-border:  #2E3D47;
-  --c-steel:   #677E8A;
-  --c-silver:  #ABAFB5;
-  --c-rose:    #E0B4B2;
-  --c-white:   #f0f4f5;
+  --c-bg:      #070C0E;
+  --c-surface: #0D151A;
+  --c-raised:  #142028;
+  --c-border:  #20333F;
+  --c-steel:   #5E7A8A;
+  --c-silver:  #9EBCCB;
+  --c-rose:    #00F0FF;
+  --c-white:   #ECF5F8;
 
   --clr-accent:       var(--c-rose);
   --clr-text-primary: var(--c-white);
@@ -30,7 +30,7 @@
   --tr: 0.22s ease;
 
   --shadow-card: 0 4px 28px rgba(0,0,0,0.38);
-  --shadow-glow: 0 0 40px rgba(224,180,178,0.12);
+  --shadow-glow: 0 0 40px rgba(0,240,255,0.12);
 }
 
 html { scroll-behavior: smooth; }
@@ -47,15 +47,15 @@ body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 55% at 65% -10%, rgba(103,126,138,0.1) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at -5% 85%,  rgba(224,180,178,0.07) 0%, transparent 55%);
+    radial-gradient(ellipse 80% 55% at 65% -10%, rgba(94,122,138,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at -5% 85%,  rgba(0,240,255,0.07) 0%, transparent 55%);
   pointer-events: none;
 }
 
 /* ── Header ───────────────────────────────────────────────── */
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(14,29,33,0.85);
+  background: rgba(7,12,14,0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--c-border);
@@ -122,8 +122,8 @@ body::before {
   font-size: 0.7rem; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--c-rose);
-  background: rgba(224,180,178,0.08);
-  border: 1px solid rgba(224,180,178,0.2);
+  background: rgba(0,240,255,0.08);
+  border: 1px solid rgba(0,240,255,0.2);
   border-radius: 100px;
   padding: 0.3rem 0.85rem;
   margin-bottom: 1.75rem;
@@ -151,12 +151,12 @@ body::before {
   text-decoration: none;
   border-radius: var(--radius-sm);
   transition: background var(--tr), transform var(--tr), box-shadow var(--tr);
-  box-shadow: 0 4px 20px rgba(224,180,178,0.22);
+  box-shadow: 0 4px 20px rgba(0,240,255,0.22);
 }
 .hero-cta:hover {
-  background: #ead0ce;
+  background: #88f7ff;
   transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(224,180,178,0.32);
+  box-shadow: 0 6px 28px rgba(0,240,255,0.32);
 }
 /* Double arrow on hero CTA */
 .arrow-pair {
@@ -223,7 +223,7 @@ body::before {
   content: '';
   position: absolute; inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(224,180,178,0.04) 0%, transparent 55%);
+  background: linear-gradient(135deg, rgba(0,240,255,0.04) 0%, transparent 55%);
   opacity: 0;
   transition: opacity var(--tr);
   pointer-events: none;
@@ -322,7 +322,7 @@ body::before {
   width: 11px; height: 11px;
   object-fit: contain;
   /* Tint to rose — use CSS color via filter */
-  filter: invert(79%) sepia(14%) saturate(400%) hue-rotate(320deg) brightness(105%);
+  filter: invert(66%) sepia(91%) saturate(2396%) hue-rotate(150deg) brightness(107%) contrast(105%);
   opacity: 0.9;
 }
 
