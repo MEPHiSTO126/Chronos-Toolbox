@@ -46,10 +46,11 @@
       Convert, compress, merge, and transform documents — all in your browser. Nothing leaves your device.
     </p>
     <div class="filter-bar" role="tablist" aria-label="Filter by category">
-      <button class="filter-btn active" data-filter="all"     role="tab" aria-selected="true"  id="filter-all">All</button>
-      <button class="filter-btn"        data-filter="pdf"     role="tab" aria-selected="false" id="filter-pdf">PDF Tools</button>
-      <button class="filter-btn"        data-filter="convert" role="tab" aria-selected="false" id="filter-convert">Conversions</button>
-      <button class="filter-btn"        data-filter="image"   role="tab" aria-selected="false" id="filter-image">Image → Doc</button>
+      <button class="filter-btn active" data-filter="all"      role="tab" aria-selected="true"  id="filter-all">All Tools</button>
+      <button class="filter-btn"        data-filter="pdf"      role="tab" aria-selected="false" id="filter-pdf">PDF Tools</button>
+      <button class="filter-btn"        data-filter="convert"  role="tab" aria-selected="false" id="filter-convert">Conversions</button>
+      <button class="filter-btn"        data-filter="compress" role="tab" aria-selected="false" id="filter-compress">Compression</button>
+      <button class="filter-btn"        data-filter="image"    role="tab" aria-selected="false" id="filter-image">Image → Doc</button>
     </div>
   </section>
 
@@ -142,6 +143,30 @@
         <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
         <div class="tool-card__from-to"><span class="badge badge--pdf">PDF</span><span class="arrow">→</span><span class="badge badge--audio">Audio</span></div>
         <div class="tool-card__body"><p class="tool-card__title">PDF to Audio <span class="tag-new">Unique</span></p><p class="tool-card__desc">Listen to any PDF as a spoken audio file — great for on the go.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- Compress Word -->
+      <a class="tool-card" href="tools/compress-word/index.html" data-category="compress" role="listitem" id="card-compress-word">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M12 9v8"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--word">Word</span><span class="arrow">→</span><span class="badge badge--lite">Compressed</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Compress Word</p><p class="tool-card__desc">Reduce the file size of Word documents (.docx/.doc) while preserving structure.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- Compress PDF -->
+      <a class="tool-card" href="tools/compress-pdf/index.html" data-category="pdf compress" role="listitem" id="card-compress-pdf">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17v-4h6v4M12 9v8"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--pdf">PDF</span><span class="arrow">→</span><span class="badge badge--lite">Compressed</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Compress PDF</p><p class="tool-card__desc">Reduce PDF size by optimizing content streams and removing duplicate objects.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- Compress PPTX -->
+      <a class="tool-card" href="tools/compress-pptx/index.html" data-category="compress" role="listitem" id="card-compress-pptx">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M12 9v4"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--word">PPTX</span><span class="arrow">→</span><span class="badge badge--lite">Compressed</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Compress PPTX</p><p class="tool-card__desc">Shrink PowerPoint presentation files (.pptx/.ppt) by optimizing embedded images.</p></div>
         <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
       </a>
 

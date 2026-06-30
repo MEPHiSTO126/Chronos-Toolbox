@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Compress Word documents. Powered by Chronos Toolbox Backend." />
+  <title>Compress Word · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Doc Converter</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Compress Word</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🗜️</span>
+    <h1 class="tool-hero__title">Compress <span>Word</span></h1>
+    <p class="tool-hero__subtitle">Reduce the file size of your DOCX and DOC documents while preserving layout quality.</p>
+  </section>
+
+  <main class="workspace">
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload a Word document">
+      <input type="file" id="file-input" accept=".docx,.doc" multiple aria-label="Select Word documents" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your Word file here</p>
+      <p class="dropzone__sub">or <span>click to browse</span></p>
+    </div>
+
+    <div class="action-bar" id="action-bar" style="display:none; justify-content: center;">
+      <button class="btn-primary" id="btn-convert">Compress Word</button>
+      <span class="file-count" id="file-info" style="margin-left: 1rem;"></span>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Uploading and compressing...</span>
+        <span id="progress-pct"></span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+    </div>
+
+    <div class="result-area" id="result-area">
+      <div class="result-card">
+        <span class="result-card__icon" aria-hidden="true">✅</span>
+        <p class="result-card__title">Compression complete!</p>
+        <p class="result-card__meta" id="result-meta"></p>
+        <a class="btn-download" id="btn-download">⬇ Download Compressed File</a>
+        <br />
+        <button class="btn-convert-again" id="btn-again">Compress another file</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed via Backend API</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
