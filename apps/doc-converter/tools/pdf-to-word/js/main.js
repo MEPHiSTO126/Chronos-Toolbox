@@ -53,25 +53,27 @@ async function ensureBackendAwake() {
   const origin = new URL(API_URL).origin;
   const progressText = document.getElementById('progress-text');
   const maxAttempts = 20;
-  const delayMs = 3000;
-
-  if (progressText) {
-    progressText.textContent = 'Waking up the server (this may take up to a minute)...';
-  }
+  const delayMs = 4000;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (progressText) {
+      progressText.textContent = attempt === 1
+        ? 'Waking up the server (this may take ~30s)...'
+        : `Still waking up... (attempt ${attempt}/${maxAttempts})`;
+    }
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      // Use mode: 'no-cors' to avoid CORS issues during wake-up checks
-      await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      // No 'no-cors' — we need to actually confirm the server responds OK.
+      // The health endpoint allows all origins, so this won't be blocked.
+      const res = await fetch(`${origin}/`, { method: 'GET', signal: controller.signal });
       clearTimeout(timeoutId);
-      if (progressText) {
-        progressText.textContent = 'Uploading and converting...';
+      if (res.ok) {
+        if (progressText) progressText.textContent = 'Uploading and converting...';
+        return true;
       }
-      return true;
     } catch (e) {
-      console.warn(`Wake attempt ${attempt} failed:`, e);
+      // Server not yet ready — swallow and retry
     }
     if (attempt < maxAttempts) {
       await new Promise(r => setTimeout(r, delayMs));
@@ -80,13 +82,13 @@ async function ensureBackendAwake() {
   return false;
 }
 
-// Initial preemptive wake trigger on page load
+// Initial preemptive wake trigger on page load (fire-and-forget, no-cors ok here)
 (async () => {
   try {
     const origin = new URL(API_URL).origin;
     await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors' });
   } catch (e) {
-    // Ignore error
+    // Ignore — this is just a warm-up nudge
   }
 })();
 
