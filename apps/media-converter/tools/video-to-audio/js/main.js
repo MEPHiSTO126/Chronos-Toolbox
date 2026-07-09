@@ -165,14 +165,29 @@ btnExtract.addEventListener('click', async () => {
   btnRemove.disabled = true;
   progressWrap.classList.add('visible');
 
-  let progress = 0;
-  progressBar.style.width = '0%';
-  progressPct.textContent = '0%';
-  const progressInterval = setInterval(() => {
-    progress += (95 - progress) * 0.05;
-    progressBar.style.width = `${progress}%`;
-    progressPct.textContent = `${Math.round(progress)}%`;
-  }, 200);
+  let progressInterval = null;
+  const __handleProgress = (phase, loaded, total) => {
+    const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
+    const pPct = document.getElementById('progress-pct');
+    const pTxt = document.getElementById('progress-text');
+    if (phase === 'upload') {
+      const pct = (loaded / total) * 50;
+      if (pBar) pBar.style.width = `${pct}%`;
+      if (pPct) pPct.textContent = `${Math.round(pct)}%`;
+      if (pTxt) pTxt.textContent = 'Uploading...';
+      
+      if (loaded === total) {
+        let procPct = 50;
+        if (pTxt) pTxt.textContent = 'Processing on server (depends on file size)...';
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = setInterval(() => {
+          procPct += (95 - procPct) * 0.05;
+          if (pBar) pBar.style.width = `${procPct}%`;
+          if (pPct) pPct.textContent = `${Math.round(procPct)}%`;
+        }, 300);
+      }
+    }
+  };
 
   const formData = new FormData();
   formData.append('file', selectedFile);
@@ -183,7 +198,7 @@ btnExtract.addEventListener('click', async () => {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const response = await fetch(API_URL, { method: 'POST', body: formData });
+    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData }, __handleProgress);
     if (!response.ok) {
       const err = await response.text();
       throw new Error(`Server error ${response.status}: ${err}`);
@@ -216,3 +231,30 @@ btnExtract.addEventListener('click', async () => {
     btnRemove.disabled = false;
   }
 });
+
+// ── XHR Progress Wrapper ───────────────────────────────────────
+async function doFetchWithProgress(url, options, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(options.method || 'GET', url);
+    if (options.headers) {
+      for (const [k, v] of Object.entries(options.headers)) xhr.setRequestHeader(k, v);
+    }
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) onProgress('upload', e.loaded, e.total);
+    };
+    xhr.onload = () => {
+      const response = {
+        ok: xhr.status >= 200 && xhr.status < 300,
+        status: xhr.status,
+        text: async () => await xhr.response.text(),
+        json: async () => JSON.parse(await xhr.response.text()),
+        blob: async () => xhr.response
+      };
+      resolve(response);
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.responseType = 'blob';
+    xhr.send(options.body);
+  });
+}
