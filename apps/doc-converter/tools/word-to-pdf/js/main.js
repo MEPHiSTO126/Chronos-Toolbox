@@ -27,15 +27,39 @@ dropzone.addEventListener('drop', e => {
 });
 fileInput.addEventListener('change', () => addFiles([...fileInput.files]));
 
+function validateFiles(files) {
+  const validFiles = [];
+  const invalidFiles = [];
+  
+  for (const file of files) {
+    const isWord = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      || file.type === 'application/msword'
+      || file.name.toLowerCase().endsWith('.docx')
+      || file.name.toLowerCase().endsWith('.doc');
+    if (isWord) {
+      validFiles.push(file);
+    } else {
+      invalidFiles.push(file.name);
+    }
+  }
+  
+  if (invalidFiles.length > 0) {
+    toast(`${invalidFiles.length} non-Word file(s) rejected: ${invalidFiles.join(', ')}`, true);
+  }
+  
+  return validFiles;
+}
+
 function addFiles(files) {
   if (!files.length) return;
-  selectedFiles = files;
+  const validFiles = validateFiles([...files]);
+  if (!validFiles.length) return;
+  
+  selectedFiles = validFiles;
   dropzone.style.display = 'none';
   actionBar.style.display = 'flex';
-  const wordCount  = files.filter(f => /\.(doc|docx)$/i.test(f.name)).length;
-  const otherCount = files.length - wordCount;
-  let label = `${files.length} file${files.length !== 1 ? 's' : ''} selected`;
-  if (otherCount > 0) label += ` · ${otherCount} non-Word will be returned as-is`;
+  const wordCount  = validFiles.filter(f => /\.(doc|docx)$/i.test(f.name)).length;
+  let label = `${validFiles.length} file${validFiles.length !== 1 ? 's' : ''} selected`;
   fileInfo.textContent = label;
 }
 
@@ -134,10 +158,22 @@ btnConvert.addEventListener('click', async () => {
     }
 
     const blob = await response.blob();
+    
+    // Verify MIME type
+    const expectedTypes = [
+      'application/pdf',
+      'application/zip',
+      'application/octet-stream'
+    ];
+    if (!expectedTypes.some(t => blob.type === t || blob.type.startsWith('application/'))) {
+      console.warn('Unexpected MIME type:', blob.type);
+    }
+
     const url  = URL.createObjectURL(blob);
 
     const cd  = response.headers.get('Content-Disposition') || '';
-    let fname = cd.match(/filename="?([^"]+)"?/)?.[1];
+    let fname = cd.match(/filename\*?=([^;]+)/)?.[1]?.replace(/^UTF-8''/, '')?.replace(/^"|"$/g, '')
+      || cd.match(/filename="?([^"]+)"?/)?.[1];
     if (!fname) {
       fname = selectedFiles.length === 1
         ? selectedFiles[0].name.replace(/\.docx?$/i, '.pdf')

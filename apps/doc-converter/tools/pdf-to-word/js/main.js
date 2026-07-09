@@ -18,6 +18,27 @@ const resultMeta  = document.getElementById('result-meta');
 
 let selectedFiles = [];
 
+// ── Validation ──────────────────────────────────────────────────
+function validateFiles(files) {
+  const validFiles = [];
+  const invalidFiles = [];
+  
+  for (const file of files) {
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
+      validFiles.push(file);
+    } else {
+      invalidFiles.push(file.name);
+    }
+  }
+  
+  if (invalidFiles.length > 0) {
+    toast(`${invalidFiles.length} non-PDF file(s) rejected: ${invalidFiles.join(', ')}`, true);
+  }
+  
+  return validFiles;
+}
+
 // ── Drag & Drop ─────────────────────────────────────────────────
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
@@ -29,13 +50,13 @@ fileInput.addEventListener('change', () => addFiles([...fileInput.files]));
 
 function addFiles(files) {
   if (!files.length) return;
-  selectedFiles = files; // replace selection each time
+  const validFiles = validateFiles([...files]);
+  if (!validFiles.length) return;
+  
+  selectedFiles = validFiles;
   dropzone.style.display = 'none';
   actionBar.style.display = 'flex';
-  const pdfCount  = files.filter(f => f.name.toLowerCase().endsWith('.pdf')).length;
-  const otherCount = files.length - pdfCount;
-  let label = `${files.length} file${files.length !== 1 ? 's' : ''} selected`;
-  if (otherCount > 0) label += ` · ${otherCount} non-PDF will be returned as-is`;
+  let label = `${validFiles.length} file${validFiles.length !== 1 ? 's' : ''} selected`;
   fileInfo.textContent = label;
 }
 
@@ -61,8 +82,6 @@ async function ensureBackendAwake() {
 
   for (let attempt = 1; attempt <= 15; attempt++) {
     try {
-      // Allow fetch to take as long as needed (no short abort timeout)
-      // Removed mode: 'no-cors' so we can accurately read the HTTP status
       const response = await fetch(`${origin}/`, { method: 'GET' });
       
       if (response.ok) {
@@ -134,11 +153,23 @@ btnConvert.addEventListener('click', async () => {
     }
 
     const blob = await response.blob();
+    
+    // Verify MIME type
+    const expectedTypes = [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/zip',
+      'application/octet-stream'
+    ];
+    if (!expectedTypes.some(t => blob.type === t || blob.type.startsWith('application/'))) {
+      console.warn('Unexpected MIME type:', blob.type);
+    }
+
     const url  = URL.createObjectURL(blob);
 
     // Determine filename from Content-Disposition or fallback
     const cd  = response.headers.get('Content-Disposition') || '';
-    let fname = cd.match(/filename="?([^"]+)"?/)?.[1];
+    let fname = cd.match(/filename\*?=([^;]+)/)?.[1]?.replace(/^UTF-8''/, '')?.replace(/^"|"$/g, '')
+      || cd.match(/filename="?([^"]+)"?/)?.[1];
     if (!fname) {
       fname = selectedFiles.length === 1
         ? selectedFiles[0].name.replace(/\.pdf$/i, '.docx')

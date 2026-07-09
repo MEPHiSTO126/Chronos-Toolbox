@@ -145,12 +145,23 @@
           </div>
         </div>
 
+        <div class="player-options" style="margin-top: 1rem; border-top: 1px solid var(--clr-border); padding-top: 1rem;">
+          <div class="player-opt">
+            <label for="opt-export-format">Export Format</label>
+            <select id="opt-export-format">
+              <option value="wav">WAV (uncompressed)</option>
+              <option value="mp3">MP3 (requires browser support)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="player-progress-bar-bg">
           <div class="player-progress-bar-fill" id="player-bar"></div>
         </div>
       </div>
 
       <div style="margin-top:1rem; text-align:center; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <button class="btn-convert-again" id="btn-export">⬇ Export Audio</button>
         <button class="btn-convert-again" id="btn-next-file" style="display:none;">⏭ Skip to Next PDF</button>
         <button class="btn-convert-again" id="btn-new-file">Load different PDFs</button>
       </div>
