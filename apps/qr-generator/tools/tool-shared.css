@@ -13,7 +13,7 @@
   --c-border:  #2E3D47;
   --c-steel:   #677E8A;
   --c-silver:  #ABAFB5;
-  --c-rose:    #E0B4B2;
+  --c-accent:    #E0B4B2;
   --c-white:   #f0f4f5;
 
   --clr-bg:           var(--c-bg);
@@ -21,12 +21,12 @@
   --clr-surface-2:    var(--c-raised);
   --clr-border:       var(--c-border);
   --clr-border-hover: var(--c-steel);
-  --clr-accent:       var(--c-rose);
+  --clr-accent:       var(--c-accent);
   --clr-accent-dim:   var(--c-steel);
   --clr-text-primary: var(--c-white);
   --clr-text-sub:     var(--c-silver);
   --clr-text-muted:   var(--c-steel);
-  --clr-glow:         rgba(224,180,178,0.15);
+  --clr-glow:         rgba(0,217,147,0.15);
   --clr-danger:       #c0524a;
   --clr-danger-bg:    rgba(192,82,74,0.1);
 
@@ -65,7 +65,7 @@ body {
   position: sticky; top: 0; z-index: 100;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  background: rgba(14,29,33,0.88);
+  background: rgba(8,18,14,0.88);
   border-bottom: 1px solid var(--clr-border);
 }
 .header-inner {
@@ -85,13 +85,13 @@ body {
 }
 .logo-wordmark { height: 20px; object-fit: contain; }
 .logo-text-fallback { font-size: 0.88rem; font-weight: 600; }
-.logo-text-fallback strong { color: var(--c-rose); }
+.logo-text-fallback strong { color: var(--c-accent); }
 .breadcrumb {
   display: flex; align-items: center; gap: 0.4rem;
   font-size: 0.85rem; color: var(--c-steel); flex: 1;
 }
 .breadcrumb a { color: var(--c-silver); text-decoration: none; }
-.breadcrumb a:hover { color: var(--c-rose); }
+.breadcrumb a:hover { color: var(--c-accent); }
 .breadcrumb__sep { color: var(--c-border); }
 .btn-back {
   display: inline-flex; align-items: center; gap: 0.45rem;
@@ -103,8 +103,8 @@ body {
   flex-shrink: 0;
 }
 .btn-back:hover {
-  color: var(--c-rose); border-color: var(--c-steel);
-  background: rgba(224,180,178,0.05);
+  color: var(--c-accent); border-color: var(--c-steel);
+  background: rgba(0,217,147,0.05);
 }
 /* Back arrows — two right-arrow images, flipped */
 .back-arrow-pair {
@@ -131,7 +131,7 @@ body {
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   font-weight: 800; letter-spacing: -0.03em;
 }
-.tool-hero__title span { color: var(--c-rose); }
+.tool-hero__title span { color: var(--c-accent); }
 .tool-hero__subtitle {
   margin-top: 0.6rem; font-size: 0.95rem;
   color: var(--clr-text-sub); line-height: 1.6;
@@ -170,7 +170,7 @@ body {
 }
 .dropzone:hover, .dropzone.drag-over {
   border-color: var(--c-steel);
-  background: rgba(224,180,178,0.02);
+  background: rgba(0,217,147,0.02);
 }
 .dropzone input[type="file"] {
   position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
@@ -178,7 +178,7 @@ body {
 .dropzone__icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
 .dropzone__title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
 .dropzone__sub { font-size: 0.85rem; color: var(--clr-text-sub); }
-.dropzone__sub span { color: var(--c-rose); font-weight: 600; }
+.dropzone__sub span { color: var(--c-accent); font-weight: 600; }
 
 /* ── File preview grid ────────────────────────────────────── */
 .preview-area { margin-top: 1.5rem; }
@@ -204,8 +204,8 @@ body {
   cursor: grab;
 }
 .preview-item:active { cursor: grabbing; }
-.preview-item.dragging { opacity: 0.4; border-color: var(--c-rose); }
-.preview-item.drag-target { border-color: var(--c-rose); background: rgba(224,180,178,0.04); }
+.preview-item.dragging { opacity: 0.4; border-color: var(--c-accent); }
+.preview-item.drag-target { border-color: var(--c-accent); background: rgba(0,217,147,0.04); }
 .preview-item img {
   width: 100%; flex: 1; object-fit: cover; display: block;
 }
@@ -229,10 +229,10 @@ body {
 .preview-item__remove:hover { background: var(--clr-danger); color: #fff; }
 .preview-item__num {
   position: absolute; top: 0.4rem; left: 0.4rem;
-  background: rgba(14,29,33,0.9);
+  background: rgba(8,18,14,0.9);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-sm);
-  color: var(--c-rose);
+  color: var(--c-accent);
   font-size: 0.65rem; font-weight: 700;
   padding: 0.1rem 0.4rem;
 }
@@ -288,7 +288,7 @@ body {
   font-family: var(--font);
   font-size: 1rem; font-weight: 700;
   padding: 0.85rem 2.2rem;
-  background: var(--c-rose);
+  background: var(--c-accent);
   color: var(--c-bg);
   border: none; border-radius: var(--radius-sm);
   cursor: pointer;
@@ -332,7 +332,7 @@ body {
 }
 .progress-bar-fill {
   height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--c-steel), var(--c-rose));
+  background: linear-gradient(90deg, var(--c-steel), var(--c-accent));
   border-radius: 100px;
   transition: width 0.3s ease;
 }
@@ -344,11 +344,11 @@ body {
 .result-area.visible { display: block; }
 .result-card {
   background: var(--clr-surface);
-  border: 1px solid rgba(224,180,178,0.15);
+  border: 1px solid rgba(0,217,147,0.15);
   border-radius: var(--radius-lg);
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 0 30px rgba(224,180,178,0.05);
+  box-shadow: 0 0 30px rgba(0,217,147,0.05);
 }
 .result-card__icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
 .result-card__title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem; }
@@ -357,7 +357,7 @@ body {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--font); font-size: 1rem; font-weight: 700;
   padding: 0.85rem 2rem;
-  background: var(--c-rose);
+  background: var(--c-accent);
   color: var(--c-bg); border: none; border-radius: var(--radius-sm);
   cursor: pointer; text-decoration: none;
   transition: background var(--tr), transform var(--tr), box-shadow var(--tr);
@@ -370,7 +370,7 @@ body {
   text-decoration: none; cursor: pointer; background: none; border: none;
   font-family: var(--font);
 }
-.btn-convert-again:hover { color: var(--c-rose); }
+.btn-convert-again:hover { color: var(--c-accent); }
 
 /* ── Toast ────────────────────────────────────────────────── */
 .ct-toast {
@@ -403,7 +403,7 @@ body {
   object-fit: contain;
 }
 .footer-text { font-size: 0.82rem; color: var(--c-steel); }
-.footer-text a, .site-footer a { color: var(--c-rose); text-decoration: none; }
+.footer-text a, .site-footer a { color: var(--c-accent); text-decoration: none; }
 .footer-text a:hover, .site-footer a:hover { text-decoration: underline; }
 
 /* ── Animations ───────────────────────────────────────────── */
