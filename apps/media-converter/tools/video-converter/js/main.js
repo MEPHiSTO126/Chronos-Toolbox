@@ -126,43 +126,39 @@ function resetState() {
 
 // ── Wake-up Helper ──────────────────────────────────────────
 async function ensureBackendAwake() {
-  const maxAttempts = 25;
-  const delayMs = 3000;
-  progressText.textContent = 'Waking up the server (this may take up to a minute)...';
+  const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
+  const progressText = document.getElementById('progress-text');
+  
+  if (progressText) {
+    progressText.textContent = 'Waking up the server (this may take up to a minute)...';
+  }
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  for (let attempt = 1; attempt <= 15; attempt++) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      // Allow fetch to take as long as needed (no short abort timeout)
+      // Removed mode: 'no-cors' so we can accurately read the HTTP status
+      const response = await fetch(`${origin}/`, { method: 'GET' });
       
-      const p1 = fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
-      const p2 = new Promise(r => setTimeout(r, 400)).then(() => 
-        fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal })
-      );
-      
-      await Promise.all([p1, p2]);
-      clearTimeout(timeoutId);
-      progressText.textContent = 'Transcoding video container...';
-      return true;
+      if (response.ok) {
+        if (progressText) progressText.textContent = 'Uploading and processing...';
+        return true;
+      } else {
+        console.warn(`Wake attempt ${attempt} returned status ${response.status}`);
+      }
     } catch (e) {
       console.warn(`Wake attempt ${attempt} failed:`, e);
     }
-    if (attempt < maxAttempts) {
-      await new Promise(r => setTimeout(r, delayMs));
-    }
+    await new Promise(r => setTimeout(r, 3000));
   }
   return false;
 }
 
-// Preemptive double wake trigger on page load
+// Initial preemptive wake trigger on page load
 (async () => {
   try {
-    fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-    await new Promise(r => setTimeout(r, 500));
-    fetch(`${BASE_URL}/`, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-  } catch (e) {
-    // Ignore error
-  }
+    const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
+    await fetch(`${origin}/`, { method: 'GET' });
+  } catch (e) {}
 })();
 
 // ── Convert Button Handler ──────────────────────────────────

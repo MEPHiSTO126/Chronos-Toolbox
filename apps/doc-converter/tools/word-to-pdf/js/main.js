@@ -1,7 +1,9 @@
 'use strict';
 
 // Change to your deployed backend URL in production
-const API_URL = 'https://toolbox-backend-76dc.onrender.com/convert/word-to-pdf';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com';
+const API_URL = `${BASE_URL}/convert/word-to-pdf`;
 
 const dropzone    = document.getElementById('dropzone');
 const fileInput   = document.getElementById('file-input');
@@ -50,32 +52,29 @@ function reset() {
 
 // ── Wake-up Helper ──────────────────────────────────────────────
 async function ensureBackendAwake() {
-  const origin = new URL(API_URL).origin;
+  const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
   const progressText = document.getElementById('progress-text');
-  const maxAttempts = 20;
-  const delayMs = 3000;
-
+  
   if (progressText) {
     progressText.textContent = 'Waking up the server (this may take up to a minute)...';
   }
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  for (let attempt = 1; attempt <= 15; attempt++) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      // Use mode: 'no-cors' to avoid CORS issues during wake-up checks
-      await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors', signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (progressText) {
-        progressText.textContent = 'Uploading and converting...';
+      // Allow fetch to take as long as needed (no short abort timeout)
+      // Removed mode: 'no-cors' so we can accurately read the HTTP status
+      const response = await fetch(`${origin}/`, { method: 'GET' });
+      
+      if (response.ok) {
+        if (progressText) progressText.textContent = 'Uploading and processing...';
+        return true;
+      } else {
+        console.warn(`Wake attempt ${attempt} returned status ${response.status}`);
       }
-      return true;
     } catch (e) {
       console.warn(`Wake attempt ${attempt} failed:`, e);
     }
-    if (attempt < maxAttempts) {
-      await new Promise(r => setTimeout(r, delayMs));
-    }
+    await new Promise(r => setTimeout(r, 3000));
   }
   return false;
 }
@@ -83,11 +82,9 @@ async function ensureBackendAwake() {
 // Initial preemptive wake trigger on page load
 (async () => {
   try {
-    const origin = new URL(API_URL).origin;
-    await fetch(`${origin}/`, { method: 'GET', mode: 'no-cors' });
-  } catch (e) {
-    // Ignore error
-  }
+    const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
+    await fetch(`${origin}/`, { method: 'GET' });
+  } catch (e) {}
 })();
 
 // ── Convert ─────────────────────────────────────────────────────
