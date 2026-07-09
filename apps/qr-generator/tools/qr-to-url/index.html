@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Decode QR codes from images. Fast, free, and completely private." />
+  <title>Scan / Decode QR · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    .result-text-area {
+      margin-top: 1.5rem;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: left;
+      display: none;
+    }
+    .result-text-area.visible {
+      display: block;
+    }
+    .result-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--c-rose);
+      margin-bottom: 0.75rem;
+    }
+    .decoded-content {
+      background: var(--c-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      color: var(--c-white);
+      font-family: monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+      white-space: pre-wrap;
+      margin-bottom: 1rem;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .btn-action-group {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .btn-action {
+      flex: 1;
+      background: var(--c-rose);
+      color: var(--c-bg);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: transform var(--tr), background var(--tr);
+    }
+    .btn-action:hover {
+      background: #f0c4c2;
+      transform: translateY(-1px);
+    }
+    .btn-action--secondary {
+      background: transparent;
+      border: 1px solid var(--c-border);
+      color: var(--c-white);
+    }
+    .btn-action--secondary:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--c-steel);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">QR Tools</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Decode QR</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">📷</span>
+    <h1 class="tool-hero__title">Scan / Decode <span>QR</span></h1>
+    <p class="tool-hero__subtitle">Upload an image of a QR code to extract its content instantly.</p>
+  </section>
+
+  <main class="workspace">
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload a QR code image">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select QR code image" />
+      <span class="dropzone__icon" aria-hidden="true">🖼️</span>
+      <p class="dropzone__title">Drop your QR Code image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span></p>
+    </div>
+
+    <div class="result-text-area" id="result-text-area">
+      <p class="result-title">Decoded Content</p>
+      <div class="decoded-content" id="decoded-content"></div>
+      <div class="btn-action-group">
+        <button class="btn-action" id="btn-copy">📋 Copy Content</button>
+        <a href="#" class="btn-action btn-action--secondary" id="btn-open-link" target="_blank" style="display: none;">🌐 Open Link</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed locally-first</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

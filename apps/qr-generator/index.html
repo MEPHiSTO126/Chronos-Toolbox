@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chronos QR Code Generator and Scanner — create QR codes for URLs, WiFi configurations, and contact cards, or scan images to read them. Fast, private, browser-based." />
+  <title>QR Generator & Scanner · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../home/index.html" class="logo" id="logo-home-link" aria-label="Back to Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../packages/images/tool-box.png" alt="" aria-hidden="true" width="28" height="28" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <div class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">QR Code Tools</span>
+      </div>
+      <a href="../home/index.html" class="btn-back" id="btn-all-tools">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        All Tools
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-icon" aria-hidden="true">
+      <img src="../../packages/images/qr-code.png" alt="QR Code" width="64" height="64" />
+    </div>
+    <h1 id="hero-heading" class="hero-title">
+      QR <span class="hero-title--accent">Generator</span>
+    </h1>
+    <p class="hero-subtitle">
+      Generate WiFi, vCard, Text, and URL QR codes, or scan and decode QR code images instantly. 100% private, processed in your browser.
+    </p>
+  </section>
+
+  <!-- Tools grid -->
+  <main class="tools-section" aria-label="Available QR tools">
+    <div class="tools-grid" id="tools-grid" role="list">
+
+      <!-- URL to QR -->
+      <a class="tool-card" href="tools/url-to-qr/index.html" role="listitem" id="card-url-to-qr">
+        <div class="tool-card__icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        </div>
+        <div class="tool-card__from-to">
+          <span class="badge badge--url">URL/TEXT</span>
+          <span class="arrow">→</span>
+          <span class="badge badge--qr">QR Code</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">URL / Text to QR</p>
+          <p class="tool-card__desc">Convert any URL, text string, or message into a high-quality QR code image.</p>
+        </div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- QR to URL -->
+      <a class="tool-card" href="tools/qr-to-url/index.html" role="listitem" id="card-qr-to-url">
+        <div class="tool-card__icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <rect x="7" y="7" width="3" height="3"/>
+            <rect x="14" y="7" width="3" height="3"/>
+            <rect x="7" y="14" width="3" height="3"/>
+            <rect x="14" y="14" width="3" height="3"/>
+          </svg>
+        </div>
+        <div class="tool-card__from-to">
+          <span class="badge badge--qr">QR Code</span>
+          <span class="arrow">→</span>
+          <span class="badge badge--url">URL/TEXT</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">Scan / Decode QR</p>
+          <p class="tool-card__desc">Upload an image of a QR code to read, copy, or open its embedded text or link.</p>
+        </div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- WiFi to QR -->
+      <a class="tool-card" href="tools/wifi-to-qr/index.html" role="listitem" id="card-wifi-to-qr">
+        <div class="tool-card__icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3" />
+          </svg>
+        </div>
+        <div class="tool-card__from-to">
+          <span class="badge badge--wifi">WiFi Config</span>
+          <span class="arrow">→</span>
+          <span class="badge badge--qr">QR Code</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">WiFi QR Generator</p>
+          <p class="tool-card__desc">Generate a QR code allowing guests to scan and connect directly to your wireless network.</p>
+        </div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- vCard to QR -->
+      <a class="tool-card" href="tools/vcard-to-qr/index.html" role="listitem" id="card-vcard-to-qr">
+        <div class="tool-card__icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <div class="tool-card__from-to">
+          <span class="badge badge--vcard">vCard</span>
+          <span class="arrow">→</span>
+          <span class="badge badge--qr">QR Code</span>
+        </div>
+        <div class="tool-card__body">
+          <p class="tool-card__title">vCard QR Generator</p>
+          <p class="tool-card__desc">Convert contact details (name, phone, email) into a QR code that scans into address books.</p>
+        </div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2026 Chronos Toolbox · Built with local-first performance and privacy in mind.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

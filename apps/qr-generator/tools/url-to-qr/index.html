@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Generate a QR code from any URL or text. Fast, free, and completely private." />
+  <title>URL / Text to QR · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    .input-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .input-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--c-silver);
+      margin-bottom: 0.5rem;
+    }
+    .text-input {
+      width: 100%;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      color: var(--c-white);
+      padding: 0.75rem 1rem;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      transition: border-color var(--tr);
+      resize: vertical;
+      min-height: 100px;
+    }
+    .text-input:focus {
+      outline: none;
+      border-color: var(--c-rose);
+    }
+    .btn-generate {
+      width: 100%;
+      background: var(--c-rose);
+      color: var(--c-bg);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.5rem;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--tr), background var(--tr);
+    }
+    .btn-generate:hover {
+      background: #f0c4c2;
+      transform: translateY(-1px);
+    }
+    .qr-preview-card {
+      margin-top: 2rem;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      display: none;
+    }
+    .qr-preview-card.visible {
+      display: block;
+    }
+    .qr-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      display: inline-block;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      margin-bottom: 1.5rem;
+    }
+    .qr-container canvas {
+      display: block;
+      max-width: 100%;
+    }
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--c-rose);
+      color: var(--c-bg);
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1.5rem;
+      transition: transform var(--tr);
+      font-size: 0.9rem;
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">QR Tools</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>URL to QR</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🔗</span>
+    <h1 class="tool-hero__title">URL / Text to <span>QR</span></h1>
+    <p class="tool-hero__subtitle">Convert links, plain text, or messages into a scannable QR Code.</p>
+  </section>
+
+  <main class="workspace">
+    <div class="options-panel">
+      <div class="input-group">
+        <label for="text-input" class="input-label">Enter URL or Plain Text</label>
+        <textarea id="text-input" class="text-input" placeholder="https://example.com or your custom text here..."></textarea>
+      </div>
+      <button class="btn-generate" id="btn-generate">Generate QR Code</button>
+    </div>
+
+    <div class="qr-preview-card" id="qr-preview-card">
+      <div class="qr-container" id="qr-container">
+        <!-- Canvas injected here -->
+      </div>
+      <div>
+        <a href="#" class="btn-download" id="btn-download" download="qrcode.png">
+          ⬇ Download PNG
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed locally-first</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
