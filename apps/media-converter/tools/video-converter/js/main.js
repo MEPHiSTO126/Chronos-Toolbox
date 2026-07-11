@@ -125,6 +125,7 @@ function resetState() {
 }
 
 // ── Wake-up Helper ──────────────────────────────────────────
+// Render free tier can take 60+ seconds to wake up
 async function ensureBackendAwake() {
   const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
   const progressText = document.getElementById('progress-text');
@@ -133,14 +134,13 @@ async function ensureBackendAwake() {
     progressText.textContent = 'Waking up the server (this may take up to a minute)...';
   }
 
-  for (let attempt = 1; attempt <= 15; attempt++) {
+  // Increased attempts and wait time for Render cold starts
+  for (let attempt = 1; attempt <= 30; attempt++) {
     try {
-      // Allow fetch to take as long as needed (no short abort timeout)
-      // Removed mode: 'no-cors' so we can accurately read the HTTP status
       const response = await fetch(`${origin}/`, { method: 'GET' });
       
       if (response.ok) {
-        if (progressText) progressText.textContent = 'Uploading and processing...';
+        if (progressText) progressText.textContent = 'Server ready. Uploading and processing...';
         return true;
       } else {
         console.warn(`Wake attempt ${attempt} returned status ${response.status}`);
@@ -148,7 +148,10 @@ async function ensureBackendAwake() {
     } catch (e) {
       console.warn(`Wake attempt ${attempt} failed:`, e);
     }
-    await new Promise(r => setTimeout(r, 3000));
+    
+    // Exponential backoff: 2s, 3s, 4s... up to max 10s
+    const waitTime = Math.min(2000 + attempt * 200, 10000);
+    await new Promise(r => setTimeout(r, waitTime));
   }
   return false;
 }

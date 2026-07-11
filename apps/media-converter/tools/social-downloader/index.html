@@ -110,6 +110,26 @@
         <button class="btn-primary" id="btn-submit" style="margin: 0; padding: 0 1.5rem; font-size: 0.9rem;">Download</button>
       </div>
       <p class="url-hint">Supports: YouTube, TikTok, Instagram, X (Twitter), Facebook, etc.</p>
+      <div id="platform-hint" style="font-size: 0.75rem; color: var(--clr-text-muted); margin-top: 0.75rem; display: none;"></div>
+      <p class="url-hint" style="font-size: 0.72rem; margin-top: 1rem; color: var(--c-steel);">
+        ⚠️ Facebook share links (<code>facebook.com/share/v/...</code>) may not work. Use direct video URLs (<code>facebook.com/watch/?v=ID</code>).
+        <br>Age-restricted, private, or login-required videos cannot be downloaded <strong>without cookies</strong>.
+      </p>
+      
+      <!-- Optional cookies for private/age-restricted videos -->
+      <details style="margin-top: 1.5rem; text-align: left; color: var(--c-silver); font-size: 0.8rem;">
+        <summary style="cursor: pointer; color: var(--c-rose); font-weight: 600;">🔐 Advanced: Provide cookies for private/age-restricted videos</summary>
+        <div style="margin-top: 0.75rem; padding: 1rem; background: var(--clr-surface-2); border-radius: var(--radius-sm); border: 1px solid var(--clr-border);">
+          <label style="display: block; margin-bottom: 0.5rem; font-size: 0.75rem;">Paste Netscape-format cookies.txt (export from browser extension):</label>
+          <textarea id="cookies-input" class="url-input" style="width: 100%; min-height: 80px; resize: vertical; font-family: monospace; font-size: 0.7rem; padding: 0.5rem;" placeholder="# Netscape HTTP Cookie File
+.example.com	TRUE	/	FALSE	0	sessionid	abc123
+.example.com	TRUE	/	FALSE	0	csrftoken	xyz789"></textarea>
+          <p style="font-size: 0.65rem; color: var(--clr-text-muted); margin-top: 0.5rem;">
+            Get cookies via browser extension like "Get cookies.txt LOCALLY" or "EditThisCookie". 
+            <strong>Never share cookies publicly.</strong> Cookies are only sent to backend for this download.
+          </p>
+        </div>
+      </details>
     </div>
 
     <!-- Progress Wrap -->
