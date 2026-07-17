@@ -240,14 +240,20 @@ btnSubmit.addEventListener('click', async () => {
   } catch (err) {
     console.error(err);
     let msg = err.message || 'Failed to download video.';
-    // Clean up common error messages
     if (msg.includes('Network error')) {
       msg = 'Network error. Check your connection or try again.';
     } else if (msg.includes('did not wake up')) {
       msg = 'Server is taking too long to wake up. Please try again in a minute.';
     } else if (msg.includes('timeout') || msg.includes('timed out')) {
       msg = 'Download timed out. Video may be too large or connection too slow.';
-    }
+    } else if (msg.includes('Sign in to confirm') || msg.includes('bot')) {
+      msg = 'YouTube requires authentication. Paste your YouTube cookies in the Cookies field below, then try again.';
+    } else if (msg.includes('Private video') || msg.includes('private')) {
+      msg = 'This video is private. Cannot download private videos.';
+    } else if (msg.includes('Video unavailable') || msg.includes('unavailable')) {
+      msg = 'This video is unavailable or has been removed.';
+    } else if (msg.includes('age-restricted') || msg.includes('age')) {
+      msg = 'This video is age-restricted. Provide cookies for authentication.';
     showToast(msg, true);
     clearInterval(progressInterval);
     progressWrap.classList.remove('visible');
