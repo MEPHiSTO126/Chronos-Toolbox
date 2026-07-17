@@ -254,6 +254,7 @@ btnSubmit.addEventListener('click', async () => {
       msg = 'This video is unavailable or has been removed.';
     } else if (msg.includes('age-restricted') || msg.includes('age')) {
       msg = 'This video is age-restricted. Provide cookies for authentication.';
+    }
     showToast(msg, true);
     clearInterval(progressInterval);
     progressWrap.classList.remove('visible');
