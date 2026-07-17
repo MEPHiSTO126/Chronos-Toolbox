@@ -252,8 +252,8 @@ btnSubmit.addEventListener('click', async () => {
       msg = 'This video is private. Cannot download private videos.';
     } else if (msg.includes('Video unavailable') || msg.includes('unavailable')) {
       msg = 'This video is unavailable or has been removed.';
-    } else if (msg.includes('age-restricted') || msg.includes('age')) {
-      msg = 'This video is age-restricted. Provide cookies for authentication.';
+    } else if (msg.includes('age-restricted') || msg.includes('age') || msg.includes('comfortable for some audiences')) {
+      msg = 'This video is age-restricted. Paste platform cookies in the Cookies field below, then try again.';
     }
     showToast(msg, true);
     clearInterval(progressInterval);
