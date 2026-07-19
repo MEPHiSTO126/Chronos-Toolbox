@@ -14,8 +14,32 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   display: none;
+}
+
+/* Custom scrollbar */
+.search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--c-rose, #FF7E9F), var(--c-violet, #A27BFF));
+  border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF9DB5, #B89AFF);
+}
+
+.search-results {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-rose, #FF7E9F) rgba(255,255,255,0.05);
 }
 
 .search-results.visible {

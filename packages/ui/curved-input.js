@@ -170,9 +170,19 @@ const CurvedInput = (() => {
     }
 
     init() {
+      this.measureButtonText();
       this.render();
       this.bindEvents();
       this.updateWidth();
+    }
+
+    measureButtonText() {
+      const opts = this.options;
+      if (!opts.showButton) return;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = `600 ${opts.fontSize}px ${getComputedStyle(document.body).fontFamily || 'Outfit, sans-serif'}`;
+      this.btnTextW = ctx.measureText(opts.buttonText).width;
     }
 
     render() {

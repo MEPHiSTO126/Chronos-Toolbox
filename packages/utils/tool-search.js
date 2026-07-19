@@ -78,6 +78,8 @@ const ToolSearch = (() => {
       showButton: true,
       showIcon: true,
       type: 'search',
+      buttonColor: options.buttonColor,
+      borderColor: options.borderColor,
       onSubmit: (value) => {
         if (value.trim()) {
           const results = FuzzySearch.searchTools(value, tools);
@@ -91,7 +93,8 @@ const ToolSearch = (() => {
     const searchResults = new SearchResults(`#${containerId}`, {
       onSelect: (result) => {
         window.location.href = result.url;
-      }
+      },
+      highlightColor: options.buttonColor
     });
 
     const inputEl = searchContainer.querySelector('input');

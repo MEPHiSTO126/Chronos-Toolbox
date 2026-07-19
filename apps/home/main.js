@@ -19,6 +19,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize search with all tools
   ToolSearch.initSearch('curved-search', ToolSearch.allTools, {
-    placeholder: 'Search all tools...'
+    placeholder: 'Search all tools...',
+    buttonColor: '#00F0FF'
   });
 });

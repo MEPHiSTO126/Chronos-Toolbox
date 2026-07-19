@@ -14,6 +14,7 @@ const SearchResults = (() => {
       this.options = {
         onSelect: null,
         maxResults: 8,
+        highlightColor: null,
         ...options
       };
 
@@ -78,8 +79,9 @@ const SearchResults = (() => {
       if (!query) return this.escapeHtml(text);
       
       const escaped = this.escapeHtml(text);
+      const color = this.options.highlightColor || 'var(--c-rose, #FF7E9F)';
       const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      return escaped.replace(regex, '<strong style="color: var(--c-rose, #FF7E9F);">$1</strong>');
+      return escaped.replace(regex, `<strong style="color: ${color};">$1</strong>`);
     }
 
     escapeHtml(text) {
