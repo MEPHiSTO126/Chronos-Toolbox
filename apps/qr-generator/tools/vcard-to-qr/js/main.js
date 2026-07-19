@@ -1,3 +1,21 @@
+function showToast(message, isError = false) {
+  const existingToast = document.querySelector('.ct-toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  toast.offsetHeight;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 3500);
+  }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const firstNameInput = document.getElementById('first-name');
   const lastNameInput = document.getElementById('last-name');
@@ -21,12 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const website = websiteInput.value.trim();
 
     if (!firstName || !lastName) {
-      alert('Please enter both First and Last Name.');
+      showToast('Please enter both First and Last Name.', true);
       return;
     }
 
     if (!phone) {
-      alert('Please enter a Phone Number.');
+      showToast('Please enter a Phone Number.', true);
       return;
     }
 
@@ -79,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, (error) => {
       if (error) {
         console.error(error);
-        alert('Failed to generate vCard QR code.');
+        showToast('Failed to generate vCard QR code.', true);
         return;
       }
 

@@ -1,3 +1,21 @@
+function showToast(message, isError = false) {
+  const existingToast = document.querySelector('.ct-toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  toast.offsetHeight;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 3500);
+  }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const textInput = document.getElementById('text-input');
   const btnGenerate = document.getElementById('btn-generate');
@@ -8,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnGenerate.addEventListener('click', () => {
     const text = textInput.value.trim();
     if (!text) {
-      alert('Please enter some text or a URL.');
+      showToast('Please enter some text or a URL.', true);
       return;
     }
 
@@ -30,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, (error) => {
       if (error) {
         console.error(error);
-        alert('Failed to generate QR code.');
+        showToast('Failed to generate QR code.', true);
         return;
       }
 

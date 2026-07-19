@@ -1,3 +1,21 @@
+function showToast(message, isError = false) {
+  const existingToast = document.querySelector('.ct-toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  toast.offsetHeight;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 3500);
+  }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('file-input');
@@ -42,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function processFile(file) {
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file.');
+      showToast('Please upload an image file.', true);
       return;
     }
 
@@ -64,11 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
           if (code) {
             displayResult(code.data);
           } else {
-            alert('Could not find a valid QR Code in this image. Please make sure the QR code is clear and well-lit.');
+            showToast('Could not find a valid QR Code in this image. Please make sure the QR code is clear and well-lit.', true);
           }
         } catch (err) {
           console.error(err);
-          alert('Error processing image data.');
+          showToast('Error processing image data.', true);
         }
       };
       img.src = event.target.result;

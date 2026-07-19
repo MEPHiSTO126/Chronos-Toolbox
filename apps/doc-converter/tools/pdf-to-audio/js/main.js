@@ -8,10 +8,6 @@ const state = {
   currentPage: 0,
   isPlaying: false,
   utterance: null,
-  mediaRecorder: null,
-  audioChunks: [],
-  audioContext: null,
-  destination: null,
 };
 
 const dropzone    = document.getElementById('dropzone');
@@ -31,10 +27,8 @@ const btnPrev     = document.getElementById('btn-prev');
 const btnNext     = document.getElementById('btn-next');
 const btnNextFile = document.getElementById('btn-next-file');
 const btnNewFile  = document.getElementById('btn-new-file');
-const btnExport   = document.getElementById('btn-export');
 const voiceSelect = document.getElementById('opt-voice');
 const speedSelect = document.getElementById('opt-speed');
-const exportFormatSelect = document.getElementById('opt-export-format');
 
 // ── Voices ───────────────────────────────────────────────────────
 function populateVoices() {
@@ -55,73 +49,6 @@ function getVoice() {
   return voices[indices[+voiceSelect.value]] || voices[0] || null;
 }
 
-// ── Audio Export Setup ───────────────────────────────────────────
-async function setupAudioCapture() {
-  if (state.mediaRecorder && state.mediaRecorder.state === 'recording') return true;
-  
-  state.audioChunks = [];
-  
-  try {
-    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Create a destination for capturing audio
-    state.destination = state.audioContext.createMediaStreamDestination();
-    
-    // Determine mime type
-    const format = exportFormatSelect.value;
-    let mimeType = 'audio/wav';
-    if (format === 'mp3' && MediaRecorder.isTypeSupported('audio/mp3')) {
-      mimeType = 'audio/mp3';
-    } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-      mimeType = 'audio/webm';
-    } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
-      mimeType = 'audio/ogg';
-    }
-    
-    state.mediaRecorder = new MediaRecorder(state.destination.stream, { mimeType });
-    
-    state.mediaRecorder.ondataavailable = e => {
-      if (e.data.size > 0) state.audioChunks.push(e.data);
-    };
-    
-    state.mediaRecorder.onstop = () => {
-      const blob = new Blob(state.audioChunks, { type: mimeType });
-      downloadAudioBlob(blob, format);
-    };
-    
-    state.mediaRecorder.start(100); // Collect data every 100ms
-    return true;
-  } catch (e) {
-    console.error('Audio capture setup failed:', e);
-    toast('Audio export not supported in this browser. Use WAV format.', true);
-    return false;
-  }
-}
-
-function stopAudioCapture() {
-  if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
-    state.mediaRecorder.stop();
-  }
-  if (state.audioContext) {
-    state.audioContext.close();
-    state.audioContext = null;
-  }
-  state.mediaRecorder = null;
-  state.destination = null;
-}
-
-function downloadAudioBlob(blob, format) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const fname = state.queue[state.queueIdx] 
-    ? state.queue[state.queueIdx].name.replace(/\.pdf$/i, `.${format === 'wav' ? 'wav' : 'mp3'}`)
-    : `audio.${format === 'wav' ? 'wav' : 'mp3'}`;
-  a.href = url;
-  a.download = fname;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 // ── File loading ─────────────────────────────────────────────────
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
@@ -139,35 +66,41 @@ async function loadFileAtIndex(idx) {
   const file = state.queue[idx];
   if (!file) return;
   stopSpeech();
-  stopAudioCapture();
   state.pages = []; state.currentPage = 0;
   dropzone.style.display = 'none';
   playerArea.style.display = 'none';
   extractWrap.classList.add('visible');
 
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const total = pdf.numPages;
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    const total = pdf.numPages;
 
-  for (let i = 1; i <= total; i++) {
-    setExtractProgress(Math.round((i / total) * 100), `Extracting page ${i} of ${total} — ${file.name}`);
-    const page    = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    
-    // Improved text extraction - group items by Y position to preserve paragraphs
-    const items = content.items;
-    const paragraphs = groupTextItems(items);
-    const pageText = paragraphs.join('\n\n').trim() || '[No readable text on this page]';
-    
-    state.pages.push(pageText);
-    await sleep(2);
+    for (let i = 1; i <= total; i++) {
+      setExtractProgress(Math.round((i / total) * 100), `Extracting page ${i} of ${total} — ${file.name}`);
+      const page    = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      
+      // Improved text extraction - group items by Y position to preserve paragraphs
+      const items = content.items;
+      const paragraphs = groupTextItems(items);
+      const pageText = paragraphs.join('\n\n').trim() || '[No readable text on this page]';
+      
+      state.pages.push(pageText);
+      await sleep(2);
+    }
+
+    extractWrap.classList.remove('visible');
+    playerTitle.textContent = file.name;
+    state.currentPage = 0;
+    updateUI();
+    playerArea.style.display = 'block';
+  } catch (err) {
+    console.error('PDF extraction failed:', err);
+    extractWrap.classList.remove('visible');
+    dropzone.style.display = 'block';
+    toast('Failed to load PDF: ' + err.message, true);
   }
-
-  extractWrap.classList.remove('visible');
-  playerTitle.textContent = file.name;
-  state.currentPage = 0;
-  updateUI();
-  playerArea.style.display = 'block';
 }
 
 function groupTextItems(items) {
@@ -245,69 +178,9 @@ btnStop.addEventListener('click',     () => stopSpeech());
 btnPrev.addEventListener('click',     () => { if (state.currentPage > 0) { stopSpeech(); state.currentPage--; updateUI(); } });
 btnNext.addEventListener('click',     () => { if (state.currentPage < state.pages.length - 1) { stopSpeech(); state.currentPage++; updateUI(); } });
 btnNextFile.addEventListener('click', () => advanceQueue());
-btnNewFile.addEventListener('click',  () => { stopSpeech(); stopAudioCapture(); fileInput.value=''; playerArea.style.display='none'; dropzone.style.display='block'; });
-btnExport.addEventListener('click',   () => exportAudio());
+btnNewFile.addEventListener('click',  () => { stopSpeech(); fileInput.value=''; playerArea.style.display='none'; dropzone.style.display='block'; });
 speedSelect.addEventListener('change',() => { if (state.isPlaying) { stopSpeech(); playCurrent(); } });
 voiceSelect.addEventListener('change',() => { if (state.isPlaying) { stopSpeech(); playCurrent(); } });
-
-async function exportAudio() {
-  if (!state.pages.length) {
-    toast('No text to export.', true);
-    return;
-  }
-  
-  const format = exportFormatSelect.value;
-  const success = await setupAudioCapture();
-  if (!success) return;
-  
-  btnExport.textContent = '⏺ Recording...';
-  btnExport.disabled = true;
-  
-  // Speak all pages and capture
-  state.isPlaying = true;
-  state.currentPage = 0;
-  await speakAllPagesForExport();
-}
-
-async function speakAllPagesForExport() {
-  if (state.currentPage >= state.pages.length) {
-    stopSpeech();
-    stopAudioCapture();
-    btnExport.textContent = '⬇ Export Audio';
-    btnExport.disabled = false;
-    state.isPlaying = false;
-    updateUI();
-    return;
-  }
-  
-  const text = state.pages[state.currentPage];
-  if (!text || text === '[No readable text on this page]') {
-    state.currentPage++;
-    await speakAllPagesForExport();
-    return;
-  }
-  
-  state.utterance = new SpeechSynthesisUtterance(text);
-  state.utterance.rate  = parseFloat(speedSelect.value);
-  state.utterance.voice = getVoice();
-  state.utterance.onend = () => {
-    state.currentPage++;
-    speakAllPagesForExport();
-  };
-  state.utterance.onerror = () => {
-    state.currentPage++;
-    speakAllPagesForExport();
-  };
-  
-  // Connect utterance to audio capture if recording
-  if (state.destination && state.audioContext) {
-    // Note: Web Speech API doesn't directly support MediaStream output
-    // We'll use a workaround: play through audio element and capture
-  }
-  
-  speechSynthesis.speak(state.utterance);
-  updateUI();
-}
 
 function playCurrent() {
   const text = state.pages[state.currentPage];
@@ -330,7 +203,7 @@ function playCurrent() {
 
 function pauseSpeech()  { speechSynthesis.pause(); state.isPlaying = false; updateUI(); }
 function stopSpeech()   { speechSynthesis.cancel(); state.isPlaying = false; state.utterance = null; updateUI(); }
-function advanceQueue() { stopSpeech(); stopAudioCapture(); state.queueIdx++; loadFileAtIndex(state.queueIdx); }
+function advanceQueue() { stopSpeech(); state.queueIdx++; loadFileAtIndex(state.queueIdx); }
 
 function updateUI() {
   const n = state.pages.length; const i = state.currentPage;

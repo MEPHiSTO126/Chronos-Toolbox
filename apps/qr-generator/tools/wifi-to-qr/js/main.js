@@ -1,3 +1,21 @@
+function showToast(message, isError = false) {
+  const existingToast = document.querySelector('.ct-toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  toast.offsetHeight;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 3500);
+  }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const ssidInput = document.getElementById('ssid-input');
   const passwordInput = document.getElementById('password-input');
@@ -27,12 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHidden = hiddenInput.checked;
 
     if (!ssid) {
-      alert('Please enter your network name (SSID).');
+      showToast('Please enter your network name (SSID).', true);
       return;
     }
 
     if (encryption !== 'nopass' && !password) {
-      alert('Please enter the password for your secured network.');
+      showToast('Please enter the password for your secured network.', true);
       return;
     }
 
@@ -72,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, (error) => {
       if (error) {
         console.error(error);
-        alert('Failed to generate WiFi QR code.');
+        showToast('Failed to generate WiFi QR code.', true);
         return;
       }
 

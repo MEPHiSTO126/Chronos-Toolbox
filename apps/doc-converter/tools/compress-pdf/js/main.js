@@ -26,16 +26,31 @@ dropzone.addEventListener('drop', e => {
 });
 fileInput.addEventListener('change', () => addFiles([...fileInput.files]));
 
+function validateFiles(files, acceptedExtensions) {
+  const valid = [];
+  const rejected = [];
+  for (const f of files) {
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    if (acceptedExtensions.includes(ext)) {
+      valid.push(f);
+    } else {
+      rejected.push(f.name);
+    }
+  }
+  if (rejected.length > 0) {
+    toast(`Rejected: ${rejected.join(', ')}. Only ${acceptedExtensions.join(', ')} files are supported.`, true);
+  }
+  return valid;
+}
+
 function addFiles(files) {
   if (!files.length) return;
-  selectedFiles = files;
+  const validFiles = validateFiles(files, ['.pdf']);
+  if (!validFiles.length) return;
+  selectedFiles = validFiles;
   dropzone.style.display = 'none';
   actionBar.style.display = 'flex';
-  const pdfCount = files.filter(f => f.name.toLowerCase().endsWith('.pdf')).length;
-  const otherCount = files.length - pdfCount;
-  let label = `${files.length} file${files.length !== 1 ? 's' : ''} selected`;
-  if (otherCount > 0) label += ` · ${otherCount} non-PDF will be skipped or returned as-is`;
-  fileInfo.textContent = label;
+  fileInfo.textContent = `${validFiles.length} file${validFiles.length !== 1 ? 's' : ''} selected`;
 }
 
 btnAgain.addEventListener('click', reset);
@@ -52,28 +67,26 @@ function reset() {
 // Wake-up Helper
 async function ensureBackendAwake() {
   const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
-  const progressText = document.getElementById('progress-text');
+  const pText = document.getElementById('progress-text');
   
-  if (progressText) {
-    progressText.textContent = 'Waking up the server (this may take up to a minute)...';
+  if (pText) {
+    pText.textContent = 'Waking up the server (this may take up to a minute)...';
   }
 
-  for (let attempt = 1; attempt <= 15; attempt++) {
+  for (let attempt = 1; attempt <= 30; attempt++) {
     try {
-      // Allow fetch to take as long as needed (no short abort timeout)
-      // Removed mode: 'no-cors' so we can accurately read the HTTP status
       const response = await fetch(`${origin}/`, { method: 'GET' });
       
       if (response.ok) {
-        if (progressText) progressText.textContent = 'Uploading and processing...';
+        if (pText) pText.textContent = 'Server ready. Starting conversion...';
         return true;
-      } else {
-        console.warn(`Wake attempt ${attempt} returned status ${response.status}`);
       }
     } catch (e) {
       console.warn(`Wake attempt ${attempt} failed:`, e);
     }
-    await new Promise(r => setTimeout(r, 3000));
+    
+    const waitTime = Math.min(2000 + attempt * 200, 10000);
+    await new Promise(r => setTimeout(r, waitTime));
   }
   return false;
 }
