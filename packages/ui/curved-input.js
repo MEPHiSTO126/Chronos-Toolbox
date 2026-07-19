@@ -252,8 +252,9 @@ const CurvedInput = (() => {
       const btnFgColor = opts.buttonTextColor ?? palette.buttonTextColor;
       const shColor = opts.shadowColor ?? palette.shadowColor;
 
+      const actualW = this.w || opts.width;
       const pad = Math.ceil(opts.borderWidth / 2) + 6;
-      const geom = buildGeometry(this.w || opts.width, opts.bend, opts.height, pad);
+      const geom = buildGeometry(actualW, opts.bend, opts.height, pad);
       
       const T = opts.height;
       const vBase = opts.fontSize * 0.34;
@@ -278,6 +279,10 @@ const CurvedInput = (() => {
       const svgStyle = shadow
         ? `filter: drop-shadow(0 ${shadow[0]}px ${shadow[1]}px ${hexToRgba(shColor, shadow[2])})`
         : '';
+
+      // Update SVG viewBox to match actual width
+      this.svg.setAttribute('width', actualW);
+      this.svg.setAttribute('viewBox', `0 0 ${actualW} ${opts.height}`);
 
       let svgContent = `
         <defs>
