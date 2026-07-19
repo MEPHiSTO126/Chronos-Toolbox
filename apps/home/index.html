@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../packages/ui/curved-input.css" />
+  <link rel="stylesheet" href="../../packages/ui/search-results.css" />
 </head>
 <body>
 
@@ -57,6 +59,12 @@
     <p class="hero-sub">
       A growing suite of clean, fast, browser-based utilities. No sign-ups. No installs. Just tools that work.
     </p>
+    
+    <!-- Search Bar -->
+    <div class="search-container" id="search-container">
+      <div id="curved-search"></div>
+    </div>
+
     <a href="#tools" class="hero-cta" id="explore-tools-btn">
       Browse tools
       <span class="arrow-pair" aria-hidden="true">
@@ -200,6 +208,10 @@
   </footer>
 
   <script src="../../packages/utils/bouncing-balls.js"></script>
+  <script src="../../packages/ui/curved-input.js"></script>
+  <script src="../../packages/utils/fuzzy-search.js"></script>
+  <script src="../../packages/ui/search-results.js"></script>
+  <script src="../../packages/utils/tool-search.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

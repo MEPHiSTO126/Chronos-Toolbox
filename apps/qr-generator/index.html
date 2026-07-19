@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../packages/ui/curved-input.css" />
+  <link rel="stylesheet" href="../../packages/ui/search-results.css" />
 </head>
 <body>
 
@@ -45,6 +47,11 @@
     <p class="hero-subtitle">
       Generate WiFi, vCard, Text, and URL QR codes, or scan and decode QR code images instantly. 100% private, processed in your browser.
     </p>
+    
+    <!-- Search Bar -->
+    <div class="search-container" id="search-container">
+      <div id="curved-search"></div>
+    </div>
   </section>
 
   <!-- Tools grid -->
@@ -147,5 +154,19 @@
     </div>
   </footer>
 
+  <script src="../../packages/utils/bouncing-balls.js"></script>
+  <script src="../../packages/ui/curved-input.js"></script>
+  <script src="../../packages/utils/fuzzy-search.js"></script>
+  <script src="../../packages/ui/search-results.js"></script>
+  <script src="../../packages/utils/tool-search.js"></script>
+  <script>
+    // QR Generator search initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      const qrTools = ToolSearch.getToolsByCategory('QR Generator');
+      ToolSearch.initSearch('curved-search', qrTools, {
+        placeholder: 'Search QR tools...'
+      });
+    });
+  </script>
 </body>
 </html>

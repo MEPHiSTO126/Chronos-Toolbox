@@ -71,6 +71,13 @@ async function ensureBackendAwake() {
 
 btnConvert.addEventListener('click', async () => {
   if (!selectedFiles.length) return;
+
+  const invalid = selectedFiles.filter(f => !/\.(ppt|pptx)$/i.test(f.name));
+  if (invalid.length) {
+    showToast(`${invalid.length} file${invalid.length !== 1 ? 's' : ''} not a PowerPoint file — only .ppt / .pptx accepted`, 'error');
+    return;
+  }
+
   actionBar.style.display = 'none';
   progressWrap.classList.add('visible');
 
@@ -166,7 +173,8 @@ async function doFetchWithProgress(url, options, onProgress) {
         status: xhr.status,
         text: async () => await xhr.response.text(),
         json: async () => JSON.parse(await xhr.response.text()),
-        blob: async () => xhr.response
+        blob: async () => xhr.response,
+        headers: { get: (name) => xhr.getResponseHeader(name) }
       };
       resolve(response);
     };

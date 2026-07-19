@@ -172,6 +172,16 @@ body::before {
 }
 .hero-cta:hover .arrow-pair { gap: 4px; }
 
+/* ── Search Container ─────────────────────────────────────── */
+.search-container {
+  position: relative;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* ── Tools section ────────────────────────────────────────── */
 .tools-section {
   position: relative; z-index: 1;

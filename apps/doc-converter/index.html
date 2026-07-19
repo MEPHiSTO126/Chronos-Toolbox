@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../packages/ui/curved-input.css" />
+  <link rel="stylesheet" href="../../packages/ui/search-results.css" />
 </head>
 <body>
 
@@ -51,6 +53,11 @@
       <button class="filter-btn"        data-filter="convert"  role="tab" aria-selected="false" id="filter-convert">Conversions</button>
       <button class="filter-btn"        data-filter="compress" role="tab" aria-selected="false" id="filter-compress">Compression</button>
       <button class="filter-btn"        data-filter="image"    role="tab" aria-selected="false" id="filter-image">Image → Doc</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-container" id="search-container">
+      <div id="curved-search"></div>
     </div>
   </section>
 
@@ -170,6 +177,14 @@
         <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
       </a>
 
+      <!-- Text Translator -->
+      <a class="tool-card tool-card--featured" href="tools/text-translator/index.html" data-category="convert" role="listitem" id="card-text-translator">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--word">Text</span><span class="arrow">⇄</span><span class="badge badge--img">50+ Langs</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Text Translator <span class="tag-new">New</span></p><p class="tool-card__desc">Translate text between 50+ languages instantly. Free, open source, and private.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
     </div>
   </main>
 
@@ -179,6 +194,19 @@
   </footer>
 
   <script src="../../packages/utils/bouncing-balls.js"></script>
+  <script src="../../packages/ui/curved-input.js"></script>
+  <script src="../../packages/utils/fuzzy-search.js"></script>
+  <script src="../../packages/ui/search-results.js"></script>
+  <script src="../../packages/utils/tool-search.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    // Doc Converter search initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      const docTools = ToolSearch.getToolsByCategory('Doc Converter');
+      ToolSearch.initSearch('curved-search', docTools, {
+        placeholder: 'Search doc tools...'
+      });
+    });
+  </script>
 </body>
 </html>

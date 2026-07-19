@@ -14,3 +14,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
+
+// ── Search Functionality ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize search with all tools
+  ToolSearch.initSearch('curved-search', ToolSearch.allTools, {
+    placeholder: 'Search all tools...'
+  });
+});

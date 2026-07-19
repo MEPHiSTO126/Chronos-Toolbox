@@ -1,0 +1,110 @@
+/* ============================================================
+   CHRONOS TOOLBOX — Search Results Dropdown
+   ============================================================ */
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--c-surface, #1A1116);
+  border: 1px solid var(--c-border, #3C2232);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.search-results.visible {
+  display: block;
+  animation: fadeUp 0.2s ease;
+}
+
+.search-results__empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--c-steel, #8E6B81);
+  font-size: 0.9rem;
+}
+
+.search-results__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--c-border, #3C2232);
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-results__item:last-child {
+  border-bottom: none;
+}
+
+.search-results__item:hover {
+  background: rgba(255,126,159,0.05);
+}
+
+.search-results__item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--c-raised, #261821);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.search-results__item-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.search-results__item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-results__item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--c-white, #F7F2F5);
+  margin-bottom: 0.15rem;
+}
+
+.search-results__item-desc {
+  font-size: 0.78rem;
+  color: var(--c-steel, #8E6B81);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-results__item-category {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--c-rose, #FF7E9F);
+  background: rgba(255,126,159,0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  flex-shrink: 0;
+}
+
+.search-results__item-arrow {
+  color: var(--c-steel, #8E6B81);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

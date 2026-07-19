@@ -1,6 +1,10 @@
 'use strict';
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+const API_URL = typeof window.TOOLBOX_API !== 'undefined' 
+  ? window.TOOLBOX_API 
+  : 'https://toolbox-backend-76dc.onrender.com';
+
 const state = {
   queue: [],           // array of File objects
   queueIdx: 0,         // which file we're on
@@ -8,6 +12,9 @@ const state = {
   currentPage: 0,
   isPlaying: false,
   utterance: null,
+  useEdgeTTS: false,   // Toggle between browser TTS and Edge TTS
+  edgeVoices: [],      // Available Edge TTS voices
+  audioElement: null,  // For Edge TTS audio playback
 };
 
 const dropzone    = document.getElementById('dropzone');
@@ -29,6 +36,7 @@ const btnNextFile = document.getElementById('btn-next-file');
 const btnNewFile  = document.getElementById('btn-new-file');
 const voiceSelect = document.getElementById('opt-voice');
 const speedSelect = document.getElementById('opt-speed');
+const ttsModeSelect = document.getElementById('tts-mode');
 
 // ── Voices ───────────────────────────────────────────────────────
 function populateVoices() {
@@ -42,11 +50,44 @@ function populateVoices() {
 }
 speechSynthesis.addEventListener('voiceschanged', populateVoices);
 populateVoices();
+loadEdgeVoices();
 
 function getVoice() {
   const voices = speechSynthesis.getVoices();
   const indices = JSON.parse(voiceSelect.dataset.voiceIndices || '[]');
   return voices[indices[+voiceSelect.value]] || voices[0] || null;
+}
+
+// ── Edge TTS Voices ─────────────────────────────────────────────
+async function loadEdgeVoices() {
+  try {
+    const response = await fetch(`${API_URL}/media/tts-voices`);
+    if (!response.ok) throw new Error('Failed to load voices');
+    const data = await response.json();
+    state.edgeVoices = data.voices || [];
+  } catch (err) {
+    console.warn('Could not load Edge TTS voices:', err);
+    state.edgeVoices = [];
+  }
+}
+
+function populateEdgeVoices() {
+  if (!state.edgeVoices.length) return;
+  voiceSelect.innerHTML = state.edgeVoices.map((v, i) => 
+    `<option value="${i}">${v.name} (${v.gender})</option>`
+  ).join('');
+}
+
+// ── TTS Mode Toggle ──────────────────────────────────────────────
+if (ttsModeSelect) {
+  ttsModeSelect.addEventListener('change', () => {
+    state.useEdgeTTS = ttsModeSelect.value === 'edge';
+    if (state.useEdgeTTS) {
+      populateEdgeVoices();
+    } else {
+      populateVoices();
+    }
+  });
 }
 
 // ── File loading ─────────────────────────────────────────────────
@@ -185,6 +226,15 @@ voiceSelect.addEventListener('change',() => { if (state.isPlaying) { stopSpeech(
 function playCurrent() {
   const text = state.pages[state.currentPage];
   if (!text) return;
+  
+  if (state.useEdgeTTS) {
+    playWithEdgeTTS(text);
+  } else {
+    playWithBrowserTTS(text);
+  }
+}
+
+function playWithBrowserTTS(text) {
   state.utterance = new SpeechSynthesisUtterance(text);
   state.utterance.rate  = parseFloat(speedSelect.value);
   state.utterance.voice = getVoice();
@@ -201,8 +251,83 @@ function playCurrent() {
   state.isPlaying = true; updateUI();
 }
 
-function pauseSpeech()  { speechSynthesis.pause(); state.isPlaying = false; updateUI(); }
-function stopSpeech()   { speechSynthesis.cancel(); state.isPlaying = false; state.utterance = null; updateUI(); }
+async function playWithEdgeTTS(text) {
+  try {
+    // Stop any current playback
+    if (state.audioElement) {
+      state.audioElement.pause();
+      state.audioElement = null;
+    }
+    
+    const voice = state.edgeVoices[+voiceSelect.value];
+    const voiceName = voice ? voice.id : 'en-US-AriaNeural';
+    const rate = speedSelect.value >= 1.5 ? '+50%' : speedSelect.value >= 1.2 ? '+20%' : '+0%';
+    
+    // Show loading state
+    btnPlay.textContent = '⏳';
+    playerInfo.textContent = 'Generating audio...';
+    
+    const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`);
+    
+    if (!response.ok) {
+      throw new Error('TTS request failed');
+    }
+    
+    const blob = await response.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    
+    state.audioElement = new Audio(audioUrl);
+    state.audioElement.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+      if (state.currentPage < state.pages.length - 1) {
+        state.currentPage++; updateUI(); playCurrent();
+      } else {
+        state.isPlaying = false; updateUI();
+        if (state.queueIdx < state.queue.length - 1) advanceQueue();
+      }
+    };
+    state.audioElement.onerror = () => {
+      URL.revokeObjectURL(audioUrl);
+      state.isPlaying = false; updateUI();
+      toast('Audio playback failed', true);
+    };
+    
+    await state.audioElement.play();
+    state.isPlaying = true; updateUI();
+    
+  } catch (err) {
+    console.error('Edge TTS error:', err);
+    toast('Edge TTS failed, falling back to browser TTS', true);
+    // Fallback to browser TTS
+    state.useEdgeTTS = false;
+    if (ttsModeSelect) ttsModeSelect.value = 'browser';
+    playWithBrowserTTS(text);
+  }
+}
+
+function pauseSpeech() {
+  if (state.useEdgeTTS && state.audioElement) {
+    state.audioElement.pause();
+  } else {
+    speechSynthesis.pause();
+  }
+  state.isPlaying = false; 
+  updateUI();
+}
+
+function stopSpeech() {
+  if (state.useEdgeTTS && state.audioElement) {
+    state.audioElement.pause();
+    state.audioElement.currentTime = 0;
+    state.audioElement = null;
+  } else {
+    speechSynthesis.cancel();
+  }
+  state.isPlaying = false; 
+  state.utterance = null; 
+  updateUI();
+}
+
 function advanceQueue() { stopSpeech(); state.queueIdx++; loadFileAtIndex(state.queueIdx); }
 
 function updateUI() {

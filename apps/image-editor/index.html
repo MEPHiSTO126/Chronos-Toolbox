@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../packages/ui/curved-input.css" />
+  <link rel="stylesheet" href="../../packages/ui/search-results.css" />
 </head>
 <body>
 
@@ -51,6 +53,11 @@
       <button class="filter-btn"        data-filter="edit"      role="tab" aria-selected="false" id="filter-edit">Edit & Adjust</button>
       <button class="filter-btn"        data-filter="decorate"  role="tab" aria-selected="false" id="filter-decorate">Enhance & Decorate</button>
     </div>
+    
+    <!-- Search Bar -->
+    <div class="search-container" id="search-container">
+      <div id="curved-search"></div>
+    </div>
   </section>
 
   <!-- Tools grid -->
@@ -71,6 +78,14 @@
         <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="tool-card__from-to"><span class="badge badge--heic">HEIC</span><span class="arrow">→</span><span class="badge badge--img">JPG</span></div>
         <div class="tool-card__body"><p class="tool-card__title">HEIC to JPG</p><p class="tool-card__desc">Convert Apple HEIC/HEIF photos from your iPhone into standard JPG images.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- Image to Text (OCR) -->
+      <a class="tool-card" href="tools/ocr-extract/index.html" data-category="convert" role="listitem" id="card-ocr-extract">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--img">Image</span><span class="arrow">→</span><span class="badge badge--word">Text</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Image to Text (OCR)</p><p class="tool-card__desc">Extract text from photos, screenshots, and scanned documents using OCR technology.</p></div>
         <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
       </a>
 
@@ -156,6 +171,22 @@
         <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
       </a>
 
+      <!-- Background Remover -->
+      <a class="tool-card tool-card--featured" href="tools/bg-remover/index.html" data-category="edit" role="listitem" id="card-bg-remover">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/><line x1="2" y1="2" x2="22" y2="22" stroke-dasharray="2 2"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--img">Image</span><span class="arrow">→</span><span class="badge badge--lite">No BG</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Background Remover <span class="tag-new">New</span></p><p class="tool-card__desc">Remove image backgrounds instantly. Perfect for product photos, portraits, and composites.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
+      <!-- Image Upscaler -->
+      <a class="tool-card tool-card--featured" href="tools/image-upscaler/index.html" data-category="edit" role="listitem" id="card-image-upscaler">
+        <div class="tool-card__icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+        <div class="tool-card__from-to"><span class="badge badge--img">Small</span><span class="arrow">→</span><span class="badge badge--lite">Large</span></div>
+        <div class="tool-card__body"><p class="tool-card__title">Image Upscaler <span class="tag-new">New</span></p><p class="tool-card__desc">Increase image resolution up to 4× while preserving quality. Perfect for printing.</p></div>
+        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+      </a>
+
     </div>
   </main>
 
@@ -165,6 +196,19 @@
   </footer>
 
   <script src="../../packages/utils/bouncing-balls.js"></script>
+  <script src="../../packages/ui/curved-input.js"></script>
+  <script src="../../packages/utils/fuzzy-search.js"></script>
+  <script src="../../packages/ui/search-results.js"></script>
+  <script src="../../packages/utils/tool-search.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    // Image Editor search initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      const imageTools = ToolSearch.getToolsByCategory('Image Editor');
+      ToolSearch.initSearch('curved-search', imageTools, {
+        placeholder: 'Search image tools...'
+      });
+    });
+  </script>
 </body>
 </html>

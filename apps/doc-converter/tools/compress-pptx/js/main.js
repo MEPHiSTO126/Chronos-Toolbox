@@ -209,7 +209,8 @@ async function doFetchWithProgress(url, options, onProgress) {
         status: xhr.status,
         text: async () => await xhr.response.text(),
         json: async () => JSON.parse(await xhr.response.text()),
-        blob: async () => xhr.response
+        blob: async () => xhr.response,
+        headers: { get: (name) => xhr.getResponseHeader(name) }
       };
       resolve(response);
     };

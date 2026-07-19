@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Upscale images to higher resolutions. Free, fast, and private. Multiple upscaling algorithms available." />
+  <title>Image Upscaler · Chronos Toolbox</title>
+  <link rel="icon" type="image/png" href="../../../../packages/images/white-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../tool-shared.css" />
+  <style>
+    .preview-container {
+      width: 100%;
+      max-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: 
+        linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+        linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+        linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      background-color: #1a1a1a;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--clr-border);
+      padding: 1rem;
+      overflow: hidden;
+    }
+    .preview-img {
+      max-width: 100%;
+      max-height: 330px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .comparison-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .comparison-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--clr-text-sub);
+      text-align: center;
+    }
+    .size-label {
+      font-size: 0.75rem;
+      color: var(--clr-text-muted);
+      text-align: center;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .control-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--clr-text-sub);
+    }
+    .control-group select {
+      font-family: inherit;
+      font-size: 0.85rem;
+      background: var(--clr-surface-2);
+      color: var(--clr-text-primary);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .control-group select:focus {
+      border-color: var(--c-rose);
+    }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--clr-text-sub);
+      margin-top: 0.5rem;
+    }
+    .info-box {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .info-box p {
+      font-size: 0.82rem;
+      color: var(--clr-text-sub);
+      line-height: 1.5;
+    }
+    .info-box strong {
+      color: var(--c-rose);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
+        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+      </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../../index.html">Image Editor</a>
+        <span class="breadcrumb__sep">/</span>
+        <span>Image Upscaler</span>
+      </nav>
+      <a href="../../index.html" class="btn-back" id="btn-back">
+        <span class="back-arrow-pair" aria-hidden="true">
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
+        </span>
+        Back
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="tool-hero">
+    <span class="tool-hero__icon" aria-hidden="true">🔍</span>
+    <h1 class="tool-hero__title">Image <span>Upscaler</span></h1>
+    <p class="tool-hero__subtitle">Increase image resolution while preserving quality. Perfect for printing or enlarging small images.</p>
+  </section>
+
+  <!-- Workspace -->
+  <main class="workspace">
+
+    <!-- Drop zone -->
+    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+      <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
+      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <p class="dropzone__title">Drop your image here</p>
+      <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP</p>
+    </div>
+
+    <!-- Editor section (shown after load) -->
+    <div id="editor-section" style="display:none; margin-top:1.5rem;">
+      
+      <!-- Controls -->
+      <div class="options-panel" style="margin-bottom:1.5rem;">
+        <p class="options-panel__title" style="margin-bottom:1rem;">Upscale Settings</p>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="control-group">
+            <label for="scale-select">Scale Factor</label>
+            <select id="scale-select">
+              <option value="2" selected>2× (Double)</option>
+              <option value="3">3× (Triple)</option>
+              <option value="4">4× (Quadruple)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="method-select">Algorithm</label>
+            <select id="method-select">
+              <option value="bicubic" selected>Bicubic (Sharpest)</option>
+              <option value="bilinear">Bilinear (Smoother)</option>
+              <option value="neighbor">Nearest Neighbor (Pixelated)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Grid -->
+      <div class="comparison-grid">
+        
+        <!-- Original -->
+        <div class="comparison-item">
+          <p class="comparison-label">Original</p>
+          <div class="preview-container">
+            <img id="preview-original" class="preview-img" src="" alt="Original image" />
+          </div>
+          <p class="size-label" id="original-size">—</p>
+        </div>
+
+        <!-- Result -->
+        <div class="comparison-item">
+          <p class="comparison-label">Upscaled</p>
+          <div class="preview-container">
+            <img id="preview-result" class="preview-img" src="" alt="Result image" />
+          </div>
+          <p class="size-label" id="result-size">—</p>
+        </div>
+
+      </div>
+
+      <!-- Status -->
+      <div class="status-bar" style="margin-top:1rem;">
+        <span id="status-text">Ready to upscale</span>
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <p><strong>Tip:</strong> For best results, use images with clear details. Bicubic produces the sharpest results, while Nearest Neighbor creates a pixelated/retro effect.</p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+        <button class="btn-primary" id="btn-upscale" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Upscale Image</button>
+        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      </div>
+
+      <!-- Download button (shown after result) -->
+      <div id="result-area" style="display:none; margin-top:1.5rem;">
+        <div style="background:var(--clr-surface); border:1px solid rgba(255,126,159,0.15); border-radius:var(--radius-lg); padding:1.5rem; text-align:center;">
+          <p style="font-size:0.95rem; font-weight:600; margin-bottom:1rem;">Image upscaled! Download your result:</p>
+          <button class="btn-download" id="btn-download" style="font-family:inherit; font-weight:700; font-size:0.95rem; border-radius:var(--radius-sm); padding:0.75rem 2rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Download PNG</button>
+        </div>
+      </div>
+
+      <!-- Progress indicator -->
+      <div id="progress-wrap" style="display:none; margin-top:1rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:var(--clr-text-sub);">
+          <div style="width:16px; height:16px; border:2px solid var(--c-border); border-top-color:var(--c-rose); border-radius:50%; animation: spin 1s linear infinite;"></div>
+          <span>Processing...</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
+    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; All processing is done locally in your browser.</p>
+  </footer>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
