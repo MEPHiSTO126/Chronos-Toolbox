@@ -78,45 +78,50 @@ async function split() {
   progressWrap.classList.add('visible');
   resultArea.classList.remove('visible');
 
-  if (pageSets.length === 1) {
-    // Single output → return PDF directly
-    setProgress(30, 'Extracting pages…');
-    const outDoc = await PDFDocument.create();
-    const pages  = await outDoc.copyPages(srcDoc, pageSets[0].indices);
-    pages.forEach(p => outDoc.addPage(p));
-    setProgress(80, 'Saving…');
-    const bytes = await outDoc.save();
-    const blob  = new Blob([bytes], { type: 'application/pdf' });
-    btnDownload.href = URL.createObjectURL(blob);
-    btnDownload.download = pageSets[0].name;
-    btnDownload.textContent = '⬇ Download PDF';
-    resultMeta.textContent = `${pageSets[0].indices.length} page${pageSets[0].indices.length !== 1 ? 's' : ''} · ${fmt(blob.size)}`;
-  } else {
-    // Multiple pages → ZIP
-    const zip = new JSZip();
-    for (let i = 0; i < pageSets.length; i++) {
-      setProgress(Math.round((i / pageSets.length) * 88), `Creating page ${i + 1} of ${pageSets.length}…`);
+  try {
+    if (pageSets.length === 1) {
+      // Single output → return PDF directly
+      setProgress(30, 'Extracting pages…');
       const outDoc = await PDFDocument.create();
-      const [pg]   = await outDoc.copyPages(srcDoc, pageSets[i].indices);
-      outDoc.addPage(pg);
-      const bytes  = await outDoc.save();
-      zip.file(pageSets[i].name, bytes);
-      await sleep(1);
+      const pages  = await outDoc.copyPages(srcDoc, pageSets[0].indices);
+      pages.forEach(p => outDoc.addPage(p));
+      setProgress(80, 'Saving…');
+      const bytes = await outDoc.save();
+      const blob  = new Blob([bytes], { type: 'application/pdf' });
+      btnDownload.href = URL.createObjectURL(blob);
+      btnDownload.download = pageSets[0].name;
+      btnDownload.textContent = '⬇ Download PDF';
+      resultMeta.textContent = `${pageSets[0].indices.length} page${pageSets[0].indices.length !== 1 ? 's' : ''} · ${fmt(blob.size)}`;
+    } else {
+      // Multiple pages → ZIP
+      const zip = new JSZip();
+      for (let i = 0; i < pageSets.length; i++) {
+        setProgress(Math.round((i / pageSets.length) * 88), `Creating page ${i + 1} of ${pageSets.length}…`);
+        const outDoc = await PDFDocument.create();
+        const [pg]   = await outDoc.copyPages(srcDoc, pageSets[i].indices);
+        outDoc.addPage(pg);
+        const bytes  = await outDoc.save();
+        zip.file(pageSets[i].name, bytes);
+        await sleep(1);
+      }
+      setProgress(95, 'Zipping…');
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      btnDownload.href = URL.createObjectURL(zipBlob);
+      btnDownload.download = `${state.file.name.replace('.pdf', '')}_pages.zip`;
+      btnDownload.textContent = '⬇ Download ZIP';
+      resultMeta.textContent = `${pageSets.length} pages · ${fmt(zipBlob.size)}`;
     }
-    setProgress(95, 'Zipping…');
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    btnDownload.href = URL.createObjectURL(zipBlob);
-    btnDownload.download = `${state.file.name.replace('.pdf', '')}_pages.zip`;
-    btnDownload.textContent = '⬇ Download ZIP';
-    resultMeta.textContent = `${pageSets.length} pages · ${fmt(zipBlob.size)}`;
-  }
 
-  setProgress(100, 'Done!');
-  await sleep(300);
-  progressWrap.classList.remove('visible');
-  resultArea.classList.add('visible');
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  btnSplit.disabled = false;
+    setProgress(100, 'Done!');
+    await sleep(300);
+    progressWrap.classList.remove('visible');
+    resultArea.classList.add('visible');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {
+    toast('Failed to split PDF: ' + e.message, true);
+    progressWrap.classList.remove('visible');
+    btnSplit.disabled = false;
+  }
 }
 
 function reset() {

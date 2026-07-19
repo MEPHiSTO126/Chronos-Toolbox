@@ -96,22 +96,27 @@ async function apply() {
   resultArea.classList.remove('visible');
   btnApply.disabled = true;
 
-  const outDoc = await PDFDocument.create();
-  const total  = state.pdfLibDoc.getPageCount();
-  const keepIndices = [...Array(total).keys()].filter(i => !state.selected.has(i));
-  const pages  = await outDoc.copyPages(state.pdfLibDoc, keepIndices);
-  pages.forEach(p => outDoc.addPage(p));
-  setProgress(80, 'Saving…');
-  const bytes = await outDoc.save();
-  const blob  = new Blob([bytes], { type: 'application/pdf' });
-  btnDownload.href = URL.createObjectURL(blob);
-  resultMeta.textContent = `${state.selected.size} page${state.selected.size !== 1 ? 's' : ''} removed · ${keepIndices.length} remaining · ${fmt(blob.size)}`;
-  setProgress(100, 'Done!');
-  await sleep(300);
-  progressWrap.classList.remove('visible');
-  resultArea.classList.add('visible');
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  btnApply.disabled = false;
+  try {
+    const outDoc = await PDFDocument.create();
+    const total  = state.pdfLibDoc.getPageCount();
+    const keepIndices = [...Array(total).keys()].filter(i => !state.selected.has(i));
+    const pages  = await outDoc.copyPages(state.pdfLibDoc, keepIndices);
+    pages.forEach(p => outDoc.addPage(p));
+    setProgress(80, 'Saving…');
+    const bytes = await outDoc.save();
+    const blob  = new Blob([bytes], { type: 'application/pdf' });
+    btnDownload.href = URL.createObjectURL(blob);
+    resultMeta.textContent = `${state.selected.size} page${state.selected.size !== 1 ? 's' : ''} removed · ${keepIndices.length} remaining · ${fmt(blob.size)}`;
+    setProgress(100, 'Done!');
+    await sleep(300);
+    progressWrap.classList.remove('visible');
+    resultArea.classList.add('visible');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {
+    toast('Failed to delete pages: ' + e.message, true);
+    progressWrap.classList.remove('visible');
+    btnApply.disabled = false;
+  }
 }
 
 function reset() {

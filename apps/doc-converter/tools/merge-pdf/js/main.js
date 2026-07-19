@@ -90,30 +90,35 @@ async function merge() {
   setProgress(0, 'Starting…');
   await sleep(50);
 
-  const merged = await PDFDocument.create();
+  try {
+    const merged = await PDFDocument.create();
 
-  for (let i = 0; i < state.files.length; i++) {
-    setProgress(Math.round((i / state.files.length) * 90), `Adding "${state.files[i].name}"…`);
-    const buf = await state.files[i].arrayBuffer();
-    const src = await PDFDocument.load(buf);
-    const pages = await merged.copyPages(src, src.getPageIndices());
-    pages.forEach(p => merged.addPage(p));
-    await sleep(10);
+    for (let i = 0; i < state.files.length; i++) {
+      setProgress(Math.round((i / state.files.length) * 90), `Adding "${state.files[i].name}"…`);
+      const buf = await state.files[i].arrayBuffer();
+      const src = await PDFDocument.load(buf);
+      const pages = await merged.copyPages(src, src.getPageIndices());
+      pages.forEach(p => merged.addPage(p));
+      await sleep(10);
+    }
+
+    setProgress(95, 'Saving PDF…');
+    const bytes = await merged.save();
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url  = URL.createObjectURL(blob);
+    btnDownload.href = url;
+    btnDownload.download = 'merged.pdf';
+    resultMeta.textContent = `${merged.getPageCount()} pages · ${fmt(blob.size)}`;
+    setProgress(100, 'Done!');
+    await sleep(300);
+    progressWrap.classList.remove('visible');
+    resultArea.classList.add('visible');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {
+    toast('Failed to merge PDFs: ' + e.message, true);
+    progressWrap.classList.remove('visible');
+    btnMerge.disabled = false;
   }
-
-  setProgress(95, 'Saving PDF…');
-  const bytes = await merged.save();
-  const blob = new Blob([bytes], { type: 'application/pdf' });
-  const url  = URL.createObjectURL(blob);
-  btnDownload.href = url;
-  btnDownload.download = 'merged.pdf';
-  resultMeta.textContent = `${merged.getPageCount()} pages · ${fmt(blob.size)}`;
-  setProgress(100, 'Done!');
-  await sleep(300);
-  progressWrap.classList.remove('visible');
-  resultArea.classList.add('visible');
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  btnMerge.disabled = false;
 }
 
 function clearAll() {

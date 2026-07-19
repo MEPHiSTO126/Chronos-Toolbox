@@ -106,24 +106,29 @@ async function apply() {
   setProgress(10, 'Applying rotations…');
   progressWrap.classList.add('visible'); resultArea.classList.remove('visible'); btnApply.disabled = true;
 
-  // Apply rotations to each page via pdf-lib
-  const pages = state.pdfLibDoc.getPages();
-  state.rotations.forEach((rot, i) => {
-    if (rot !== 0) {
-      const cur = pages[i].getRotation().angle;
-      pages[i].setRotation(degrees((cur + rot) % 360));
-    }
-  });
-  setProgress(80, 'Saving…');
-  const bytes = await state.pdfLibDoc.save();
-  const blob  = new Blob([bytes], { type: 'application/pdf' });
-  btnDownload.href = URL.createObjectURL(blob);
-  resultMeta.textContent = `${state.rotations.filter(r => r !== 0).length} pages rotated · ${fmt(blob.size)}`;
-  setProgress(100, 'Done!');
-  await sleep(300);
-  progressWrap.classList.remove('visible'); resultArea.classList.add('visible');
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  btnApply.disabled = false;
+  try {
+    // Apply rotations to each page via pdf-lib
+    const pages = state.pdfLibDoc.getPages();
+    state.rotations.forEach((rot, i) => {
+      if (rot !== 0) {
+        const cur = pages[i].getRotation().angle;
+        pages[i].setRotation(degrees((cur + rot) % 360));
+      }
+    });
+    setProgress(80, 'Saving…');
+    const bytes = await state.pdfLibDoc.save();
+    const blob  = new Blob([bytes], { type: 'application/pdf' });
+    btnDownload.href = URL.createObjectURL(blob);
+    resultMeta.textContent = `${state.rotations.filter(r => r !== 0).length} pages rotated · ${fmt(blob.size)}`;
+    setProgress(100, 'Done!');
+    await sleep(300);
+    progressWrap.classList.remove('visible'); resultArea.classList.add('visible');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {
+    toast('Failed to rotate PDF: ' + e.message, true);
+    progressWrap.classList.remove('visible');
+    btnApply.disabled = false;
+  }
 }
 
 function reset() {
