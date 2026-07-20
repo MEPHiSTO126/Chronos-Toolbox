@@ -17,9 +17,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 // ── Search Functionality ──────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize search with all tools
-  ToolSearch.initSearch('curved-search', ToolSearch.allTools, {
+  SearchBar.create('#search-container', {
+    tools: ToolSearch.allTools,
     placeholder: 'Search all tools...',
-    buttonColor: '#00F0FF'
+    accent: '#00F0FF'
   });
 });

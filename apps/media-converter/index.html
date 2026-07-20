@@ -10,8 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="../../packages/ui/curved-input.css" />
-  <link rel="stylesheet" href="../../packages/ui/search-results.css" />
+  <link rel="stylesheet" href="../../packages/ui/search-bar.css" />
 </head>
 <body>
 
@@ -289,18 +288,15 @@
   </footer>
 
   <script src="../../packages/utils/bouncing-balls.js"></script>
-  <script src="../../packages/ui/curved-input.js"></script>
-  <script src="../../packages/utils/fuzzy-search.js"></script>
-  <script src="../../packages/ui/search-results.js"></script>
+  <script src="../../packages/ui/search-bar.js"></script>
   <script src="../../packages/utils/tool-search.js"></script>
   <script src="js/main.js"></script>
   <script>
-    // Media Converter search initialization
     document.addEventListener('DOMContentLoaded', () => {
-      const mediaTools = ToolSearch.getToolsByCategory('Media Converter');
-      ToolSearch.initSearch('curved-search', mediaTools, {
+      SearchBar.create('#search-container', {
+        tools: ToolSearch.getToolsByCategory('Media Converter'),
         placeholder: 'Search media tools...',
-        buttonColor: '#A27BFF'
+        accent: '#A27BFF'
       });
     });
   </script>
