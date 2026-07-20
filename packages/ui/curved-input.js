@@ -212,8 +212,21 @@ const CurvedInput = (() => {
       this.input.spellcheck = false;
       if (opts.name) this.input.name = opts.name;
 
+      // Real submit button overlay (interactive; sits above SVG + input)
+      this.submitBtn = document.createElement('button');
+      this.submitBtn.type = 'submit';
+      this.submitBtn.className = 'curved-input__submit';
+      this.submitBtn.setAttribute('aria-label', opts.buttonText);
+      this.submitBtn.tabIndex = 0;
+      this.submitBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+        </svg>`;
+
       this.form.appendChild(this.svg);
       this.form.appendChild(this.input);
+      this.form.appendChild(this.submitBtn);
       this.container.appendChild(this.form);
 
       this.updateSVG();
@@ -340,8 +353,9 @@ const CurvedInput = (() => {
         const [iconX, iconY] = geom.point(iconCx, iconCy);
         const iconAngle = geom.angleAt(iconCx);
 
+        // Decorative only — real <button> overlay handles clicks
         svgContent += `
-          <g class="curved-input__button" role="button" tabindex="0" aria-label="${opts.buttonText}">
+          <g class="curved-input__button-deco" aria-hidden="true">
             <path class="curved-input__button-bg" d="${buttonPath}" fill="${accentColor}" />
             <g transform="translate(${round2(iconX)} ${round2(iconY)}) rotate(${round2(iconAngle)})">
               <circle cx="0" cy="${-iconR * 0.1}" r="${iconR}" fill="none" stroke="${btnFgColor}" stroke-width="${iconStroke}" />
@@ -349,10 +363,35 @@ const CurvedInput = (() => {
             </g>
           </g>
         `;
+
+        // Store button rectangle (in form-local pixels) for the overlay button
+        this.btnRect = {
+          right: Math.max(0, (geom.W - btnU1)),
+          top: btnInset,
+          width: btnW,
+          height: btnH
+        };
+      } else {
+        this.btnRect = null;
       }
 
       this.svg.innerHTML = svgContent;
       this.svg.style.cssText = svgStyle;
+      this.positionButton();
+    }
+
+    positionButton() {
+      if (!this.submitBtn) return;
+      if (!this.btnRect) {
+        this.submitBtn.style.display = 'none';
+        return;
+      }
+      const r = this.btnRect;
+      this.submitBtn.style.display = 'flex';
+      this.submitBtn.style.top = `${r.top}px`;
+      this.submitBtn.style.right = `${r.right}px`;
+      this.submitBtn.style.width = `${r.width}px`;
+      this.submitBtn.style.height = `${r.height}px`;
     }
 
     renderCaret(geom, T, fgColor, fontSize) {
@@ -415,26 +454,21 @@ const CurvedInput = (() => {
         this.options.onSubmit?.(this.getValue());
       });
 
-      this.svg.addEventListener('click', (e) => {
+      // Real button overlay handles submission
+      this.submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.input.focus();
-        // Approximate caret position from click
-        const rect = this.svg.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const charWidth = this.options.fontSize * 0.6;
-        const idx = Math.round(x / charWidth);
-        const clampedIdx = Math.max(0, Math.min(idx, this.getValue().length));
-        this.input.setSelectionRange(clampedIdx, clampedIdx);
-        this.caretIndex = clampedIdx;
-        this.updateSVG();
+        this.options.onSubmit?.(this.getValue());
       });
 
-      // Button click via delegation (survives SVG re-renders)
+      // Clicking the decorative SVG focuses the input (caret at end)
       this.svg.addEventListener('click', (e) => {
-        const btn = e.target.closest('.curved-input__button');
-        if (btn) {
-          e.stopPropagation();
-          this.options.onSubmit?.(this.getValue());
-        }
+        this.input.focus();
+        const len = this.getValue().length;
+        this.input.setSelectionRange(len, len);
+        this.caretIndex = len;
+        this.updateSVG();
       });
     }
 

@@ -20,6 +20,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: none; /* decorative only; input handles interaction */
 }
 
 .curved-input__svg text {
@@ -35,35 +36,45 @@
   opacity: 0.28;
 }
 
-.curved-input__button {
+/* ── Real submit button overlay (interactive) ─────────────── */
+.curved-input__submit {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
   cursor: pointer;
-  outline: none;
+  padding: 0;
+  border-radius: 12px;
+  transition: filter 0.2s ease, transform 0.1s ease;
 }
 
-.curved-input__button-bg {
-  transition:
-    filter 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.curved-input__button:hover .curved-input__button-bg {
+.curved-input__submit:hover {
   filter: brightness(1.12);
 }
 
-.curved-input__button:active .curved-input__button-bg {
+.curved-input__submit:active {
   filter: brightness(0.94);
+  transform: scale(0.97);
 }
 
-.curved-input__button:focus-visible .curved-input__button-bg {
-  filter: brightness(1.18);
+.curved-input__submit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
 }
 
+/* ── Hidden (but interactive) text input ──────────────────── */
 .curved-input__field {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.01;
+  opacity: 0;
   border: 0;
   padding: 0;
   margin: 0;
