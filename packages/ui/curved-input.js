@@ -333,15 +333,20 @@ const CurvedInput = (() => {
       if (opts.showButton) {
         const btnH = T - btnInset * 2;
         const buttonPath = bentRectPath(geom, btnU0, btnU1, -T / 2 + btnInset, T / 2 - btnInset, Math.min(opts.cornerRadius * 0.72, btnH / 2));
-        const buttonTextPath = bentLinePath(geom, btnU0, btnU1, vBase);
+        const iconCx = (btnU0 + btnU1) / 2;
+        const iconCy = 0;
+        const iconR = Math.min(btnH * 0.28, 10);
+        const iconStroke = Math.max(2, iconR * 0.22);
+        const [iconX, iconY] = geom.point(iconCx, iconCy);
+        const iconAngle = geom.angleAt(iconCx);
 
         svgContent += `
           <g class="curved-input__button" role="button" tabindex="0" aria-label="${opts.buttonText}">
             <path class="curved-input__button-bg" d="${buttonPath}" fill="${accentColor}" />
-            <path id="${this.buttonPathId}" d="${buttonTextPath}" fill="none" />
-            <text fill="${btnFgColor}" text-anchor="middle" style="font-size: ${opts.fontSize}px; font-weight: 600; pointer-events: none;">
-              <textPath href="#${this.buttonPathId}" start-offset="50%">${opts.buttonText}</textPath>
-            </text>
+            <g transform="translate(${round2(iconX)} ${round2(iconY)}) rotate(${round2(iconAngle)})">
+              <circle cx="0" cy="${-iconR * 0.1}" r="${iconR}" fill="none" stroke="${btnFgColor}" stroke-width="${iconStroke}" />
+              <line x1="${iconR * 0.6}" y1="${iconR * 0.5}" x2="${iconR * 1.1}" y2="${iconR * 1.0}" stroke="${btnFgColor}" stroke-width="${iconStroke}" stroke-linecap="round" />
+            </g>
           </g>
         `;
       }
@@ -423,14 +428,14 @@ const CurvedInput = (() => {
         this.updateSVG();
       });
 
-      // Button click
-      const buttonEl = this.svg.querySelector('.curved-input__button');
-      if (buttonEl) {
-        buttonEl.addEventListener('click', (e) => {
+      // Button click via delegation (survives SVG re-renders)
+      this.svg.addEventListener('click', (e) => {
+        const btn = e.target.closest('.curved-input__button');
+        if (btn) {
           e.stopPropagation();
           this.options.onSubmit?.(this.getValue());
-        });
-      }
+        }
+      });
     }
 
     setValue(value) {

@@ -97,19 +97,27 @@ const ToolSearch = (() => {
       highlightColor: options.buttonColor
     });
 
+    // Use the CurvedInput's own onChange to drive search
+    searchInput.options.onChange = (value) => {
+      if (value.trim().length >= 2) {
+        const results = FuzzySearch.searchTools(value, tools, { maxResults: 8 });
+        searchResults.show(results, value);
+      } else {
+        searchResults.hide();
+      }
+    };
+
+    // Also bind to the hidden input directly as a fallback
     const inputEl = searchContainer.querySelector('input');
     if (inputEl) {
-      const debouncedSearch = FuzzySearch.debounce((value) => {
-        if (value.trim().length >= 2) {
-          const results = FuzzySearch.searchTools(value, tools, { maxResults: 8 });
-          searchResults.show(results, value);
+      inputEl.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (val.trim().length >= 2) {
+          const results = FuzzySearch.searchTools(val, tools, { maxResults: 8 });
+          searchResults.show(results, val);
         } else {
           searchResults.hide();
         }
-      }, 200);
-
-      inputEl.addEventListener('input', (e) => {
-        debouncedSearch(e.target.value);
       });
 
       inputEl.addEventListener('keydown', (e) => {
