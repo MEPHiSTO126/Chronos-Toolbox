@@ -15,6 +15,8 @@ const state = {
   useEdgeTTS: false,   // Toggle between browser TTS and Edge TTS
   edgeVoices: [],      // Available Edge TTS voices
   audioElement: null,  // For Edge TTS audio playback
+  audioBlob: null,     // Last generated Edge TTS blob (for download)
+  pageBlobs: {},       // Cache: page index → Blob
 };
 
 const dropzone    = document.getElementById('dropzone');
@@ -223,6 +225,87 @@ btnNewFile.addEventListener('click',  () => { stopSpeech(); fileInput.value=''; 
 speedSelect.addEventListener('change',() => { if (state.isPlaying) { stopSpeech(); playCurrent(); } });
 voiceSelect.addEventListener('change',() => { if (state.isPlaying) { stopSpeech(); playCurrent(); } });
 
+// Export / Download
+const btnExport = document.getElementById('btn-export');
+if (btnExport) {
+  btnExport.addEventListener('click', async () => {
+    if (state.useEdgeTTS) {
+      // Edge TTS — download current page's cached blob, or generate it
+      const cacheKey = `${state.queueIdx}-${state.currentPage}`;
+      let blob = state.pageBlobs[cacheKey];
+
+      if (!blob) {
+        // Generate audio for current page first
+        const text = state.pages[state.currentPage];
+        if (!text) { toast('No text to export', true); return; }
+        btnExport.textContent = '⏳ Generating...';
+        try {
+          const voice = state.edgeVoices[+voiceSelect.value];
+          const voiceName = voice ? voice.id : 'en-US-AriaNeural';
+          const rate = speedSelect.value >= 1.5 ? '+50%' : speedSelect.value >= 1.2 ? '+20%' : '+0%';
+          const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`, {
+            method: 'POST'
+          });
+          if (!response.ok) throw new Error('Export failed');
+          blob = await response.blob();
+          state.pageBlobs[cacheKey] = blob;
+        } catch (err) {
+          toast('Export failed: ' + err.message, true);
+          btnExport.textContent = '⬇ Export Audio';
+          return;
+        }
+      }
+
+      downloadBlob(blob, `speech-page${state.currentPage + 1}.mp3`);
+      btnExport.textContent = '⬇ Export Audio';
+      toast('Audio downloaded');
+
+    } else {
+      // Browser TTS — generate all pages via Edge TTS for download
+      if (!state.pages.length) { toast('No pages to export', true); return; }
+      btnExport.textContent = '⏳ Generating all pages...';
+      try {
+        const voice = state.edgeVoices[0];
+        const voiceName = voice ? voice.id : 'en-US-AriaNeural';
+        const rate = speedSelect.value >= 1.5 ? '+50%' : speedSelect.value >= 1.2 ? '+20%' : '+0%';
+        const blobs = [];
+
+        for (let i = 0; i < state.pages.length; i++) {
+          btnExport.textContent = `⏳ Page ${i + 1} of ${state.pages.length}...`;
+          const cacheKey = `${state.queueIdx}-${i}`;
+          let pageBlob = state.pageBlobs[cacheKey];
+          if (!pageBlob) {
+            const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(state.pages[i])}&voice=${voiceName}&rate=${rate}`, {
+              method: 'POST'
+            });
+            if (!response.ok) throw new Error(`Page ${i + 1} failed`);
+            pageBlob = await response.blob();
+            state.pageBlobs[cacheKey] = pageBlob;
+          }
+          blobs.push(pageBlob);
+        }
+
+        // Concatenate all blobs
+        const combinedBlob = new Blob(blobs, { type: 'audio/mpeg' });
+        const baseName = (state.queue[state.queueIdx]?.name || 'speech').replace(/\.pdf$/i, '');
+        downloadBlob(combinedBlob, `${baseName}.mp3`);
+        toast('Audio downloaded');
+      } catch (err) {
+        toast('Export failed: ' + err.message, true);
+      }
+      btnExport.textContent = '⬇ Export Audio';
+    }
+  });
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function playCurrent() {
   const text = state.pages[state.currentPage];
   if (!text) return;
@@ -259,6 +342,26 @@ async function playWithEdgeTTS(text) {
       state.audioElement = null;
     }
     
+    // Check cache first
+    const cacheKey = `${state.queueIdx}-${state.currentPage}`;
+    if (state.pageBlobs[cacheKey]) {
+      const blob = state.pageBlobs[cacheKey];
+      const audioUrl = URL.createObjectURL(blob);
+      state.audioElement = new Audio(audioUrl);
+      state.audioElement.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        if (state.currentPage < state.pages.length - 1) {
+          state.currentPage++; updateUI(); playCurrent();
+        } else {
+          state.isPlaying = false; updateUI();
+          if (state.queueIdx < state.queue.length - 1) advanceQueue();
+        }
+      };
+      await state.audioElement.play();
+      state.isPlaying = true; updateUI();
+      return;
+    }
+    
     const voice = state.edgeVoices[+voiceSelect.value];
     const voiceName = voice ? voice.id : 'en-US-AriaNeural';
     const rate = speedSelect.value >= 1.5 ? '+50%' : speedSelect.value >= 1.2 ? '+20%' : '+0%';
@@ -267,13 +370,17 @@ async function playWithEdgeTTS(text) {
     btnPlay.textContent = '⏳';
     playerInfo.textContent = 'Generating audio...';
     
-    const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`);
+    const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`, {
+      method: 'POST'
+    });
     
     if (!response.ok) {
       throw new Error('TTS request failed');
     }
     
     const blob = await response.blob();
+    state.audioBlob = blob;
+    state.pageBlobs[cacheKey] = blob;
     const audioUrl = URL.createObjectURL(blob);
     
     state.audioElement = new Audio(audioUrl);
