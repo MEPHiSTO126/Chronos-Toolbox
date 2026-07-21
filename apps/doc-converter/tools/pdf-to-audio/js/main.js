@@ -243,8 +243,10 @@ if (btnExport) {
           const voice = state.edgeVoices[+voiceSelect.value];
           const voiceName = voice ? voice.id : 'en-US-AriaNeural';
           const rate = speedSelect.value >= 1.5 ? '+50%' : speedSelect.value >= 1.2 ? '+20%' : '+0%';
-          const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`, {
-            method: 'POST'
+          const response = await fetch(`${API_URL}/media/text-to-speech`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, voice: voiceName, rate })
           });
           if (!response.ok) throw new Error('Export failed');
           blob = await response.blob();
@@ -275,8 +277,10 @@ if (btnExport) {
           const cacheKey = `${state.queueIdx}-${i}`;
           let pageBlob = state.pageBlobs[cacheKey];
           if (!pageBlob) {
-            const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(state.pages[i])}&voice=${voiceName}&rate=${rate}`, {
-              method: 'POST'
+            const response = await fetch(`${API_URL}/media/text-to-speech`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: state.pages[i], voice: voiceName, rate })
             });
             if (!response.ok) throw new Error(`Page ${i + 1} failed`);
             pageBlob = await response.blob();
@@ -370,8 +374,10 @@ async function playWithEdgeTTS(text) {
     btnPlay.textContent = '⏳';
     playerInfo.textContent = 'Generating audio...';
     
-    const response = await fetch(`${API_URL}/media/text-to-speech?text=${encodeURIComponent(text)}&voice=${voiceName}&rate=${rate}`, {
-      method: 'POST'
+    const response = await fetch(`${API_URL}/media/text-to-speech`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice: voiceName, rate })
     });
     
     if (!response.ok) {
