@@ -1,9 +1,58 @@
 {
   "redirects": [
-    {
-      "source": "/",
-      "destination": "/apps/home/index.html",
-      "permanent": false
-    }
+    { "source": "/", "destination": "/apps/home/index.html", "permanent": false },
+
+    { "source": "/doc-converter", "destination": "/apps/doc-converter/index.html", "permanent": false },
+    { "source": "/image-editor", "destination": "/apps/image-editor/index.html", "permanent": false },
+    { "source": "/media-converter", "destination": "/apps/media-converter/index.html", "permanent": false },
+    { "source": "/qr-generator", "destination": "/apps/qr-generator/index.html", "permanent": false },
+
+    { "source": "/pdf-to-word", "destination": "/apps/doc-converter/tools/pdf-to-word/index.html", "permanent": false },
+    { "source": "/word-to-pdf", "destination": "/apps/doc-converter/tools/word-to-pdf/index.html", "permanent": false },
+    { "source": "/pptx-to-pdf", "destination": "/apps/doc-converter/tools/pptx-to-pdf/index.html", "permanent": false },
+    { "source": "/pdf-to-jpg", "destination": "/apps/doc-converter/tools/pdf-to-jpg/index.html", "permanent": false },
+    { "source": "/jpg-to-pdf", "destination": "/apps/doc-converter/tools/jpg-to-pdf/index.html", "permanent": false },
+    { "source": "/merge-pdf", "destination": "/apps/doc-converter/tools/merge-pdf/index.html", "permanent": false },
+    { "source": "/split-pdf", "destination": "/apps/doc-converter/tools/split-pdf/index.html", "permanent": false },
+    { "source": "/rotate-pdf", "destination": "/apps/doc-converter/tools/rotate-pdf/index.html", "permanent": false },
+    { "source": "/page-deleter", "destination": "/apps/doc-converter/tools/page-deleter/index.html", "permanent": false },
+    { "source": "/rearrange-pdf", "destination": "/apps/doc-converter/tools/rearrange-pdf/index.html", "permanent": false },
+    { "source": "/pdf-to-audio", "destination": "/apps/doc-converter/tools/pdf-to-audio/index.html", "permanent": false },
+    { "source": "/compress-word", "destination": "/apps/doc-converter/tools/compress-word/index.html", "permanent": false },
+    { "source": "/compress-pdf", "destination": "/apps/doc-converter/tools/compress-pdf/index.html", "permanent": false },
+    { "source": "/compress-pptx", "destination": "/apps/doc-converter/tools/compress-pptx/index.html", "permanent": false },
+    { "source": "/text-translator", "destination": "/apps/doc-converter/tools/text-translator/index.html", "permanent": false },
+
+    { "source": "/image-converter", "destination": "/apps/image-editor/tools/image-converter/index.html", "permanent": false },
+    { "source": "/heic-to-jpg", "destination": "/apps/image-editor/tools/heic-to-jpg/index.html", "permanent": false },
+    { "source": "/crop-resize", "destination": "/apps/image-editor/tools/crop-resize/index.html", "permanent": false },
+    { "source": "/filters-effects", "destination": "/apps/image-editor/tools/filters-effects/index.html", "permanent": false },
+    { "source": "/rotate-flip", "destination": "/apps/image-editor/tools/rotate-flip/index.html", "permanent": false },
+    { "source": "/compress-image", "destination": "/apps/image-editor/tools/compress-image/index.html", "permanent": false },
+    { "source": "/add-text", "destination": "/apps/image-editor/tools/add-text/index.html", "permanent": false },
+    { "source": "/add-border", "destination": "/apps/image-editor/tools/add-border/index.html", "permanent": false },
+    { "source": "/round-crop", "destination": "/apps/image-editor/tools/round-crop/index.html", "permanent": false },
+    { "source": "/combine-images", "destination": "/apps/image-editor/tools/combine-images/index.html", "permanent": false },
+    { "source": "/add-watermark", "destination": "/apps/image-editor/tools/add-watermark/index.html", "permanent": false },
+    { "source": "/filter-adder", "destination": "/apps/image-editor/tools/filter-adder/index.html", "permanent": false },
+    { "source": "/ocr-extract", "destination": "/apps/image-editor/tools/ocr-extract/index.html", "permanent": false },
+    { "source": "/bg-remover", "destination": "/apps/image-editor/tools/bg-remover/index.html", "permanent": false },
+    { "source": "/image-upscaler", "destination": "/apps/image-editor/tools/image-upscaler/index.html", "permanent": false },
+
+    { "source": "/video-to-audio", "destination": "/apps/media-converter/tools/video-to-audio/index.html", "permanent": false },
+    { "source": "/audio-loop", "destination": "/apps/media-converter/tools/audio-loop/index.html", "permanent": false },
+    { "source": "/audio-to-text", "destination": "/apps/media-converter/tools/audio-to-text/index.html", "permanent": false },
+    { "source": "/vocal-splitter", "destination": "/apps/media-converter/tools/vocal-splitter/index.html", "permanent": false },
+    { "source": "/compress-video", "destination": "/apps/media-converter/tools/compress-video/index.html", "permanent": false },
+    { "source": "/video-converter", "destination": "/apps/media-converter/tools/video-converter/index.html", "permanent": false },
+    { "source": "/social-downloader", "destination": "/apps/media-converter/tools/social-downloader/index.html", "permanent": false },
+
+    { "source": "/url-to-qr", "destination": "/apps/qr-generator/tools/url-to-qr/index.html", "permanent": false },
+    { "source": "/qr-to-url", "destination": "/apps/qr-generator/tools/qr-to-url/index.html", "permanent": false },
+    { "source": "/vcard-to-qr", "destination": "/apps/qr-generator/tools/vcard-to-qr/index.html", "permanent": false },
+    { "source": "/wifi-to-qr", "destination": "/apps/qr-generator/tools/wifi-to-qr/index.html", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/((?!apps/).*)", "destination": "/apps/404.html" }
   ]
 }
