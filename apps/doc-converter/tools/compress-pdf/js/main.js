@@ -131,6 +131,7 @@ btnConvert.addEventListener('click', async () => {
   };
 
   const formData = new FormData();
+  const originalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
   selectedFiles.forEach(f => formData.append('files', f));
 
   try {
@@ -159,7 +160,13 @@ btnConvert.addEventListener('click', async () => {
     btnDownload.href = url;
     btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'Compressed PDF File'}`;
-    resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} compressed · ${fmt(blob.size)}`;
+    const saved = originalSize - blob.size;
+    const pct = originalSize > 0 ? Math.round((saved / originalSize) * 100) : 0;
+    if (saved > 0) {
+      resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} compressed · ${fmt(originalSize)} → ${fmt(blob.size)} (saved ${fmt(saved)}, ${pct}%)`;
+    } else {
+      resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(originalSize)} → ${fmt(blob.size)} — already optimized`;
+    }
     
     clearInterval(progressInterval);
     document.getElementById('progress-bar').style.width = '100%';
