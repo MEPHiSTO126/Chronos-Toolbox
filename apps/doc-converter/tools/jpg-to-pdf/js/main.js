@@ -6,6 +6,8 @@
 'use strict';
 
 // ── State ─────────────────────────────────────────────────
+let currentObjectURL = null;
+
 const state = {
   files: [],        // { file: File, dataUrl: string, id: string }
   dragSrcId: null,
@@ -136,6 +138,7 @@ function showWorkspace() {
 }
 
 function clearAll() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   state.files = [];
   fileInput.value = '';
   addMoreInput.value = '';
@@ -152,78 +155,89 @@ function clearAll() {
 async function convert() {
   if (!state.files.length) return;
 
-  const { jsPDF } = window.jspdf;
-  const margin   = parseInt(optMargin.value, 10);
-  const pageSize = optSize.value;
-  const orient   = optOrient.value;
-
   btnConvert.disabled = true;
   progressWrap.classList.add('visible');
   resultArea.classList.remove('visible');
-  setProgress(0, 'Preparing…');
 
-  // Small delay so UI paints before heavy work
-  await sleep(60);
+  try {
+    const { jsPDF } = window.jspdf;
+    const margin   = parseInt(optMargin.value, 10);
+    const pageSize = optSize.value;
+    const orient   = optOrient.value;
 
-  let pdf = null;
+    setProgress(0, 'Preparing…');
 
-  for (let i = 0; i < state.files.length; i++) {
-    const { dataUrl, file } = state.files[i];
-    const pct = Math.round(((i) / state.files.length) * 95);
-    setProgress(pct, `Processing image ${i + 1} of ${state.files.length}…`);
+    // Small delay so UI paints before heavy work
+    await sleep(60);
 
-    // Get natural image dimensions
-    const dims = await getImageDimensions(dataUrl);
+    let pdf = null;
 
-    let pageOrient = orient;
-    if (orient === 'auto') {
-      pageOrient = dims.width > dims.height ? 'landscape' : 'portrait';
+    for (let i = 0; i < state.files.length; i++) {
+      const { dataUrl, file } = state.files[i];
+      const pct = Math.round(((i) / state.files.length) * 95);
+      setProgress(pct, `Processing image ${i + 1} of ${state.files.length}…`);
+
+      // Get natural image dimensions
+      const dims = await getImageDimensions(dataUrl);
+
+      let pageOrient = orient;
+      if (orient === 'auto') {
+        pageOrient = dims.width > dims.height ? 'landscape' : 'portrait';
+      }
+
+      let pageFormat = pageSize === 'fit' ? [dims.width * 0.264583, dims.height * 0.264583] : pageSize; // px→mm approx
+
+      if (i === 0) {
+        pdf = new jsPDF({ orientation: pageOrient, unit: 'mm', format: pageFormat });
+      } else {
+        pdf.addPage(pageFormat, pageOrient);
+      }
+
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = pdf.internal.pageSize.getHeight();
+      const usableW = pw - margin * 2;
+      const usableH = ph - margin * 2;
+
+      // Scale image to fit within usable area, preserving aspect ratio
+      const imgAr = dims.width / dims.height;
+      const boxAr = usableW / usableH;
+      let drawW, drawH;
+      if (imgAr > boxAr) { drawW = usableW; drawH = usableW / imgAr; }
+      else                { drawH = usableH; drawW = usableH * imgAr; }
+
+      const x = margin + (usableW - drawW) / 2;
+      const y = margin + (usableH - drawH) / 2;
+
+      const fmt = file.type === 'image/png' ? 'PNG' : 'JPEG';
+      pdf.addImage(dataUrl, fmt, x, y, drawW, drawH);
+
+      await sleep(10); // allow UI update between heavy iterations
     }
 
-    let pageFormat = pageSize === 'fit' ? [dims.width * 0.264583, dims.height * 0.264583] : pageSize; // px→mm approx
+    setProgress(100, 'Done!');
+    await sleep(300);
 
-    if (i === 0) {
-      pdf = new jsPDF({ orientation: pageOrient, unit: 'mm', format: pageFormat });
-    } else {
-      pdf.addPage(pageFormat, pageOrient);
-    }
+    const pdfBlob = pdf.output('blob');
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+    currentObjectURL = URL.createObjectURL(pdfBlob);
+    const url = currentObjectURL;
+    const sizeMb = (pdfBlob.size / 1024 / 1024).toFixed(2);
 
-    const pw = pdf.internal.pageSize.getWidth();
-    const ph = pdf.internal.pageSize.getHeight();
-    const usableW = pw - margin * 2;
-    const usableH = ph - margin * 2;
+    btnDownload.href = url;
+    btnDownload.download = 'chronos-converted.pdf';
+    resultMeta.textContent = `${state.files.length} page${state.files.length !== 1 ? 's' : ''} · ${sizeMb} MB`;
 
-    // Scale image to fit within usable area, preserving aspect ratio
-    const imgAr = dims.width / dims.height;
-    const boxAr = usableW / usableH;
-    let drawW, drawH;
-    if (imgAr > boxAr) { drawW = usableW; drawH = usableW / imgAr; }
-    else                { drawH = usableH; drawW = usableH * imgAr; }
-
-    const x = margin + (usableW - drawW) / 2;
-    const y = margin + (usableH - drawH) / 2;
-
-    const fmt = file.type === 'image/png' ? 'PNG' : 'JPEG';
-    pdf.addImage(dataUrl, fmt, x, y, drawW, drawH);
-
-    await sleep(10); // allow UI update between heavy iterations
+    progressWrap.classList.remove('visible');
+    resultArea.classList.add('visible');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (err) {
+    console.error(err);
+    toast('Conversion failed. Please try again.', true);
+    progressWrap.classList.remove('visible');
+    actionBar.style.display = 'flex';
+  } finally {
+    btnConvert.disabled = false;
   }
-
-  setProgress(100, 'Done!');
-  await sleep(300);
-
-  const pdfBlob = pdf.output('blob');
-  const url = URL.createObjectURL(pdfBlob);
-  const sizeMb = (pdfBlob.size / 1024 / 1024).toFixed(2);
-
-  btnDownload.href = url;
-  btnDownload.download = 'chronos-converted.pdf';
-  resultMeta.textContent = `${state.files.length} page${state.files.length !== 1 ? 's' : ''} · ${sizeMb} MB`;
-
-  progressWrap.classList.remove('visible');
-  resultArea.classList.add('visible');
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  btnConvert.disabled = false;
 }
 
 // ── Helpers ────────────────────────────────────────────────

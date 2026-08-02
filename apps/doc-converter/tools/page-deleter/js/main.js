@@ -2,6 +2,8 @@
 const { PDFDocument } = PDFLib;
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+let currentObjectURL = null;
+
 const state = { srcBytes: null, pdfLibDoc: null, pdfJsDoc: null, selected: new Set() };
 
 const dropzone    = document.getElementById('dropzone');
@@ -105,7 +107,9 @@ async function apply() {
     setProgress(80, 'Saving…');
     const bytes = await outDoc.save();
     const blob  = new Blob([bytes], { type: 'application/pdf' });
-    btnDownload.href = URL.createObjectURL(blob);
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+    currentObjectURL = URL.createObjectURL(blob);
+    btnDownload.href = currentObjectURL;
     resultMeta.textContent = `${state.selected.size} page${state.selected.size !== 1 ? 's' : ''} removed · ${keepIndices.length} remaining · ${fmt(blob.size)}`;
     setProgress(100, 'Done!');
     await sleep(300);
@@ -120,6 +124,7 @@ async function apply() {
 }
 
 function reset() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   Object.assign(state, { srcBytes: null, pdfLibDoc: null, pdfJsDoc: null, selected: new Set() });
   fileInput.value = ''; pageGrid.innerHTML = '';
   dropzone.style.display = 'block'; editorArea.style.display = 'none';

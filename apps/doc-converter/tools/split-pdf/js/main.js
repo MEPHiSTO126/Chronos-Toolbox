@@ -1,6 +1,8 @@
 'use strict';
 const { PDFDocument } = PDFLib;
 
+let currentObjectURL = null;
+
 const state = { file: null, srcDoc: null };
 
 const dropzone     = document.getElementById('dropzone');
@@ -88,7 +90,9 @@ async function split() {
       setProgress(80, 'Saving…');
       const bytes = await outDoc.save();
       const blob  = new Blob([bytes], { type: 'application/pdf' });
-      btnDownload.href = URL.createObjectURL(blob);
+      if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+      currentObjectURL = URL.createObjectURL(blob);
+      btnDownload.href = currentObjectURL;
       btnDownload.download = pageSets[0].name;
       btnDownload.textContent = '⬇ Download PDF';
       resultMeta.textContent = `${pageSets[0].indices.length} page${pageSets[0].indices.length !== 1 ? 's' : ''} · ${fmt(blob.size)}`;
@@ -106,7 +110,9 @@ async function split() {
       }
       setProgress(95, 'Zipping…');
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      btnDownload.href = URL.createObjectURL(zipBlob);
+      if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+      currentObjectURL = URL.createObjectURL(zipBlob);
+      btnDownload.href = currentObjectURL;
       btnDownload.download = `${state.file.name.replace('.pdf', '')}_pages.zip`;
       btnDownload.textContent = '⬇ Download ZIP';
       resultMeta.textContent = `${pageSets.length} pages · ${fmt(zipBlob.size)}`;
@@ -125,6 +131,7 @@ async function split() {
 }
 
 function reset() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   state.file = null; state.srcDoc = null;
   fileInput.value = '';
   dropzone.style.display = 'block';

@@ -17,6 +17,7 @@ const btnAgain    = document.getElementById('btn-again');
 const resultMeta  = document.getElementById('result-meta');
 
 let selectedFiles = [];
+let currentObjectURL = null;
 
 // ── Drag & Drop ─────────────────────────────────────────────────
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
@@ -66,6 +67,7 @@ function addFiles(files) {
 btnAgain.addEventListener('click', reset);
 
 function reset() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   selectedFiles = [];
   fileInput.value = '';
   dropzone.style.display = 'block';
@@ -172,7 +174,8 @@ btnConvert.addEventListener('click', async () => {
       console.warn('Unexpected MIME type:', blob.type);
     }
 
-    const url  = URL.createObjectURL(blob);
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+    currentObjectURL = URL.createObjectURL(blob);
 
     const cd  = response.headers.get('Content-Disposition') || '';
     let fname = cd.match(/filename\*?=([^;]+)/)?.[1]?.replace(/^UTF-8''/, '')?.replace(/^"|"$/g, '')

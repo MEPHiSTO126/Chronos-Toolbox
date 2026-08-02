@@ -11,6 +11,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // ── State ──────────────────────────────────────────────────
+let currentObjectURLs = [];
+
 const state = {
   pdfDoc:   null,
   fileName: '',
@@ -110,6 +112,8 @@ async function convert() {
     pageNums = Array.from({ length: state.pdfDoc.numPages }, (_, i) => i + 1);
   }
 
+  currentObjectURLs.forEach(url => URL.revokeObjectURL(url));
+  currentObjectURLs = [];
   state.pages = [];
   pagesGrid.innerHTML = '';
   pagesArea.style.display    = 'none';
@@ -134,6 +138,7 @@ async function convert() {
     // Convert canvas to blob
     const blob = await new Promise(res => canvas.toBlob(res, mimeType, 0.92));
     const url  = URL.createObjectURL(blob);
+    currentObjectURLs.push(url);
     state.pages.push({ pageNum, canvas, blob, url, ext });
 
     renderPageCard({ pageNum, canvas, url, ext });
@@ -189,6 +194,8 @@ async function downloadAll() {
 
 // ── Helpers ────────────────────────────────────────────────
 function clearAll() {
+  currentObjectURLs.forEach(url => URL.revokeObjectURL(url));
+  currentObjectURLs = [];
   state.pdfDoc = null;
   state.pages  = [];
   fileInput.value = '';

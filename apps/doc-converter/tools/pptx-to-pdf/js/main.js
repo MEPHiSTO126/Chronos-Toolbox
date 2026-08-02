@@ -15,6 +15,7 @@ const btnAgain = document.getElementById('btn-again');
 const resultMeta = document.getElementById('result-meta');
 
 let selectedFiles = [];
+let currentObjectURL = null;
 
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
@@ -74,7 +75,7 @@ btnConvert.addEventListener('click', async () => {
 
   const invalid = selectedFiles.filter(f => !/\.(ppt|pptx)$/i.test(f.name));
   if (invalid.length) {
-    showToast(`${invalid.length} file${invalid.length !== 1 ? 's' : ''} not a PowerPoint file — only .ppt / .pptx accepted`, 'error');
+    toast(`${invalid.length} file${invalid.length !== 1 ? 's' : ''} not a PowerPoint file — only .ppt / .pptx accepted`, true);
     return;
   }
 
@@ -116,7 +117,8 @@ btnConvert.addEventListener('click', async () => {
     const res = await doFetchWithProgress(API_URL, { method: 'POST', body: formData }, __handleProgress);
     if (!res.ok) throw new Error(await res.text());
     const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+    currentObjectURL = URL.createObjectURL(blob);
     const cd = res.headers.get('Content-Disposition') || '';
     let fname = cd.match(/filename="?([^"]+)"?/)?.[1];
     if (!fname) fname = selectedFiles.length === 1 ? selectedFiles[0].name.replace(/\.pptx?$/i, '.pdf') : 'converted_presentations.zip';
@@ -142,6 +144,7 @@ btnConvert.addEventListener('click', async () => {
 });
 
 function reset() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   selectedFiles = []; fileInput.value = '';
   dropzone.style.display = 'block'; actionBar.style.display = 'none';
   resultArea.classList.remove('visible'); progressWrap.classList.remove('visible');

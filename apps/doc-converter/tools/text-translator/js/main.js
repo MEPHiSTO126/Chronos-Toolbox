@@ -1,6 +1,6 @@
 /**
  * Chronos Toolbox — Text Translator
- * Translate text between languages using LibreTranslate (free, no API key).
+ * Translate text between languages using MyMemory (free, no API key).
  */
 
 'use strict';
@@ -16,9 +16,6 @@ const btnClear = document.getElementById('btn-clear');
 const btnCopy = document.getElementById('btn-copy');
 const statusText = document.getElementById('status-text');
 const charCount = document.getElementById('char-count');
-
-// ── LibreTranslate instance (free, no API key) ─────────────
-const LIBRE_TRANSLATE_URL = 'https://libretranslate.com';
 
 // ── Events ─────────────────────────────────────────────────
 btnTranslate.addEventListener('click', translateText);
@@ -60,62 +57,27 @@ async function translateText() {
   statusText.textContent = 'Connecting to translation service...';
 
   try {
-    const response = await fetch(`${LIBRE_TRANSLATE_URL}/translate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        q: text,
-        source: source,
-        target: target,
-        format: 'text'
-      })
-    });
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+    const response = await fetch(url);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `Translation API error: ${response.status}`);
+      throw new Error(`Translation API error: ${response.status}`);
     }
 
     const data = await response.json();
-    outputText.value = data.translatedText;
+
+    if (data.responseStatus !== 200 || !data.responseData?.translatedText) {
+      throw new Error(data.responseDetails || 'Translation failed');
+    }
+
+    outputText.value = data.responseData.translatedText;
     statusText.textContent = `Translated from ${getLangName(source)} to ${getLangName(target)}`;
     toast('Translation complete!');
 
   } catch (err) {
     console.error('Translation Error:', err);
-    
-    // Fallback: Try alternative LibreTranslate instance
-    try {
-      statusText.textContent = 'Trying alternative service...';
-      const fallbackResponse = await fetch('https://translate.terraprint.co/translate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          q: text,
-          source: source,
-          target: target,
-          format: 'text'
-        })
-      });
-
-      if (!fallbackResponse.ok) {
-        throw new Error('Fallback service also failed');
-      }
-
-      const fallbackData = await fallbackResponse.json();
-      outputText.value = fallbackData.translatedText;
-      statusText.textContent = `Translated from ${getLangName(source)} to ${getLangName(target)}`;
-      toast('Translation complete (via fallback)!');
-
-    } catch (fallbackErr) {
-      console.error('Fallback Translation Error:', fallbackErr);
-      toast(`Error: ${err.message}. Please try again later.`, true);
-      statusText.textContent = 'Translation failed';
-    }
+    toast(`Error: ${err.message}. Please try again later.`, true);
+    statusText.textContent = 'Translation failed';
   } finally {
     btnTranslate.disabled = false;
     btnTranslate.textContent = 'Translate';

@@ -1,6 +1,8 @@
 'use strict';
 const { PDFDocument } = PDFLib;
 
+let currentObjectURL = null;
+
 const state = { files: [], dragSrcIdx: null };
 
 const dropzone    = document.getElementById('dropzone');
@@ -105,7 +107,9 @@ async function merge() {
     setProgress(95, 'Saving PDF…');
     const bytes = await merged.save();
     const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url  = URL.createObjectURL(blob);
+    if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+    currentObjectURL = URL.createObjectURL(blob);
+    const url = currentObjectURL;
     btnDownload.href = url;
     btnDownload.download = 'merged.pdf';
     resultMeta.textContent = `${merged.getPageCount()} pages · ${fmt(blob.size)}`;
@@ -122,6 +126,7 @@ async function merge() {
 }
 
 function clearAll() {
+  if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
   state.files = [];
   fileInput.value = ''; addMoreInput.value = '';
   fileList.innerHTML = '';
