@@ -31,6 +31,51 @@ function updateCharCount() {
   charCount.style.color = count > 5000 ? 'var(--clr-danger)' : 'var(--clr-text-muted)';
 }
 
+// ── Chunking helper for MyMemory 450-char limit ────────────
+function splitIntoChunks(text, maxLen = 450) {
+  if (text.length <= maxLen) return [text];
+  const paragraphs = text.split('\n');
+  const chunks = [];
+  let currentChunk = '';
+
+  for (const para of paragraphs) {
+    if ((currentChunk + '\n' + para).trim().length <= maxLen) {
+      currentChunk = currentChunk ? currentChunk + '\n' + para : para;
+    } else {
+      if (currentChunk) chunks.push(currentChunk);
+      if (para.length <= maxLen) {
+        currentChunk = para;
+      } else {
+        // Split long paragraph by sentences
+        const sentences = para.match(/[^.!?]+[.!?]+|\s*[^.!?]+$/g) || [para];
+        for (const sent of sentences) {
+          if ((currentChunk + ' ' + sent).trim().length <= maxLen) {
+            currentChunk = currentChunk ? currentChunk + ' ' + sent : sent;
+          } else {
+            if (currentChunk) chunks.push(currentChunk);
+            currentChunk = sent;
+          }
+        }
+      }
+    }
+  }
+  if (currentChunk) chunks.push(currentChunk);
+  return chunks;
+}
+
+async function translateSingleChunk(chunk, source, target) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${source}|${target}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Translation API error: ${response.status}`);
+  }
+  const data = await response.json();
+  if (data.responseStatus !== 200 || !data.responseData?.translatedText) {
+    throw new Error(data.responseDetails || 'Translation failed');
+  }
+  return data.responseData.translatedText;
+}
+
 // ── Translation ────────────────────────────────────────────
 async function translateText() {
   const text = inputText.value.trim();
@@ -57,20 +102,21 @@ async function translateText() {
   statusText.textContent = 'Connecting to translation service...';
 
   try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
-    const response = await fetch(url);
+    const chunks = splitIntoChunks(text, 450);
+    const translatedChunks = [];
 
-    if (!response.ok) {
-      throw new Error(`Translation API error: ${response.status}`);
+    for (let i = 0; i < chunks.length; i++) {
+      if (chunks.length > 1) {
+        statusText.textContent = `Translating segment ${i + 1} of ${chunks.length}...`;
+      }
+      const translated = await translateSingleChunk(chunks[i], source, target);
+      translatedChunks.push(translated);
+      if (i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, 100));
+      }
     }
 
-    const data = await response.json();
-
-    if (data.responseStatus !== 200 || !data.responseData?.translatedText) {
-      throw new Error(data.responseDetails || 'Translation failed');
-    }
-
-    outputText.value = data.responseData.translatedText;
+    outputText.value = translatedChunks.join('\n\n');
     statusText.textContent = `Translated from ${getLangName(source)} to ${getLangName(target)}`;
     toast('Translation complete!');
 

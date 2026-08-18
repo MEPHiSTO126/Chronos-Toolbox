@@ -103,7 +103,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="../../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
+      <a href="../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
         <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
         <span class="logo-text">Chronos <strong>Toolbox</strong></span>
       </a>
@@ -200,7 +200,10 @@
           <div id="result-area" style="display:none;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
               <p style="font-size:0.85rem; font-weight:600; color:var(--clr-text-sub);">Extracted Text</p>
-              <button id="btn-copy" style="font-family:inherit; font-size:0.78rem; font-weight:600; padding:0.35rem 0.75rem; background:transparent; color:var(--c-rose); border:1px solid var(--c-border); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;">Copy Text</button>
+              <div style="display:flex; gap:0.5rem;">
+                <button id="btn-copy" style="font-family:inherit; font-size:0.78rem; font-weight:600; padding:0.35rem 0.75rem; background:transparent; color:var(--c-rose); border:1px solid var(--c-border); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;">Copy Text</button>
+                <button id="btn-download-txt" style="font-family:inherit; font-size:0.78rem; font-weight:600; padding:0.35rem 0.75rem; background:var(--c-rose); color:var(--c-bg); border:none; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s;">Download .txt</button>
+              </div>
             </div>
             <textarea id="extracted-text" class="text-output" readonly placeholder="Extracted text will appear here..."></textarea>
           </div>
@@ -230,7 +233,7 @@
 
   <footer class="site-footer">
     <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
-    <p class="footer-text">Part of <a href="../../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Text extraction powered by OCR.Space API.</p>
+    <p class="footer-text">Part of <a href="../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Text extraction powered by OCR.Space API.</p>
   </footer>
 
   <style>

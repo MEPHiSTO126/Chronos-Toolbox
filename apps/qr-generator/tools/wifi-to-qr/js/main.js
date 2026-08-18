@@ -69,6 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (isHidden) {
       wifiString += `H:true;`;
+    } else {
+      wifiString += `H:false;`;
     }
     wifiString += `;`;
 

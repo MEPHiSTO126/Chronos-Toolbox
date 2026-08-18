@@ -44,11 +44,14 @@ const ToolSearch = (() => {
     
     // Media Converter tools
     { id: 'video-to-audio', title: 'Video to Audio', description: 'Extract audio from video', category: 'Media Converter', url: '../media-converter/tools/video-to-audio/index.html', emoji: '🎵', tags: ['video', 'audio', 'extract', 'convert'] },
-    { id: 'audio-loop', title: 'Audio Loop', description: 'Loop audio tracks', category: 'Media Converter', url: '../media-converter/tools/audio-loop/index.html', emoji: '🔁', tags: ['audio', 'loop', 'repeat', 'track'] },
+    { id: 'multiply-audio', title: 'Multiply Audio', description: 'Multiply audio with loops and overlays', category: 'Media Converter', url: '../media-converter/tools/multiply-audio/index.html', emoji: '🔁', tags: ['audio', 'loop', 'multiply', 'overlay', 'repeat'] },
+    { id: 'audio-manipulator', title: 'Audio Manipulator', description: 'Adjust speed, pitch, volume, and audio effects', category: 'Media Converter', url: '../media-converter/tools/audio-manipulator/index.html', emoji: '🎛️', tags: ['audio', 'speed', 'pitch', 'volume', 'reverse', 'fade'] },
     { id: 'audio-to-text', title: 'Audio to Text', description: 'Transcribe audio to text', category: 'Media Converter', url: '../media-converter/tools/audio-to-text/index.html', emoji: '📝', tags: ['audio', 'text', 'transcribe', 'speech'] },
     { id: 'vocal-splitter', title: 'Vocal Splitter', description: 'Separate vocals from instrumentals', category: 'Media Converter', url: '../media-converter/tools/vocal-splitter/index.html', emoji: '🎤', tags: ['vocal', 'split', 'separate', 'instrumental'] },
+    { id: 'instrumental-extractor', title: 'Instrumental Extractor', description: 'Extract clean instrumental and backing tracks', category: 'Media Converter', url: '../media-converter/tools/instrumental-extractor/index.html', emoji: '🎼', tags: ['instrumental', 'music', 'karaoke', 'vocals', 'extract'] },
     { id: 'compress-video', title: 'Compress Video', description: 'Reduce video file size', category: 'Media Converter', url: '../media-converter/tools/compress-video/index.html', emoji: '📦', tags: ['video', 'compress', 'reduce', 'size'] },
     { id: 'video-converter', title: 'Video Converter', description: 'Convert between video formats', category: 'Media Converter', url: '../media-converter/tools/video-converter/index.html', emoji: '🔄', tags: ['video', 'convert', 'format', 'mp4', 'avi'] },
+    { id: 'video-to-gif', title: 'Video to GIF', description: 'Convert video clips to animated GIFs and vice versa', category: 'Media Converter', url: '../media-converter/tools/video-to-gif/index.html', emoji: '🎞️', tags: ['video', 'gif', 'convert', 'animation'] },
     { id: 'social-downloader', title: 'Social Downloader', description: 'Download videos from social media', category: 'Media Converter', url: '../media-converter/tools/social-downloader/index.html', emoji: '⬇️', tags: ['social', 'download', 'video', 'facebook', 'youtube'] },
     
     // QR Generator tools

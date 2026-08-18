@@ -1,9 +1,11 @@
 'use strict';
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com';
 const API_URL = typeof window.TOOLBOX_API !== 'undefined' 
   ? window.TOOLBOX_API 
-  : 'https://toolbox-backend-76dc.onrender.com';
+  : BASE_URL;
 
 const state = {
   queue: [],           // array of File objects

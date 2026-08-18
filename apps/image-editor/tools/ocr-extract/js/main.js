@@ -22,6 +22,7 @@ const previewImg = document.getElementById('preview-img');
 const btnExtract = document.getElementById('btn-extract');
 const btnClear = document.getElementById('btn-clear');
 const btnCopy = document.getElementById('btn-copy');
+const btnDownloadTxt = document.getElementById('btn-download-txt');
 const resultArea = document.getElementById('result-area');
 const extractedText = document.getElementById('extracted-text');
 const langSelect = document.getElementById('lang-select');
@@ -43,6 +44,7 @@ fileInput.addEventListener('change', () => {
 btnExtract.addEventListener('click', extractText);
 btnClear.addEventListener('click', clearAll);
 btnCopy.addEventListener('click', copyText);
+btnDownloadTxt.addEventListener('click', downloadText);
 
 // ── Loading File ───────────────────────────────────────────
 function loadFile(file) {
@@ -140,6 +142,20 @@ function copyText() {
     document.execCommand('copy');
     toast('Text copied to clipboard!');
   });
+}
+
+// ── Download Text as .txt ─────────────────────────────────
+function downloadText() {
+  if (!extractedText.value) return;
+
+  const blob = new Blob([extractedText.value], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${state.fileName || 'extracted-text'}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Text downloaded!');
 }
 
 // ── Clear / Reset ──────────────────────────────────────────

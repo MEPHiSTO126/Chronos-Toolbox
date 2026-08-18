@@ -159,6 +159,10 @@ async function convertAll() {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d');
+      if (targetFormat === 'jpeg' || targetFormat === 'jpg') {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
       ctx.drawImage(img, 0, 0);
 
       // WebGL/Canvas toBlob

@@ -27,6 +27,15 @@ const btnDownload = document.getElementById('btn-download');
 const statusText = document.getElementById('status-text');
 const progressWrap = document.getElementById('progress-wrap');
 const resultArea = document.getElementById('result-area');
+const toleranceSlider = document.getElementById('tolerance-slider');
+const toleranceVal = document.getElementById('tolerance-val');
+const apiKeyInput = document.getElementById('api-key-input');
+
+if (toleranceSlider && toleranceVal) {
+  toleranceSlider.addEventListener('input', () => {
+    toleranceVal.textContent = toleranceSlider.value;
+  });
+}
 
 // ── Events ─────────────────────────────────────────────────
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
@@ -79,57 +88,53 @@ function loadFile(file) {
 async function removeBackground() {
   if (!state.file || state.isProcessing) return;
 
+  const apiKey = apiKeyInput?.value?.trim();
+  const tolerance = parseInt(toleranceSlider?.value || '40', 10);
+
   state.isProcessing = true;
   btnRemove.disabled = true;
   btnRemove.textContent = 'Removing...';
   progressWrap.style.display = 'block';
-  statusText.textContent = 'Sending image to Remove.bg...';
   resultArea.style.display = 'none';
 
   try {
-    const formData = new FormData();
-    formData.append('image_file', state.file);
-    formData.append('size', 'auto');
+    if (apiKey) {
+      statusText.textContent = 'Sending image to Remove.bg API...';
+      const formData = new FormData();
+      formData.append('image_file', state.file);
+      formData.append('size', 'auto');
 
-    // Use free demo API endpoint (rate limited)
-    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': 'demo' // Free demo key (limited usage)
-      },
-      body: formData
-    });
+      const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+        method: 'POST',
+        headers: { 'X-Api-Key': apiKey },
+        body: formData
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.errors?.[0]?.title || `API error: ${response.status}`);
-    }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.errors?.[0]?.title || `API error: ${response.status}`);
+      }
 
-    state.resultBlob = await response.blob();
-    const resultUrl = URL.createObjectURL(state.resultBlob);
-    previewResult.src = resultUrl;
-    resultArea.style.display = 'block';
-    statusText.textContent = 'Background removed successfully!';
-
-    toast('Background removed!');
-
-  } catch (err) {
-    console.error('Background Removal Error:', err);
-    
-    // Fallback: Use client-side canvas-based removal (basic)
-    try {
-      statusText.textContent = 'Using fallback removal...';
-      const fallbackBlob = await clientSideRemoval(state.file);
+      state.resultBlob = await response.blob();
+      const resultUrl = URL.createObjectURL(state.resultBlob);
+      previewResult.src = resultUrl;
+      resultArea.style.display = 'block';
+      statusText.textContent = 'Background removed successfully (Remove.bg AI)!';
+      toast('Background removed!');
+    } else {
+      statusText.textContent = 'Removing background...';
+      const fallbackBlob = await clientSideRemoval(state.file, tolerance);
       state.resultBlob = fallbackBlob;
       const resultUrl = URL.createObjectURL(fallbackBlob);
       previewResult.src = resultUrl;
       resultArea.style.display = 'block';
-      statusText.textContent = 'Background removed (basic mode)!';
-      toast('Background removed (basic mode)!');
-    } catch (fallbackErr) {
-      toast(`Error: ${err.message}`, true);
-      statusText.textContent = 'Removal failed';
+      statusText.textContent = 'Background removed!';
+      toast('Background removed!');
     }
+  } catch (err) {
+    console.error('Background Removal Error:', err);
+    toast(`Error: ${err.message}`, true);
+    statusText.textContent = 'Removal failed';
   } finally {
     state.isProcessing = false;
     btnRemove.disabled = false;
@@ -138,8 +143,8 @@ async function removeBackground() {
   }
 }
 
-// ── Client-side fallback removal ───────────────────────────
-async function clientSideRemoval(file) {
+// ── Client-side removal ───────────────────────────────────
+async function clientSideRemoval(file, tolerance = 40) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -152,9 +157,8 @@ async function clientSideRemoval(file) {
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
 
-      // Simple color-based removal (removes similar colors to corners)
+      // Color-based removal
       const bgColor = getBackgroundColor(data, canvas.width, canvas.height);
-      const tolerance = 40;
 
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
