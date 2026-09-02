@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="doc">
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Rearrange pages in a PDF by dragging. Free, private, runs entirely in your browser." />
@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
+  <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
   <link rel="stylesheet" href="../tool-shared.css" />
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -25,28 +27,23 @@
   </style>
 </head>
 <body>
-  <div class="bg-glow" aria-hidden="true"></div>
   <header class="site-header">
     <div class="header-inner">
       <a href="../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
-        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" width="22" height="22" />
-        <span class="logo-text-fallback">Chronos <strong>Toolbox</strong></span>
+        <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        <span class="logo__text">Chronos <strong>Toolbox</strong></span>
       </a>
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <span class="breadcrumb__sep">/</span><a href="../../index.html">Doc Converter</a>
         <span class="breadcrumb__sep">/</span><span>Rearrange PDF</span>
       </nav>
       <a href="../../index.html" class="btn-back" id="btn-back">
-        <span class="back-arrow-pair" aria-hidden="true">
-          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
-          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
-        </span>Back
+        <svg class="btn-back__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>Back
       </a>
     </div>
   </header>
 
   <section class="tool-hero">
-    <span class="tool-hero__icon">↕️</span>
     <h1 class="tool-hero__title">Rearrange <span>PDF</span></h1>
     <p class="tool-hero__subtitle">Drag page thumbnails to reorder them, then download the rearranged PDF.</p>
   </section>
@@ -54,7 +51,7 @@
   <main class="workspace">
     <div class="dropzone" id="dropzone" role="button" aria-label="Drop PDF file here or click to browse">
       <input type="file" id="file-input" accept="application/pdf" />
-      <span class="dropzone__icon">📂</span>
+      <span class="dropzone__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
       <p class="dropzone__title">Drop your PDF here</p>
       <p class="dropzone__sub">or <span>click to browse</span> · PDF only</p>
     </div>
@@ -79,7 +76,7 @@
 
     <div class="result-area" id="result-area">
       <div class="result-card">
-        <span class="result-card__icon">✅</span>
+        <span class="result-card__icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
         <p class="result-card__title">Rearranged PDF ready!</p>
         <p class="result-card__meta" id="result-meta"></p>
         <a class="btn-download" id="btn-download" download="rearranged.pdf">⬇ Download PDF</a><br />

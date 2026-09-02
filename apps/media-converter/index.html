@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="media">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../packages/ui/tokens.css" />
+  <link rel="stylesheet" href="../../packages/ui/shared.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="../../packages/ui/search-bar.css" />
 </head>
@@ -16,10 +18,10 @@
 
   <!-- Header -->
   <header class="site-header">
-    <div class="header-inner">
+    <div class="header-inner header-inner--wide">
       <a href="../home/index.html" class="logo" id="logo-home-link" aria-label="Back to Chronos Toolbox home">
-        <img class="logo-toolbox" src="../../packages/images/tool-box.png" alt="" aria-hidden="true" width="28" height="28" />
-        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+        <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        <span class="logo__text">Chronos <strong>Toolbox</strong></span>
       </a>
       <div class="breadcrumb" aria-label="Breadcrumb">
         <span class="breadcrumb__sep">/</span>
@@ -37,9 +39,6 @@
 
   <!-- Hero -->
   <section class="hero" aria-labelledby="hero-heading">
-    <div class="hero-icon" aria-hidden="true">
-      <img src="../../packages/images/media-logo.png" alt="Media" width="64" height="64" />
-    </div>
     <h1 id="hero-heading" class="hero-title">
       Media <span class="hero-title--accent">Converter</span>
     </h1>
@@ -80,7 +79,7 @@
           <p class="tool-card__title">Video to Audio</p>
           <p class="tool-card__desc">Extract high-quality MP3 or WAV audio tracks from any video file.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Audio to Text -->
@@ -102,7 +101,7 @@
           <p class="tool-card__title">Audio to Text</p>
           <p class="tool-card__desc">Transcribe your voice recordings, interviews, or audio files into accurate text transcripts.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Multiply Audio -->
@@ -123,7 +122,7 @@
           <p class="tool-card__title">Multiply Audio</p>
           <p class="tool-card__desc">Loop an audio track and overlay/sequence it onto itself multiple times.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Vocal Splitter -->
@@ -143,7 +142,7 @@
           <p class="tool-card__title">Vocal Splitter</p>
           <p class="tool-card__desc">Extract voice vocals and backing instrumental tracks from any song.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Instrumental Extractor -->
@@ -164,7 +163,7 @@
           <p class="tool-card__title">Instrumental Extractor</p>
           <p class="tool-card__desc">Extract background music and instrumentals from any song, leaving only the music.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Social Downloader -->
@@ -185,7 +184,7 @@
           <p class="tool-card__title">Social Downloader</p>
           <p class="tool-card__desc">Download videos directly from YouTube, Twitter, TikTok, Instagram, and more.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Compress Video -->
@@ -207,7 +206,7 @@
           <p class="tool-card__title">Compress Video</p>
           <p class="tool-card__desc">Reduce file size by lowering resolution and bitrate without losing quality.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Video to GIF -->
@@ -228,7 +227,7 @@
           <p class="tool-card__title">Video ↔ GIF</p>
           <p class="tool-card__desc">Convert video clips to looping animated GIFs, or convert GIFs back to video files.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Video Converter -->
@@ -248,7 +247,7 @@
           <p class="tool-card__title">Video Converter</p>
           <p class="tool-card__desc">Convert between MP4, WebM, AVI, MOV, and MKV formats.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Audio Manipulator -->
@@ -276,7 +275,7 @@
           <p class="tool-card__title">Audio Manipulator</p>
           <p class="tool-card__desc">Change volume amplitude, modify playback speed/pitch, trim segments, and apply fade effects.</p>
         </div>
-        <span class="tool-card__cta">Open tool <span class="arrow-pair" aria-hidden="true"><img src="../../packages/images/right-arrow.png" alt="" /><img src="../../packages/images/right-arrow.png" alt="" /></span></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
     </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="image">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Raleway:wght@400;700&family=Pt+Sans:wght@400;700&family=Source+Sans+3:wght@400;700&family=Poppins:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Libre+Baskerville:wght@400;700&family=PT+Serif:wght@400;700&family=IBM+Plex+Sans:wght@400;700&family=Fira+Sans:wght@400;700&family=Rubik:wght@400;700&family=Work+Sans:wght@400;700&family=Barlow:wght@400;700&family=Karla:wght@400;700&family=Cabin:wght@400;700&family=Josefin+Sans:wght@400;700&family=Quicksand:wght@400;700&family=Pacifico&family=Lobster&family=Lilita+One&family=Bebas+Neue&family=Righteous&family=Passion+One:wght@400;700&family=Permanent+Marker&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Satisfy&family=Bungee&family=Orbitron:wght@400;700&family=Audiowide&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
+  <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
   <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     /* Relative canvas container wrapper */
@@ -91,14 +93,12 @@
 </head>
 <body>
 
-  <div class="bg-glow" aria-hidden="true"></div>
-
   <!-- Header -->
   <header class="site-header">
     <div class="header-inner">
       <a href="../../../home/index.html" class="logo" aria-label="Chronos Toolbox home">
-        <img class="logo-toolbox" src="../../../../packages/images/tool-box.png" alt="" aria-hidden="true" width="22" height="22" />
-        <span class="logo-text">Chronos <strong>Toolbox</strong></span>
+        <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        <span class="logo__text">Chronos <strong>Toolbox</strong></span>
       </a>
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <span class="breadcrumb__sep">/</span>
@@ -107,10 +107,7 @@
         <span>Watermark</span>
       </nav>
       <a href="../../index.html" class="btn-back" id="btn-back">
-        <span class="back-arrow-pair" aria-hidden="true">
-          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
-          <img src="../../../../packages/images/right-arrow.png" alt="" class="arr-left" />
-        </span>
+        <svg class="btn-back__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
         Back
       </a>
     </div>
@@ -118,7 +115,6 @@
 
   <!-- Hero -->
   <section class="tool-hero">
-    <span class="tool-hero__icon" aria-hidden="true">🔒</span>
     <h1 class="tool-hero__title">Add <span>Watermark</span></h1>
     <p class="tool-hero__subtitle">Protect your content with custom text tags or graphic logo overlays with live position dragging and rotation.</p>
   </section>
@@ -129,7 +125,7 @@
     <!-- Drop zone -->
     <div class="dropzone" id="dropzone" role="button" aria-label="Upload source image file">
       <input type="file" id="file-input" accept="image/*" aria-label="Select source image file" />
-      <span class="dropzone__icon" aria-hidden="true">📂</span>
+      <span class="dropzone__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
       <p class="dropzone__title">Drop your main image here</p>
       <p class="dropzone__sub">or <span>click to browse</span> · PNG, JPG, WEBP, BMP, GIF</p>
     </div>

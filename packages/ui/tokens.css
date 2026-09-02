@@ -1,0 +1,122 @@
+/* ============================================================
+   CHRONOS TOOLBOX — Design Tokens
+   Single source of truth for all CSS variables.
+   Structural palette is shared; only --color-accent varies per theme.
+   Use [data-theme] on <html> or <body> to switch accent.
+   ============================================================ */
+
+:root {
+  /* ── Structural palette (shared) ── */
+  --color-bg:            #0E1D21;
+  --color-surface:       #122E34;
+  --color-raised:        #1A3840;
+  --color-border:        #2A4048;
+  --color-steel:         #6A8290;
+  --color-silver:        #A8B8C0;
+  --color-white:         #F0F4F6;
+
+  --color-text:          var(--color-white);
+  --color-text-sub:      var(--color-silver);
+  --color-text-muted:    var(--color-steel);
+
+  --color-danger:        #C0524A;
+  --color-danger-bg:     rgba(192,82,74,0.10);
+  --color-warning:       #B89A6A;
+  --color-warning-bg:    rgba(184,154,106,0.08);
+  --color-warning-border:rgba(184,154,106,0.20);
+
+  /* ── Default accent (overridden per theme) ── */
+  --color-accent:        #E0B4B2;
+  --color-accent-hover:  #EAD0CE;
+  --color-accent-soft:   rgba(224,180,178,0.06);
+  --color-accent-border: rgba(224,180,178,0.18);
+  --color-accent-glow:   rgba(224,180,178,0.10);
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --radius-full: 50%;
+
+  /* ── Typography ── */
+  --font: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  /* ── Motion ── */
+  --transition: 0.2s ease;
+  --transition-fast: 0.15s ease;
+
+  /* ── Layout ── */
+  --header-height: 62px;
+  --content-max: 1180px;
+  --content-narrow: 960px;
+
+  /* ── Shadows ── */
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.32);
+  --shadow-toast: 0 8px 32px rgba(0,0,0,0.50);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.40);
+
+  /* ── Legacy aliases (for gradual migration — remove later) ── */
+  --c-bg:     var(--color-bg);
+  --c-surface:var(--color-surface);
+  --c-raised: var(--color-raised);
+  --c-border: var(--color-border);
+  --c-steel:  var(--color-steel);
+  --c-silver: var(--color-silver);
+  --c-white:  var(--color-white);
+  --c-rose:   var(--color-accent);
+  --clr-bg:           var(--color-bg);
+  --clr-surface:      var(--color-surface);
+  --clr-surface-2:    var(--color-raised);
+  --clr-border:       var(--color-border);
+  --clr-border-hover: var(--color-steel);
+  --clr-accent:       var(--color-accent);
+  --clr-accent-dim:   var(--color-steel);
+  --clr-text-primary: var(--color-text);
+  --clr-text-sub:     var(--color-text-sub);
+  --clr-text-muted:   var(--color-text-muted);
+  --clr-glow:         var(--color-accent-glow);
+  --clr-danger:       var(--color-danger);
+  --clr-danger-bg:    var(--color-danger-bg);
+}
+
+/* ── Per-theme accent overrides ── */
+[data-theme="home"] {
+  --color-accent:        #7DD8E0;
+  --color-accent-hover:  #9BE5EB;
+  --color-accent-soft:   rgba(125,216,224,0.07);
+  --color-accent-border: rgba(125,216,224,0.20);
+  --color-accent-glow:   rgba(125,216,224,0.10);
+}
+
+[data-theme="doc"] {
+  --color-accent:        #E0B4B2;
+  --color-accent-hover:  #EAD0CE;
+  --color-accent-soft:   rgba(224,180,178,0.06);
+  --color-accent-border: rgba(224,180,178,0.18);
+  --color-accent-glow:   rgba(224,180,178,0.10);
+}
+
+[data-theme="image"] {
+  --color-accent:        #FF7E9F;
+  --color-accent-hover:  #FFA1B8;
+  --color-accent-soft:   rgba(255,126,159,0.07);
+  --color-accent-border: rgba(255,126,159,0.20);
+  --color-accent-glow:   rgba(255,126,159,0.10);
+}
+
+[data-theme="media"] {
+  --color-accent:        #A27BFF;
+  --color-accent-hover:  #BCA0FF;
+  --color-accent-soft:   rgba(162,123,255,0.07);
+  --color-accent-border: rgba(162,123,255,0.20);
+  --color-accent-glow:   rgba(162,123,255,0.10);
+}
+
+[data-theme="qr"] {
+  --color-accent:        #00D993;
+  --color-accent-hover:  #33E1A9;
+  --color-accent-soft:   rgba(0,217,147,0.07);
+  --color-accent-border: rgba(0,217,147,0.20);
+  --color-accent-glow:   rgba(0,217,147,0.10);
+}
