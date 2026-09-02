@@ -186,7 +186,7 @@ btnConvert.addEventListener('click', async () => {
         : 'converted_to_pdf.zip';
     }
 
-    btnDownload.href = url;
+    btnDownload.href = currentObjectURL;
     btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF File'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;

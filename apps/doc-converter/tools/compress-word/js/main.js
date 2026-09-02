@@ -159,7 +159,7 @@ btnConvert.addEventListener('click', async () => {
         : 'compressed_documents.zip';
     }
 
-    btnDownload.href = url;
+    btnDownload.href = currentObjectURL;
     btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'Compressed Word File'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} compressed · ${fmt(blob.size)}`;

@@ -122,7 +122,7 @@ btnConvert.addEventListener('click', async () => {
     const cd = res.headers.get('Content-Disposition') || '';
     let fname = cd.match(/filename="?([^"]+)"?/)?.[1];
     if (!fname) fname = selectedFiles.length === 1 ? selectedFiles[0].name.replace(/\.pptx?$/i, '.pdf') : 'converted_presentations.zip';
-    btnDownload.href = url; btnDownload.download = fname;
+    btnDownload.href = currentObjectURL; btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;
     

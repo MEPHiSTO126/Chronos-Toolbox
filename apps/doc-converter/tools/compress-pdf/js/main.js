@@ -160,7 +160,7 @@ btnConvert.addEventListener('click', async () => {
         : 'compressed_pdfs.zip';
     }
 
-    btnDownload.href = url;
+    btnDownload.href = currentObjectURL;
     btnDownload.download = fname;
     btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'Compressed PDF File'}`;
     const saved = originalSize - blob.size;
