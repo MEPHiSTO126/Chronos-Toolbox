@@ -20,6 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   SearchBar.create('#search-container', {
     tools: ToolSearch.allTools,
     placeholder: 'Search all tools...',
-    accent: '#00F0FF'
+    accent: '#7DD8E0'
   });
 });

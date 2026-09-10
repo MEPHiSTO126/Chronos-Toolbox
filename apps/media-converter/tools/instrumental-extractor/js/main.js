@@ -98,6 +98,7 @@ function handleFileSelect(file) {
   selectedFile = file;
   fileNameEl.textContent = file.name;
   fileSizeEl.textContent = formatBytes(file.size);
+  if (audioPreview.src) { URL.revokeObjectURL(audioPreview.src); audioPreview.removeAttribute('src'); }
   audioPreview.src = URL.createObjectURL(file);
 
   dropzone.style.display = 'none';
@@ -211,6 +212,7 @@ btnExtract.addEventListener('click', async () => {
     }
 
     const blob = await response.blob();
+    if (btnDownload.href) { URL.revokeObjectURL(btnDownload.href); btnDownload.removeAttribute('href'); }
     const url = URL.createObjectURL(blob);
 
     // Update result card

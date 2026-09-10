@@ -227,6 +227,7 @@ btnConvert.addEventListener('click', async () => {
     }
 
     const blob = await response.blob();
+    if (btnDownload.href) { URL.revokeObjectURL(btnDownload.href); btnDownload.removeAttribute('href'); }
     const url = URL.createObjectURL(blob);
 
     // Update result card previews

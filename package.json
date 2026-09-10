@@ -11,6 +11,7 @@
     "dev:home": "npm run dev --workspace=apps/home",
     "dev:doc-converter": "npm run dev --workspace=apps/doc-converter",
     "dev:image-editor": "npm run dev --workspace=apps/image-editor",
-    "dev:qr-generator": "npm run dev --workspace=apps/qr-generator"
+    "dev:qr-generator": "npm run dev --workspace=apps/qr-generator",
+    "dev:media-converter": "npm run dev --workspace=apps/media-converter"
   }
 }

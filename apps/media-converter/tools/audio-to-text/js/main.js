@@ -99,6 +99,7 @@ function handleFileSelect(file) {
   selectedFile = file;
   fileNameEl.textContent = file.name;
   fileSizeEl.textContent = formatBytes(file.size);
+  if (audioPreview.src) { URL.revokeObjectURL(audioPreview.src); audioPreview.removeAttribute('src'); }
   audioPreview.src = URL.createObjectURL(file);
 
   dropzone.style.display = 'none';
@@ -223,6 +224,7 @@ btnTranscribe.addEventListener('click', async () => {
 
     // Set up TXT download
     const textBlob = new Blob([text], { type: 'text/plain' });
+    if (btnDownload.href) { URL.revokeObjectURL(btnDownload.href); btnDownload.removeAttribute('href'); }
     const textUrl = URL.createObjectURL(textBlob);
     btnDownload.href = textUrl;
     btnDownload.download = selectedFile.name.replace(/\.[^/.]+$/, "") + "_transcript.txt";

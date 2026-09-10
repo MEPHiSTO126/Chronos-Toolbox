@@ -8,7 +8,7 @@
   padding: 0.45rem 1rem;
   background: var(--clr-surface); color: var(--clr-text-sub);
   border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
-  cursor: pointer; transition: color var(--tr), border-color var(--tr);
+  cursor: pointer; transition: color var(--transition, 0.2s ease), border-color var(--transition, 0.2s ease);
 }
 .rot-btn:hover { color: var(--c-rose); border-color: var(--c-rose); }
 .select-hint { font-size: 0.82rem; color: var(--clr-text-muted); flex: 1; }
@@ -22,8 +22,7 @@
   border: 2px solid var(--clr-border);
   border-radius: var(--radius-md);
   overflow: hidden; cursor: pointer;
-  transition: border-color var(--tr);
-  animation: fadeUp 0.3s ease both;
+  transition: border-color var(--transition, 0.2s ease);
   user-select: none;
 }
 .page-thumb.selected { border-color: var(--c-rose); }

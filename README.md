@@ -14,7 +14,7 @@ A growing suite of clean, fast, free, and private web-based utility tools — al
 Chronos-Toolbox/
 ├── apps/
 │   ├── home/                   # Landing hub — lists all tool categories
-│   ├── doc-converter/          # 11 document tools (PDF, Word, PPTX, Audio…)
+│   ├── doc-converter/          # 15 document tools (PDF, Word, PPTX, Audio…)
 │   │   └── tools/
 │   │       ├── pdf-to-word/        ← Backend
 │   │       ├── word-to-pdf/        ← Backend
@@ -27,7 +27,7 @@ Chronos-Toolbox/
 │   │       ├── page-deleter/       ← Browser
 │   │       ├── rearrange-pdf/      ← Browser
 │   │       └── pdf-to-audio/       ← Browser
-│   ├── image-editor/           # 12 image tools (Convert, Resize, Filters...)
+│   ├── image-editor/           # 15 image tools (Convert, Resize, Filters...)
 │   │   └── tools/
 │   │       ├── image-converter/    ← Browser
 │   │       ├── heic-to-jpg/        ← Browser

@@ -19,6 +19,7 @@ const state = {
   audioElement: null,  // For Edge TTS audio playback
   audioBlob: null,     // Last generated Edge TTS blob (for download)
   pageBlobs: {},       // Cache: page index → Blob
+  currentAudioUrl: null, // Tracked playback object URL (revoked on stop/new playback)
 };
 
 const dropzone    = document.getElementById('dropzone');
@@ -112,6 +113,7 @@ async function loadFileAtIndex(idx) {
   if (!file) return;
   stopSpeech();
   state.pages = []; state.currentPage = 0;
+  state.pageBlobs = {};
   dropzone.style.display = 'none';
   playerArea.style.display = 'none';
   extractWrap.classList.add('visible');
@@ -342,26 +344,34 @@ function playWithBrowserTTS(text) {
 
 async function playWithEdgeTTS(text) {
   try {
-    // Stop any current playback
+    // Stop any current playback (revoke previous playback URL to avoid orphan)
     if (state.audioElement) {
       state.audioElement.pause();
       state.audioElement = null;
     }
+    if (state.currentAudioUrl) { URL.revokeObjectURL(state.currentAudioUrl); state.currentAudioUrl = null; }
     
     // Check cache first
     const cacheKey = `${state.queueIdx}-${state.currentPage}`;
     if (state.pageBlobs[cacheKey]) {
       const blob = state.pageBlobs[cacheKey];
       const audioUrl = URL.createObjectURL(blob);
+      state.currentAudioUrl = audioUrl;
       state.audioElement = new Audio(audioUrl);
       state.audioElement.onended = () => {
         URL.revokeObjectURL(audioUrl);
+        if (state.currentAudioUrl === audioUrl) state.currentAudioUrl = null;
         if (state.currentPage < state.pages.length - 1) {
           state.currentPage++; updateUI(); playCurrent();
         } else {
           state.isPlaying = false; updateUI();
           if (state.queueIdx < state.queue.length - 1) advanceQueue();
         }
+      };
+      state.audioElement.onerror = () => {
+        URL.revokeObjectURL(audioUrl);
+        if (state.currentAudioUrl === audioUrl) state.currentAudioUrl = null;
+        state.isPlaying = false; updateUI();
       };
       await state.audioElement.play();
       state.isPlaying = true; updateUI();
@@ -390,10 +400,12 @@ async function playWithEdgeTTS(text) {
     state.audioBlob = blob;
     state.pageBlobs[cacheKey] = blob;
     const audioUrl = URL.createObjectURL(blob);
+    state.currentAudioUrl = audioUrl;
     
     state.audioElement = new Audio(audioUrl);
     state.audioElement.onended = () => {
       URL.revokeObjectURL(audioUrl);
+      if (state.currentAudioUrl === audioUrl) state.currentAudioUrl = null;
       if (state.currentPage < state.pages.length - 1) {
         state.currentPage++; updateUI(); playCurrent();
       } else {
@@ -403,6 +415,7 @@ async function playWithEdgeTTS(text) {
     };
     state.audioElement.onerror = () => {
       URL.revokeObjectURL(audioUrl);
+      if (state.currentAudioUrl === audioUrl) state.currentAudioUrl = null;
       state.isPlaying = false; updateUI();
       toast('Audio playback failed', true);
     };
@@ -438,6 +451,7 @@ function stopSpeech() {
   } else {
     speechSynthesis.cancel();
   }
+  if (state.currentAudioUrl) { URL.revokeObjectURL(state.currentAudioUrl); state.currentAudioUrl = null; }
   state.isPlaying = false; 
   state.utterance = null; 
   updateUI();

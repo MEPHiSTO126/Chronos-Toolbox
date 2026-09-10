@@ -1,6 +1,7 @@
 {
   "redirects": [
     { "source": "/", "destination": "/apps/home/index.html", "permanent": false },
+    { "source": "/home", "destination": "/apps/home/index.html", "permanent": false },
 
     { "source": "/doc-converter", "destination": "/apps/doc-converter/index.html", "permanent": false },
     { "source": "/image-editor", "destination": "/apps/image-editor/index.html", "permanent": false },
@@ -40,11 +41,15 @@
     { "source": "/image-upscaler", "destination": "/apps/image-editor/tools/image-upscaler/index.html", "permanent": false },
 
     { "source": "/video-to-audio", "destination": "/apps/media-converter/tools/video-to-audio/index.html", "permanent": false },
-    { "source": "/audio-loop", "destination": "/apps/media-converter/tools/audio-loop/index.html", "permanent": false },
+    { "source": "/audio-loop", "destination": "/apps/media-converter/tools/multiply-audio/index.html", "permanent": false },
+    { "source": "/multiply-audio", "destination": "/apps/media-converter/tools/multiply-audio/index.html", "permanent": false },
     { "source": "/audio-to-text", "destination": "/apps/media-converter/tools/audio-to-text/index.html", "permanent": false },
     { "source": "/vocal-splitter", "destination": "/apps/media-converter/tools/vocal-splitter/index.html", "permanent": false },
+    { "source": "/instrumental-extractor", "destination": "/apps/media-converter/tools/instrumental-extractor/index.html", "permanent": false },
     { "source": "/compress-video", "destination": "/apps/media-converter/tools/compress-video/index.html", "permanent": false },
+    { "source": "/video-to-gif", "destination": "/apps/media-converter/tools/video-to-gif/index.html", "permanent": false },
     { "source": "/video-converter", "destination": "/apps/media-converter/tools/video-converter/index.html", "permanent": false },
+    { "source": "/audio-manipulator", "destination": "/apps/media-converter/tools/audio-manipulator/index.html", "permanent": false },
     { "source": "/social-downloader", "destination": "/apps/media-converter/tools/social-downloader/index.html", "permanent": false },
 
     { "source": "/url-to-qr", "destination": "/apps/qr-generator/tools/url-to-qr/index.html", "permanent": false },

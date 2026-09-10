@@ -30,6 +30,7 @@ const SearchBar = (() => {
     // ── Build DOM ──────────────────────────────────────────
     root.classList.add('search-bar');
     root.style.setProperty('--accent', accent);
+    root.style.setProperty('--color-accent', accent);
 
     root.innerHTML = `
       <div class="search-bar__input-wrap">

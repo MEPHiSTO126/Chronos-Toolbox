@@ -12,6 +12,7 @@ const state = {
   imgUrl: null,
   imgElement: null,
   resultBlob: null,
+  resultUrl: null,
   isProcessing: false
 };
 
@@ -70,6 +71,7 @@ function loadFile(file) {
   state.fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
   if (state.imgUrl) URL.revokeObjectURL(state.imgUrl);
   state.imgUrl = URL.createObjectURL(file);
+  if (state.resultUrl) { URL.revokeObjectURL(state.resultUrl); state.resultUrl = null; }
 
   const img = new Image();
   img.onload = () => {
@@ -116,8 +118,9 @@ async function removeBackground() {
       }
 
       state.resultBlob = await response.blob();
-      const resultUrl = URL.createObjectURL(state.resultBlob);
-      previewResult.src = resultUrl;
+      if (state.resultUrl) URL.revokeObjectURL(state.resultUrl);
+      state.resultUrl = URL.createObjectURL(state.resultBlob);
+      previewResult.src = state.resultUrl;
       resultArea.style.display = 'block';
       statusText.textContent = 'Background removed successfully (Remove.bg AI)!';
       toast('Background removed!');
@@ -125,8 +128,9 @@ async function removeBackground() {
       statusText.textContent = 'Removing background...';
       const fallbackBlob = await clientSideRemoval(state.file, tolerance);
       state.resultBlob = fallbackBlob;
-      const resultUrl = URL.createObjectURL(fallbackBlob);
-      previewResult.src = resultUrl;
+      if (state.resultUrl) URL.revokeObjectURL(state.resultUrl);
+      state.resultUrl = URL.createObjectURL(fallbackBlob);
+      previewResult.src = state.resultUrl;
       resultArea.style.display = 'block';
       statusText.textContent = 'Background removed!';
       toast('Background removed!');
@@ -183,7 +187,8 @@ async function clientSideRemoval(file, tolerance = 40) {
       }, 'image/png');
     };
     img.onerror = () => reject(new Error('Failed to load image'));
-    img.src = URL.createObjectURL(file);
+    // Reuse tracked state.imgUrl (revoked in loadFile/clearAll) instead of orphan URL
+    img.src = state.imgUrl;
   });
 }
 
@@ -232,6 +237,10 @@ function clearAll() {
   }
   if (state.resultBlob) {
     state.resultBlob = null;
+  }
+  if (state.resultUrl) {
+    URL.revokeObjectURL(state.resultUrl);
+    state.resultUrl = null;
   }
   state.file = null;
   state.imgElement = null;

@@ -106,6 +106,7 @@ async function handleFileSelect(file) {
   fileSizeEl.textContent = formatBytes(file.size);
 
   // Set up preview
+  if (audioPreview.src) { URL.revokeObjectURL(audioPreview.src); audioPreview.removeAttribute('src'); }
   const fileUrl = URL.createObjectURL(file);
   audioPreview.src = fileUrl;
 
@@ -253,6 +254,7 @@ btnMultiply.addEventListener('click', async () => {
     setTimeout(() => {
       try {
         const wavBlob = bufferToWav(renderedBuffer);
+        if (btnDownload.href) { URL.revokeObjectURL(btnDownload.href); btnDownload.removeAttribute('href'); }
         const wavUrl = URL.createObjectURL(wavBlob);
 
         // Update results card

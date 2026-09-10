@@ -34,7 +34,7 @@
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   pointer-events: none;
 }
 
@@ -58,7 +58,7 @@
 }
 
 .search-bar__input::placeholder {
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   font-weight: 400;
 }
 
@@ -180,7 +180,7 @@
 
 .search-bar__item-desc {
   font-size: 0.76rem;
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -199,7 +199,7 @@
 }
 
 .search-bar__item-arrow {
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   font-size: 0.85rem;
   flex-shrink: 0;
 }
@@ -208,14 +208,14 @@
 .search-bar__empty {
   padding: 1.5rem;
   text-align: center;
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   font-size: 0.88rem;
 }
 
 .search-bar__count {
   padding: 0.45rem 1rem 0.6rem;
   font-size: 0.72rem;
-  color: var(--color-steel, var(--c-steel, #6A8490));
+  color: var(--color-steel, var(--c-steel, #6A8290));
   text-align: right;
 }
 

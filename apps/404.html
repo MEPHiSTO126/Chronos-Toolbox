@@ -14,8 +14,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Outfit', sans-serif;
-      background: #0B0A10;
-      color: #F7F2F5;
+      background: var(--color-bg);
+      color: var(--color-white);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -27,18 +27,18 @@
     .code {
       font-size: clamp(6rem, 15vw, 10rem);
       font-weight: 800;
-      background: linear-gradient(135deg, #00F0FF, #FF7E9F);
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       line-height: 1;
     }
     h1 { font-size: 1.5rem; font-weight: 600; margin: 1rem 0 0.5rem; }
-    p { color: #8E6B81; font-size: 0.95rem; margin-bottom: 2rem; }
+    p { color: var(--color-steel); font-size: 0.95rem; margin-bottom: 2rem; }
     .home-link {
       display: inline-flex; align-items: center; gap: 0.5rem;
       padding: 0.75rem 1.75rem;
-      background: #00F0FF;
-      color: #0B0A10;
+      background: var(--color-accent);
+      color: var(--color-bg);
       font-size: 0.95rem; font-weight: 700;
       text-decoration: none;
       border-radius: 8px;
@@ -46,7 +46,7 @@
     }
     .home-link:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0,240,255,0.25);
+      box-shadow: 0 6px 24px var(--color-accent-glow);
     }
   </style>
 </head>
@@ -65,6 +65,7 @@
   <a href="home/index.html" class="home-link">← Back to Chronos Toolbox</a>
 
   <footer class="site-footer">
+    <img class="footer-logo" src="../packages/images/white-logo.png" alt="Chronos Toolbox" />
     <p class="footer-text">Built with care &middot; <a href="https://github.com/MEPHiSTO126/Chronos-Toolbox" target="_blank" rel="noopener">View on GitHub</a></p>
   </footer>
 </body>
