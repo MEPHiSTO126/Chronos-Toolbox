@@ -1,1 +1,1 @@
-{"name":"media-converter","version":"1.0.0","private":true,"scripts":{"dev":"serve . -l 3002"}}
+{"name":"media-converter","version":"1.0.0","private":true,"scripts":{"dev":"npx serve ../.. --listen 3004","build":"echo \"Static app — no build step needed.\""}}

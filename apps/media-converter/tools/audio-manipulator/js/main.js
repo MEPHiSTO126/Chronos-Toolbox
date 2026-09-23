@@ -46,6 +46,8 @@ function showToast(message, isError = false) {
 
   const toast = document.createElement('div');
   toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
   toast.textContent = message;
   document.body.appendChild(toast);
 
@@ -124,7 +126,8 @@ fileInput.addEventListener('change', (e) => {
 
 // ── File Selection Handler ──────────────────────────────
 async function handleFileSelect(file) {
-  if (!file.type.startsWith('audio/')) {
+  const isAudio = file && (file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|flac|aac|wma|weba)$/i.test(file.name));
+  if (!isAudio) {
     showToast('Please select a valid audio file.', true);
     return;
   }

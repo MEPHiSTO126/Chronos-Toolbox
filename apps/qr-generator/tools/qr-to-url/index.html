@@ -101,11 +101,23 @@
 
   <section class="tool-hero">
     <h1 class="tool-hero__title">Scan / Decode <span>QR</span></h1>
-    <p class="tool-hero__subtitle">Upload an image of a QR code to extract its content instantly.</p>
+    <p class="tool-hero__subtitle">Upload an image or use your camera to scan and extract QR code content instantly.</p>
   </section>
 
   <main class="workspace">
-    <div class="dropzone" id="dropzone" role="button" aria-label="Upload a QR code image">
+    <div class="scanner-controls" style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+      <button class="btn-action" id="btn-start-camera" type="button" style="max-width: 240px;">📷 Scan with Camera</button>
+    </div>
+
+    <div id="camera-container" style="display: none; position: relative; max-width: 480px; margin: 0 auto 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--c-border); background: #000;">
+      <video id="camera-preview" playsinline style="width: 100%; display: block;"></video>
+      <canvas id="camera-canvas" style="display: none;"></canvas>
+      <div style="position: absolute; bottom: 12px; left: 0; right: 0; text-align: center;">
+        <button class="btn-action btn-action--secondary" id="btn-stop-camera" type="button" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">Cancel Camera</button>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload a QR code image">
       <input type="file" id="file-input" accept="image/*" aria-label="Select QR code image" />
       <span class="dropzone__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
       <p class="dropzone__title">Drop your QR Code image here</p>
@@ -117,7 +129,7 @@
       <div class="decoded-content" id="decoded-content"></div>
       <div class="btn-action-group">
         <button class="btn-action" id="btn-copy">📋 Copy Content</button>
-        <a href="#" class="btn-action btn-action--secondary" id="btn-open-link" target="_blank" style="display: none;">🌐 Open Link</a>
+        <a href="#" class="btn-action btn-action--secondary" id="btn-open-link" target="_blank" rel="noopener noreferrer" style="display: none;">🌐 Open Link</a>
       </div>
     </div>
   </main>

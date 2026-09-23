@@ -73,7 +73,7 @@
 
   <main class="workspace">
     <!-- Upload Dropzone -->
-    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an audio file">
+    <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload an audio file">
       <input type="file" id="file-input" accept="audio/*" aria-label="Select audio file" />
       <span class="dropzone__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
       <p class="dropzone__title">Drop your song file here</p>
@@ -106,6 +106,9 @@
         <span id="progress-pct">0%</span>
       </div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+          <div class="progress-actions">
+        <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
+      </div>
     </div>
 
     <!-- Result Area -->
@@ -133,6 +136,8 @@
     <p class="footer-text">Part of <a href="../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed ephemerally on Render Cloud.</p>
   </footer>
 
+    <script src="../../../../packages/utils/config.js"></script>
+  <script src="../../../../packages/utils/api-client.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

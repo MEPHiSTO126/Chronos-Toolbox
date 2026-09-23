@@ -1,3 +1,4 @@
+let activeAbortController = null;
 /**
  * Chronos Toolbox — Vocal Splitter
  * Backend-integrated tool that splits vocal and instrumental tracks using FFmpeg filters.
@@ -37,6 +38,8 @@ function showToast(message, isError = false) {
 
   const toast = document.createElement('div');
   toast.className = `ct-toast ${isError ? 'ct-toast--error' : ''}`;
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
   toast.textContent = message;
   document.body.appendChild(toast);
 
@@ -89,7 +92,8 @@ btnAgain.addEventListener('click', resetState);
 
 // ── File Selection Handler ──────────────────────────────
 function handleFileSelect(file) {
-  if (!file.type.startsWith('audio/')) {
+  const isAudio = file && (file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|flac|aac|wma|weba)$/i.test(file.name));
+  if (!isAudio) {
     showToast('Please select a valid audio file.', true);
     return;
   }
@@ -124,31 +128,26 @@ function resetState() {
 
 // ── Wake-up Helper ──────────────────────────────────────────
 // Render free tier can take 60+ seconds to wake up
-async function ensureBackendAwake() {
-  const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
-  const progressText = document.getElementById('progress-text');
-  
-  if (progressText) {
-    progressText.textContent = 'Waking up the server (this may take up to a minute)...';
+async function ensureBackendAwake(options = {}) {
+  if (window.CHRONOS_API?.ensureBackendAwake) {
+    return await window.CHRONOS_API.ensureBackendAwake(Object.assign({ url: API_URL, maxAttempts: 15 }, options));
   }
+  const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
+  const pText = document.getElementById('progress-text');
+  if (pText) pText.textContent = 'Connecting to server (waking up if sleeping)...';
 
-  // Increased attempts and wait time for Render cold starts
-  for (let attempt = 1; attempt <= 30; attempt++) {
+  for (let attempt = 1; attempt <= 15; attempt++) {
+    if (options.signal?.aborted) throw new DOMException('Operation aborted by user', 'AbortError');
     try {
-      const response = await fetch(`${origin}/`, { method: 'GET' });
-      
+      const response = await fetch(`${origin}/`, { method: 'GET', signal: options.signal });
       if (response.ok) {
-        if (progressText) progressText.textContent = 'Server ready. Uploading and processing...';
+        if (pText) pText.textContent = 'Server ready. Processing...';
         return true;
-      } else {
-        console.warn(`Wake attempt ${attempt} returned status ${response.status}`);
       }
     } catch (e) {
-      console.warn(`Wake attempt ${attempt} failed:`, e);
+      if (e.name === 'AbortError') throw e;
     }
-    
-    // Exponential backoff: 2s, 3s, 4s... up to max 10s
-    const waitTime = Math.min(2000 + attempt * 200, 10000);
+    const waitTime = Math.min(1500 + attempt * 200, 3500);
     await new Promise(r => setTimeout(r, waitTime));
   }
   return false;
@@ -198,15 +197,15 @@ btnSplit.addEventListener('click', async () => {
   formData.append('file', selectedFile);
 
   try {
-    const awake = await ensureBackendAwake();
+    const awake = await ensureBackendAwake({ signal: activeAbortController?.signal });
     if (!awake) {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData }, __handleProgress);
+    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
     if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`Server error ${response.status}: ${err}`);
+      const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
+      throw new Error(errMsg);
     }
 
     const blob = await response.blob();
@@ -227,6 +226,15 @@ btnSplit.addEventListener('click', async () => {
     resultArea.classList.add('visible');
     showToast('Vocal splitting complete!');
   } catch (err) {
+    if (err.name === 'AbortError') {
+      const toastFn = typeof toast === 'function' ? toast : (typeof showToast === 'function' ? showToast : alert);
+      toastFn('Operation cancelled.', false);
+      if (typeof progressInterval !== 'undefined' && progressInterval) clearInterval(progressInterval);
+      progressWrap.classList.remove('visible');
+      if (typeof actionBar !== 'undefined' && actionBar) actionBar.style.display = 'flex';
+      if (typeof urlCard !== 'undefined' && urlCard) urlCard.style.display = 'block';
+      return;
+    }
     console.error(err);
     showToast(err.message || 'Failed to split vocals.', true);
     clearInterval(progressInterval);
@@ -241,12 +249,21 @@ btnSplit.addEventListener('click', async () => {
 async function doFetchWithProgress(url, options, onProgress) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    if (options.signal) {
+      if (options.signal.aborted) {
+        return reject(new DOMException('Operation aborted by user', 'AbortError'));
+      }
+      options.signal.addEventListener('abort', () => {
+        xhr.abort();
+        reject(new DOMException('Operation aborted by user', 'AbortError'));
+      }, { once: true });
+    }
     xhr.open(options.method || 'GET', url);
     if (options.headers) {
       for (const [k, v] of Object.entries(options.headers)) xhr.setRequestHeader(k, v);
     }
     xhr.upload.onprogress = e => {
-      if (e.lengthComputable) onProgress('upload', e.loaded, e.total);
+      if (e.lengthComputable && onProgress) onProgress('upload', e.loaded, e.total);
     };
     xhr.onload = () => {
       const response = {
@@ -254,11 +271,13 @@ async function doFetchWithProgress(url, options, onProgress) {
         status: xhr.status,
         text: async () => await xhr.response.text(),
         json: async () => JSON.parse(await xhr.response.text()),
-        blob: async () => xhr.response
+        blob: async () => xhr.response,
+        headers: { get: (name) => xhr.getResponseHeader(name) }
       };
       resolve(response);
     };
     xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });

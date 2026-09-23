@@ -130,7 +130,7 @@
   <main class="workspace">
 
     <!-- Drop zone -->
-    <div class="dropzone" id="dropzone" role="button" aria-label="Upload an image file">
+    <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload an image file">
       <input type="file" id="file-input" accept="image/*" aria-label="Select image file" />
       <span class="dropzone__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
       <p class="dropzone__title">Drop your image here</p>
@@ -229,7 +229,7 @@
 
   <footer class="site-footer">
     <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
-    <p class="footer-text">Part of <a href="../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Text extraction powered by OCR.Space API.</p>
+    <p class="footer-text">Part of <a href="../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Processed locally in your browser via Tesseract OCR engine.</p>
   </footer>
 
   <style>
@@ -238,6 +238,7 @@
     }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

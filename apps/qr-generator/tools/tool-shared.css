@@ -1,3 +1,1 @@
-/* DEPRECATED — unified styles now in packages/ui/tokens.css + packages/ui/shared.css */
-@import url("../../../packages/ui/tokens.css");
-@import url("../../../packages/ui/shared.css");
+/* DEPRECATED — unified styles now loaded directly via <link> in HTML from packages/ui/tokens.css + packages/ui/shared.css */

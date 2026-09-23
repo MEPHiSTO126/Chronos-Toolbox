@@ -59,7 +59,8 @@ optPages.addEventListener('change', () => {
 
 // ── Load PDF ───────────────────────────────────────────────
 async function loadFile(file) {
-  if (!file || file.type !== 'application/pdf') {
+  const isPdf = file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
+  if (!isPdf) {
     toast('Please upload a PDF file.', true); return;
   }
   state.fileName = file.name.replace(/\.pdf$/i, '');
@@ -223,6 +224,8 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;

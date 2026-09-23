@@ -83,8 +83,11 @@ optQuality.addEventListener('input', () => {
 // Quality slider visibility
 optFormat.addEventListener('change', () => {
   const fmt = optFormat.value;
-  qualityGroup.style.opacity = fmt === 'png' ? '0.4' : '1';
-  qualityGroup.style.pointerEvents = fmt === 'png' ? 'none' : 'auto';
+  const isLossless = fmt === 'png';
+  qualityGroup.style.opacity = isLossless ? '0.4' : '1';
+  qualityGroup.style.pointerEvents = isLossless ? 'none' : 'auto';
+  optQuality.disabled = isLossless;
+  qualityVal.textContent = isLossless ? 'N/A (Lossless)' : optQuality.value + '%';
 });
 
 // Deselect when clicking canvas container background
@@ -144,6 +147,8 @@ function addTextBlock(initialText = 'Type text here') {
 
 function renderBlockEl(block) {
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'draggable-text';
   el.id = `block-${block.id}`;
   el.setAttribute('tabindex', '0');
@@ -469,6 +474,8 @@ function clearAll() {
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;

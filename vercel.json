@@ -58,6 +58,6 @@
     { "source": "/wifi-to-qr", "destination": "/apps/qr-generator/tools/wifi-to-qr/index.html", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/((?!apps/).*)", "destination": "/apps/404.html" }
+    { "source": "/((?!(apps/|packages/|favicon)).*)", "destination": "/apps/404.html" }
   ]
 }

@@ -44,7 +44,8 @@ btnAgain.addEventListener('click', reset);
 btnApply.addEventListener('click', apply);
 
 async function loadFile(file) {
-  if (!file || file.type !== 'application/pdf') { toast('Please upload a PDF file.', true); return; }
+  const isPdf = file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
+  if (!isPdf) { toast('Please upload a PDF file.', true); return; }
   state.srcBytes  = await file.arrayBuffer();
   state.pdfLibDoc = await PDFDocument.load(state.srcBytes);
   state.pdfJsDoc  = await pdfjsLib.getDocument({ data: state.srcBytes.slice() }).promise;
@@ -149,7 +150,11 @@ function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
 function toast(msg,err=false) {
   document.querySelector('.ct-toast')?.remove();
   const el=document.createElement('div');
-  el.className='ct-toast'+(err?' ct-toast--error':''); el.textContent=msg; document.body.appendChild(el);
+  el.className='ct-toast'+(err?' ct-toast--error':'');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  
+   el.textContent=msg; document.body.appendChild(el);
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
   setTimeout(()=>{ el.classList.remove('show'); el.addEventListener('transitionend',()=>el.remove(),{once:true}); },3500);
 }

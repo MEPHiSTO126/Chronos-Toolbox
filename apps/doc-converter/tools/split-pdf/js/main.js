@@ -34,7 +34,8 @@ btnSplit.addEventListener('click', split);
 btnAgain.addEventListener('click', reset);
 
 async function loadFile(file) {
-  if (!file || file.type !== 'application/pdf') { toast('Please upload a PDF file.', true); return; }
+  const isPdf = file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
+  if (!isPdf) { toast('Please upload a PDF file.', true); return; }
   state.file = file;
   const buf = await file.arrayBuffer();
   state.srcDoc = await PDFDocument.load(buf);
@@ -152,6 +153,10 @@ function toast(msg, err = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
   el.className = 'ct-toast' + (err ? ' ct-toast--error' : '');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  
+  
   el.textContent = msg;
   document.body.appendChild(el);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));

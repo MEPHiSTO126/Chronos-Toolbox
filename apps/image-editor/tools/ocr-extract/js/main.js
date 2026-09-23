@@ -77,46 +77,49 @@ async function extractText() {
   btnExtract.disabled = true;
   btnExtract.textContent = 'Extracting...';
   progressWrap.style.display = 'block';
-  statusText.textContent = 'Sending image to OCR engine...';
+  statusText.textContent = 'Initializing OCR engine...';
   resultArea.style.display = 'none';
 
+  const langMap = {
+    eng: 'eng', ara: 'ara', bul: 'bul', chs: 'chi_sim', cht: 'chi_tra',
+    hrv: 'hrv', cze: 'ces', dan: 'dan', dut: 'nld', fin: 'fin',
+    fre: 'fra', ger: 'deu', gre: 'ell', hun: 'hun', kor: 'kor',
+    ita: 'ita', jpn: 'jpn', pol: 'pol', por: 'por', rus: 'rus',
+    slk: 'slk', spa: 'spa', swe: 'swe', tha: 'tha', tur: 'tur',
+    ukr: 'ukr', vie: 'vie'
+  };
+
   try {
-    const formData = new FormData();
-    formData.append('file', state.file);
-    formData.append('apikey', 'helloworld'); // Free tier key
-    formData.append('language', langSelect.value);
-    formData.append('isOverlayRequired', 'false');
-    formData.append('OCREngine', '2'); // Engine 2 is better for most images
+    if (typeof Tesseract !== 'undefined') {
+      const tesseractLang = langMap[langSelect.value] || 'eng';
+      statusText.textContent = 'Loading OCR models...';
 
-    statusText.textContent = 'Processing with OCR engine...';
+      const result = await Tesseract.recognize(
+        state.file,
+        tesseractLang,
+        {
+          logger: m => {
+            if (m.status === 'recognizing text' && m.progress != null) {
+              statusText.textContent = `Recognizing text: ${Math.round(m.progress * 100)}%`;
+            } else if (m.status) {
+              statusText.textContent = m.status.replace(/_/g, ' ') + '...';
+            }
+          }
+        }
+      );
 
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      body: formData
-    });
+      const fullText = (result && result.data && result.data.text) ? result.data.text.trim() : '';
+      if (!fullText) {
+        throw new Error('No text found in image');
+      }
 
-    if (!response.ok) {
-      throw new Error(`OCR API error: ${response.status}`);
+      extractedText.value = fullText;
+      resultArea.style.display = 'block';
+      statusText.textContent = `Extracted ${fullText.length} characters (100% locally)`;
+      toast('Text extracted successfully!');
+    } else {
+      throw new Error('OCR engine failed to load. Please check your internet connection.');
     }
-
-    const data = await response.json();
-
-    if (data.IsErroredOnProcessing) {
-      throw new Error(data.ErrorMessage?.[0] || 'OCR processing failed');
-    }
-
-    const parsedResults = data.ParsedResults;
-    if (!parsedResults || parsedResults.length === 0) {
-      throw new Error('No text found in image');
-    }
-
-    // Combine all parsed results
-    const fullText = parsedResults.map(r => r.ParsedText).join('\n\n');
-    extractedText.value = fullText;
-    resultArea.style.display = 'block';
-    statusText.textContent = `Extracted ${fullText.length} characters`;
-
-    toast('Text extracted successfully!');
 
   } catch (err) {
     console.error('OCR Error:', err);
@@ -181,6 +184,8 @@ function clearAll() {
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;

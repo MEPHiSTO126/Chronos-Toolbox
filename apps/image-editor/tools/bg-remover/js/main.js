@@ -147,36 +147,86 @@ async function removeBackground() {
   }
 }
 
-// ── Client-side removal ───────────────────────────────────
+// ── Client-side removal (Boundary Flood-Fill + Alpha Feathering) ──
 async function clientSideRemoval(file, tolerance = 40) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      const width = img.width;
+      const height = img.height;
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext('2d');
       
       ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, width, height);
       const data = imageData.data;
 
-      // Color-based removal
-      const bgColor = getBackgroundColor(data, canvas.width, canvas.height);
+      // Sample border pixels to establish true background color
+      const bgColor = getBackgroundColor(data, width, height);
+      const bgR = bgColor.r, bgG = bgColor.g, bgB = bgColor.b;
 
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        
-        const distance = Math.sqrt(
-          Math.pow(r - bgColor.r, 2) +
-          Math.pow(g - bgColor.g, 2) +
-          Math.pow(b - bgColor.b, 2)
-        );
+      // Distance calculation helper
+      function colorDist(idx) {
+        const dr = data[idx] - bgR;
+        const dg = data[idx + 1] - bgG;
+        const db = data[idx + 2] - bgB;
+        return Math.sqrt(dr * dr + dg * dg + db * db);
+      }
 
-        if (distance < tolerance) {
-          data[i + 3] = 0; // Make transparent
+      // 2D visited map for flood fill starting strictly from borders
+      const visited = new Uint8Array(width * height);
+      const queue = new Int32Array(width * height);
+      let head = 0;
+      let tail = 0;
+
+      function enqueue(x, y) {
+        const pIndex = y * width + x;
+        if (visited[pIndex]) return;
+        const d = colorDist(pIndex * 4);
+        if (d <= tolerance * 1.35) {
+          visited[pIndex] = 1;
+          queue[tail++] = pIndex;
+        }
+      }
+
+      // Seed all 4 borders (top, bottom, left, right)
+      for (let x = 0; x < width; x++) {
+        enqueue(x, 0);
+        enqueue(x, height - 1);
+      }
+      for (let y = 0; y < height; y++) {
+        enqueue(0, y);
+        enqueue(width - 1, y);
+      }
+
+      // Flood fill outward from borders (4-way connectivity)
+      const dx = [1, -1, 0, 0];
+      const dy = [0, 0, 1, -1];
+
+      while (head < tail) {
+        const pIndex = queue[head++];
+        const px = pIndex % width;
+        const py = Math.floor(pIndex / width);
+        const d = colorDist(pIndex * 4);
+
+        // Alpha calculation: transparent for core background, feathered on borders
+        if (d <= tolerance) {
+          data[pIndex * 4 + 3] = 0;
+        } else {
+          // Feathered alpha transition between tolerance and tolerance * 1.35
+          const factor = (d - tolerance) / (tolerance * 0.35);
+          data[pIndex * 4 + 3] = Math.round(Math.min(255, Math.max(0, factor * 255)));
+        }
+
+        // Traverse neighbors
+        for (let i = 0; i < 4; i++) {
+          const nx = px + dx[i];
+          const ny = py + dy[i];
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            enqueue(nx, ny);
+          }
         }
       }
 
@@ -187,31 +237,28 @@ async function clientSideRemoval(file, tolerance = 40) {
       }, 'image/png');
     };
     img.onerror = () => reject(new Error('Failed to load image'));
-    // Reuse tracked state.imgUrl (revoked in loadFile/clearAll) instead of orphan URL
     img.src = state.imgUrl;
   });
 }
 
-// ── Get background color from corners ──────────────────────
+// ── Get background color from border samples ────────────────
 function getBackgroundColor(data, width, height) {
-  const corners = [
-    0, // top-left
-    (width - 1) * 4, // top-right
-    (height - 1) * width * 4, // bottom-left
-    ((height - 1) * width + (width - 1)) * 4 // bottom-right
-  ];
+  let r = 0, g = 0, b = 0, count = 0;
+  const sampleStep = Math.max(1, Math.floor(width / 20));
 
-  let r = 0, g = 0, b = 0;
-  corners.forEach(offset => {
-    r += data[offset];
-    g += data[offset + 1];
-    b += data[offset + 2];
-  });
+  for (let x = 0; x < width; x += sampleStep) {
+    const topIdx = x * 4;
+    const botIdx = ((height - 1) * width + x) * 4;
+    r += data[topIdx] + data[botIdx];
+    g += data[topIdx + 1] + data[botIdx + 1];
+    b += data[topIdx + 2] + data[botIdx + 2];
+    count += 2;
+  }
 
   return {
-    r: Math.round(r / 4),
-    g: Math.round(g / 4),
-    b: Math.round(b / 4)
+    r: Math.round(r / count),
+    g: Math.round(g / count),
+    b: Math.round(b / count)
   };
 }
 
@@ -257,6 +304,8 @@ function clearAll() {
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;

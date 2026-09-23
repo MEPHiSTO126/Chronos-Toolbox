@@ -125,10 +125,16 @@ async function upscaleImage() {
       ctx.imageSmoothingQuality = 'low';
       ctx.drawImage(state.imgElement, 0, 0, newWidth, newHeight);
     } else if (method === 'bicubic') {
-      // Bicubic (sharper)
+      // Bicubic (standard smooth)
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(state.imgElement, 0, 0, newWidth, newHeight);
+    } else {
+      // Smart Detail (Bicubic high quality + unsharp edge enhancement)
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(state.imgElement, 0, 0, newWidth, newHeight);
+      applyUnsharpMask(ctx, newWidth, newHeight);
     }
 
     // Convert to blob and display
@@ -139,7 +145,7 @@ async function upscaleImage() {
         resultArea.style.display = 'block';
         statusText.textContent = `Upscaled to ${newWidth}×${newHeight}`;
         state.resultBlob = blob;
-        toast('Image upscaled!');
+        toast('Image upscaled with enhanced clarity!');
       }
     }, 'image/png');
 
@@ -193,6 +199,8 @@ function clearAll() {
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;
@@ -202,4 +210,37 @@ function toast(msg, isError = false) {
     el.classList.remove('show');
     el.addEventListener('transitionend', () => el.remove(), { once: true });
   }, 3500);
+}
+
+// ── Unsharp Masking Kernel (Edge Enhancement) ─────────────
+function applyUnsharpMask(ctx, width, height, amount = 0.3) {
+  try {
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+    const copy = new Uint8ClampedArray(data);
+    const a = amount;
+    const center = 1 + 4 * a;
+
+    for (let y = 1; y < height - 1; y++) {
+      const rowOffset = y * width * 4;
+      const prevRowOffset = (y - 1) * width * 4;
+      const nextRowOffset = (y + 1) * width * 4;
+
+      for (let x = 1; x < width - 1; x++) {
+        const idx = rowOffset + x * 4;
+        for (let c = 0; c < 3; c++) {
+          const val =
+            center * copy[idx + c] -
+            a * (copy[prevRowOffset + x * 4 + c] +
+                 copy[nextRowOffset + x * 4 + c] +
+                 copy[rowOffset + (x - 1) * 4 + c] +
+                 copy[rowOffset + (x + 1) * 4 + c]);
+          data[idx + c] = Math.min(255, Math.max(0, val));
+        }
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+  } catch (err) {
+    console.warn('Unsharp mask skipped:', err);
+  }
 }

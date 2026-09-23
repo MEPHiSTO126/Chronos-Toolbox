@@ -4,7 +4,7 @@
   "private": true,
   "description": "Browser-based image editor — brightness, contrast, resize, filters.",
   "scripts": {
-    "dev": "npx serve ../../ --listen 3001",
+    "dev": "npx serve ../.. --listen 3002",
     "build": "echo \"Static app — no build step needed.\""
   }
 }

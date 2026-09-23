@@ -36,7 +36,7 @@ btnMerge.addEventListener('click', merge);
 btnAgain.addEventListener('click', clearAll);
 
 function addFiles(files) {
-  const pdfs = files.filter(f => f.type === 'application/pdf');
+  const pdfs = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
   if (!pdfs.length) { toast('Please upload PDF files only.', true); return; }
   state.files.push(...pdfs);
   render();
@@ -150,6 +150,10 @@ function toast(msg, err = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
   el.className = 'ct-toast' + (err ? ' ct-toast--error' : '');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  
+  
   el.textContent = msg;
   document.body.appendChild(el);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));

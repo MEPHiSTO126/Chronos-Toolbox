@@ -1,3 +1,4 @@
+let activeAbortController = null;
 'use strict';
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com';
@@ -36,27 +37,26 @@ function addFiles(files) {
 }
 
 // ── Wake-up Helper ──────────────────────────────────────────────
-async function ensureBackendAwake() {
+async function ensureBackendAwake(options = {}) {
+  if (window.CHRONOS_API?.ensureBackendAwake) {
+    return await window.CHRONOS_API.ensureBackendAwake(Object.assign({ url: API_URL, maxAttempts: 15 }, options));
+  }
   const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
   const pText = document.getElementById('progress-text');
-  
-  if (pText) {
-    pText.textContent = 'Waking up the server (this may take up to a minute)...';
-  }
+  if (pText) pText.textContent = 'Connecting to server (waking up if sleeping)...';
 
-  for (let attempt = 1; attempt <= 30; attempt++) {
+  for (let attempt = 1; attempt <= 15; attempt++) {
+    if (options.signal?.aborted) throw new DOMException('Operation aborted by user', 'AbortError');
     try {
-      const response = await fetch(`${origin}/`, { method: 'GET' });
-      
+      const response = await fetch(`${origin}/`, { method: 'GET', signal: options.signal });
       if (response.ok) {
-        if (pText) pText.textContent = 'Server ready. Starting conversion...';
+        if (pText) pText.textContent = 'Server ready. Processing...';
         return true;
       }
     } catch (e) {
-      console.warn(`Wake attempt ${attempt} failed:`, e);
+      if (e.name === 'AbortError') throw e;
     }
-    
-    const waitTime = Math.min(2000 + attempt * 200, 10000);
+    const waitTime = Math.min(1500 + attempt * 200, 3500);
     await new Promise(r => setTimeout(r, waitTime));
   }
   return false;
@@ -71,6 +71,14 @@ async function ensureBackendAwake() {
 })();
 
 btnConvert.addEventListener('click', async () => {
+  if (activeAbortController) activeAbortController.abort();
+  activeAbortController = new AbortController();
+  const cancelBtn = document.getElementById('btn-cancel');
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (activeAbortController) activeAbortController.abort();
+    };
+  }
   if (!selectedFiles.length) return;
 
   const invalid = selectedFiles.filter(f => !/\.(ppt|pptx)$/i.test(f.name));
@@ -109,13 +117,16 @@ btnConvert.addEventListener('click', async () => {
   const formData = new FormData();
   selectedFiles.forEach(f => formData.append('files', f));
   try {
-    const awake = await ensureBackendAwake();
+    const awake = await ensureBackendAwake({ signal: activeAbortController?.signal });
     if (!awake) {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const res = await doFetchWithProgress(API_URL, { method: 'POST', body: formData }, __handleProgress);
-    if (!res.ok) throw new Error(await res.text());
+    const res = await doFetchWithProgress(API_URL, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
+    if (!res.ok) {
+      const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(res) : await res.text();
+      throw new Error(errMsg);
+    }
     const blob = await res.blob();
     if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
     currentObjectURL = URL.createObjectURL(blob);
@@ -135,8 +146,17 @@ btnConvert.addEventListener('click', async () => {
     resultArea.classList.add('visible');
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (err) {
+    if (err.name === 'AbortError') {
+      const toastFn = typeof toast === 'function' ? toast : (typeof showToast === 'function' ? showToast : alert);
+      toastFn('Operation cancelled.', false);
+      if (typeof progressInterval !== 'undefined' && progressInterval) clearInterval(progressInterval);
+      progressWrap.classList.remove('visible');
+      if (typeof actionBar !== 'undefined' && actionBar) actionBar.style.display = 'flex';
+      if (typeof urlCard !== 'undefined' && urlCard) urlCard.style.display = 'block';
+      return;
+    }
     console.error(err);
-    toast('Conversion failed. Ensure the backend is running.', true);
+    toast(err.message || 'Conversion failed. Ensure the backend is running.', true);
     clearInterval(progressInterval);
     progressWrap.classList.remove('visible');
     actionBar.style.display = 'flex';
@@ -154,6 +174,10 @@ function toast(msg, err = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
   el.className = 'ct-toast' + (err ? ' ct-toast--error' : '');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  
+  
   el.textContent = msg; document.body.appendChild(el);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
   setTimeout(() => { el.classList.remove('show'); el.addEventListener('transitionend', () => el.remove(), { once: true }); }, 3500);
@@ -163,12 +187,21 @@ function toast(msg, err = false) {
 async function doFetchWithProgress(url, options, onProgress) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    if (options.signal) {
+      if (options.signal.aborted) {
+        return reject(new DOMException('Operation aborted by user', 'AbortError'));
+      }
+      options.signal.addEventListener('abort', () => {
+        xhr.abort();
+        reject(new DOMException('Operation aborted by user', 'AbortError'));
+      }, { once: true });
+    }
     xhr.open(options.method || 'GET', url);
     if (options.headers) {
       for (const [k, v] of Object.entries(options.headers)) xhr.setRequestHeader(k, v);
     }
     xhr.upload.onprogress = e => {
-      if (e.lengthComputable) onProgress('upload', e.loaded, e.total);
+      if (e.lengthComputable && onProgress) onProgress('upload', e.loaded, e.total);
     };
     xhr.onload = () => {
       const response = {
@@ -182,6 +215,7 @@ async function doFetchWithProgress(url, options, onProgress) {
       resolve(response);
     };
     xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });

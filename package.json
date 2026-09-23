@@ -8,10 +8,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:home": "npm run dev --workspace=apps/home",
-    "dev:doc-converter": "npm run dev --workspace=apps/doc-converter",
-    "dev:image-editor": "npm run dev --workspace=apps/image-editor",
-    "dev:qr-generator": "npm run dev --workspace=apps/qr-generator",
-    "dev:media-converter": "npm run dev --workspace=apps/media-converter"
+    "dev": "npx serve . --listen 3000",
+    "dev:home": "npx serve . --listen 3000",
+    "dev:doc-converter": "npx serve . --listen 3001",
+    "dev:image-editor": "npx serve . --listen 3002",
+    "dev:qr-generator": "npx serve . --listen 3003",
+    "dev:media-converter": "npx serve . --listen 3004"
   }
 }

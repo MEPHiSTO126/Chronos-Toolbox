@@ -4,7 +4,7 @@
   "private": true,
   "description": "Generate QR codes from any text or URL.",
   "scripts": {
-    "dev": "echo \"Add your dev server command here\"",
-    "build": "echo \"Add your build command here\""
+    "dev": "npx serve ../.. --listen 3003",
+    "build": "echo \"Static app — no build step needed.\""
   }
 }

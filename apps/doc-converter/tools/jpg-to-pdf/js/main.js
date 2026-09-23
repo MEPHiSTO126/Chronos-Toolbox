@@ -78,6 +78,8 @@ function renderPreviews() {
 
   state.files.forEach((item, idx) => {
     const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
     el.className = 'preview-item';
     el.dataset.id = item.id;
     el.setAttribute('draggable', 'true');
@@ -262,6 +264,8 @@ function truncate(str, n) { return str.length > n ? str.slice(0, n - 1) + '…' 
 function toast(msg, isError = false) {
   document.querySelector('.ct-toast')?.remove();
   const el = document.createElement('div');
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
   el.className = 'ct-toast' + (isError ? ' ct-toast--error' : '');
   el.setAttribute('role', 'status');
   el.textContent = msg;

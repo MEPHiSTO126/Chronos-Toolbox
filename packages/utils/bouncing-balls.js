@@ -4,18 +4,24 @@
  */
 
 (function () {
+  // Respect user preference for reduced motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    return;
+  }
+
   // Config
   const BALL_COUNT_RATIO = 0.02; // Number of balls per pixel width
   const MIN_BALLS = 15;
-  const MAX_BALLS = 40;
+  const MAX_BALLS = 35;
   
   // Neon translucent color palette
   const COLORS = [
-    'rgba(0, 240, 255, 0.35)',   // Electric Cyan
-    'rgba(255, 126, 159, 0.35)', // Rose / Pink
-    'rgba(162, 123, 255, 0.35)', // Violet / Purple
-    'rgba(255, 159, 67, 0.35)',  // Neon Orange
-    'rgba(52, 211, 153, 0.35)'   // Mint Green
+    { fill: 'rgba(0, 240, 255, 0.45)', glow: 'rgba(0, 240, 255, 0.15)' },   // Electric Cyan
+    { fill: 'rgba(255, 126, 159, 0.45)', glow: 'rgba(255, 126, 159, 0.15)' }, // Rose / Pink
+    { fill: 'rgba(162, 123, 255, 0.45)', glow: 'rgba(162, 123, 255, 0.15)' }, // Violet / Purple
+    { fill: 'rgba(255, 159, 67, 0.45)', glow: 'rgba(255, 159, 67, 0.15)' },  // Neon Orange
+    { fill: 'rgba(52, 211, 153, 0.45)', glow: 'rgba(52, 211, 153, 0.15)' }   // Mint Green
   ];
 
   // Create canvas
@@ -44,17 +50,16 @@
 
   class Ball {
     constructor() {
-      this.radius = Math.random() * 4 + 3; // 3px to 7px
+      this.radius = Math.random() * 3.5 + 2.5; // 2.5px to 6px
       this.reset(true);
     }
 
     reset(initPhase = false) {
       this.x = Math.random() * canvas.width;
-      // Start near top if resizing, otherwise randomize
       this.y = initPhase ? Math.random() * canvas.height : -this.radius;
       
       // Random velocities
-      const speed = Math.random() * 0.6 + 0.3; // Gentle floating speed
+      const speed = Math.random() * 0.5 + 0.25; // Gentle floating speed
       const angle = Math.random() * Math.PI * 2;
       this.vx = Math.cos(angle) * speed;
       this.vy = Math.sin(angle) * speed;
@@ -87,14 +92,16 @@
     }
 
     draw() {
+      // Draw subtle outer glow ring (fast, no GPU blur penalty)
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+      ctx.fillStyle = this.color.glow;
+      ctx.fill();
+
+      // Draw crisp core
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      
-      // Apply beautiful subtle neon glow
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = this.color;
-      
+      ctx.fillStyle = this.color.fill;
       ctx.fill();
     }
   }
@@ -103,7 +110,6 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
-    // Adjust number of balls based on width
     const targetCount = Math.max(MIN_BALLS, Math.min(MAX_BALLS, Math.floor(canvas.width * BALL_COUNT_RATIO)));
     
     if (balls.length < targetCount) {
@@ -119,9 +125,6 @@
     if (isPaused) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Disable shadow blur for clear canvas clearing, then enable per ball
-    ctx.shadowBlur = 0;
     
     for (let i = 0; i < balls.length; i++) {
       balls[i].update();
