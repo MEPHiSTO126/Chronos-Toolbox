@@ -328,26 +328,17 @@ function loadScriptOnce(src) {
   });
 }
 
-// Single-thread core needs no cross-origin-isolation headers, so this works
-// on plain static hosting. jsdelivr mirrors unpkg if it is unreachable.
+// Engine files are vendored same-origin (packages/vendor/ffmpeg/) so the
+// engine Worker never hits cross-origin restrictions — some networks strip
+// CDN CORS headers, which breaks `new Worker(cdnUrl)` (see issue log).
+// Single-thread core needs no cross-origin-isolation headers, so plain
+// static hosting works. Relative to the tool page, like the CSS links.
 const FFMPEG_CDNS = [
   {
-    name: 'unpkg',
-    ffmpeg: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js',
-    core: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js',
-    wasm: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.wasm'
-  },
-  {
-    name: 'jsdelivr',
-    ffmpeg: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js',
-    core: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js',
-    wasm: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.wasm'
-  },
-  {
-    name: 'jsdelivr-pinned',
-    ffmpeg: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js',
-    core: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js',
-    wasm: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.wasm'
+    name: 'built-in',
+    ffmpeg: '../../../../packages/vendor/ffmpeg/ffmpeg.js',
+    core: '/packages/vendor/ffmpeg/ffmpeg-core.js',
+    wasm: '/packages/vendor/ffmpeg/ffmpeg-core.wasm'
   }
 ];
 
@@ -378,7 +369,7 @@ async function getFFmpegEngine(onMsg) {
       attempts.push(e.message);
     }
   }
-  throw new Error(`Could not load the in-browser video engine (${attempts.join(' / ') || 'unknown error'}). (Files under 100 MB do not need it.)`);
+  throw new Error(`Could not start the in-browser video engine (${attempts.join(' / ') || 'unknown error'}). Try a smaller file or a different browser. (Files under 100 MB do not need it.)`);
 }
 
 function getVideoDuration(file) {
