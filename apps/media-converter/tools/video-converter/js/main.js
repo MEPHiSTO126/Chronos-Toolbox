@@ -136,7 +136,7 @@ async function ensureBackendAwake(options = {}) {
   }
   const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
   const pText = document.getElementById('progress-text');
-  if (pText) pText.textContent = 'Connecting to server (waking up if sleeping)...';
+  if (pText) pText.textContent = 'Connecting to server...';
 
   for (let attempt = 1; attempt <= 15; attempt++) {
     if (options.signal?.aborted) throw new DOMException('Operation aborted by user', 'AbortError');

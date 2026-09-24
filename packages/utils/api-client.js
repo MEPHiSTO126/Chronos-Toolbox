@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Chronos Toolbox - Shared API Client Utilities
  */
 (function() {
@@ -67,7 +67,7 @@
       if (el) el.textContent = msg;
     });
 
-    onStatusChange('Connecting to server (waking up if sleeping)...');
+    onStatusChange('Connecting to server...');
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       if (signal && signal.aborted) {
@@ -79,7 +79,7 @@
         if (signal) fetchOptions.signal = signal;
         const res = await fetch(`${origin}/`, fetchOptions);
         if (res.ok) {
-          onStatusChange('Server ready. Uploading and processing...');
+          onStatusChange('Uploading and processing...');
           return true;
         }
       } catch (e) {
@@ -126,3 +126,4 @@
     bindCancelButton
   };
 })();
+
