@@ -291,7 +291,7 @@ async function uploadAndCompress(formData, crfVal, onProgress) {
   // 6-minute client timeout: video transcodes are slow, and the free-tier
   // server/proxy can take minutes or drop the connection. ontimeout/status-0
   // handlers in doFetchWithProgress turn that into a helpful message.
-  const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData, signal: activeAbortController?.signal, timeout: 360000 }, onProgress);
+  const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData, signal: activeAbortController?.signal, timeout: 900000 }, onProgress);
   if (!response.ok) {
     const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
     throw new Error(errMsg);
@@ -401,8 +401,9 @@ async function compressSegmented(file, crfVal) {
     throw new Error('Could not read this video\u2019s duration, so it cannot be split. Try a file under 100 MB.');
   }
 
-  // Aim for ~70 MB pieces (safely under the 100 MB request cap).
-  const TARGET_SEG = 70 * 1024 * 1024;
+  // Aim for ~30 MB pieces: the free-tier backend transcodes slowly, so small
+  // pieces finish inside timeouts while staying well under the 100 MB cap.
+  const TARGET_SEG = 30 * 1024 * 1024;
   const MAX_PARTS = 12;
   let segTime = Math.max(10, Math.floor(TARGET_SEG / (file.size / duration)));
   let parts = Math.ceil(duration / segTime);
@@ -423,7 +424,7 @@ async function compressSegmented(file, crfVal) {
 
   // Adaptive queue: duration metadata and keyframe spacing can make the first
   // size guess wrong, so any piece still over the cap is halved and re-queued.
-  const MAX_TOTAL_PARTS = 24;
+  const MAX_TOTAL_PARTS = 32;
   const MIN_SEG_TIME = 5;
   const created = new Set(initial);
   const queue = initial.map(name => ({ name, segTime }));
@@ -533,7 +534,7 @@ async function doFetchWithProgress(url, options, onProgress) {
     };
     xhr.onerror = () => reject(new Error('Connection to the server was lost. The file may be too large or the server timed out — try a smaller/shorter video and try again.'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
-    xhr.ontimeout = () => reject(new Error('The server took too long to respond (timed out). Try a smaller/shorter video and try again.'));
+    xhr.ontimeout = () => reject(new Error('The server took too long on this piece (free-tier servers are slow and load varies). Please wait a minute and try again — off-peak attempts often go through.'));
     if (options.timeout) xhr.timeout = options.timeout;
     xhr.responseType = 'blob';
     xhr.send(options.body);
