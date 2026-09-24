@@ -8,6 +8,6 @@
   
   window.CHRONOS_CONFIG = Object.assign({
     isLocal: isLocal,
-    API_BASE: isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com',
+    API_BASE: isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-ayd8.onrender.com',
   }, window.CHRONOS_CONFIG || {});
 })();
