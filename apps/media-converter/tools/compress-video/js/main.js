@@ -411,42 +411,73 @@ async function compressSegmented(file, crfVal) {
     parts = Math.ceil(duration / segTime);
   }
 
-  setProgress(8, `Splitting into ${parts} pieces (lossless, no quality loss)...`);
+  setProgress(8, `Splitting video (lossless, no quality loss)...`);
   const splitCode = await ff.exec(['-i', inName, '-c', 'copy', '-map', '0', '-f', 'segment', '-segment_time', String(segTime), '-reset_timestamps', '1', 'seg%03d.mp4']);
   try { await ff.deleteFile(inName); } catch (e) {}
   if (splitCode !== 0) throw new Error('Splitting the video failed. Try a file under 100 MB.');
   throwIfAborted();
 
   const entries = await ff.listDir('/');
-  const segNames = entries.map(e => e.name).filter(n => /^seg\d+\.mp4$/.test(n)).sort();
-  if (!segNames.length) throw new Error('Splitting produced no pieces. Try a file under 100 MB.');
+  const initial = entries.map(e => e.name).filter(n => /^seg\d+\.mp4$/.test(n)).sort();
+  if (!initial.length) throw new Error('Splitting produced no pieces. Try a file under 100 MB.');
 
+  // Adaptive queue: duration metadata and keyframe spacing can make the first
+  // size guess wrong, so any piece still over the cap is halved and re-queued.
+  const MAX_TOTAL_PARTS = 24;
+  const MIN_SEG_TIME = 5;
+  const created = new Set(initial);
+  const queue = initial.map(name => ({ name, segTime }));
   const compressedNames = [];
+  let doneCount = 0;
+  const progressFor = () => {
+    const total = Math.max(doneCount + queue.length, 1);
+    return 12 + (doneCount / total) * 70;
+  };
   try {
-    for (let i = 0; i < segNames.length; i++) {
+    while (queue.length) {
       throwIfAborted();
-      const name = segNames[i];
-      const base = 12 + (i / segNames.length) * 70;
-      setProgress(base, `Compressing piece ${i + 1} of ${segNames.length} on the server...`);
+      const { name, segTime: pieceSeg } = queue.shift();
+      setProgress(progressFor(), `Inspecting piece...`);
       const data = await ff.readFile(name);
       if (data.length > MAX_FILE_SIZE) {
-        throw new Error(`Piece ${i + 1} is still over 100 MB — this video\u2019s bitrate is too high to split safely. Try a shorter clip.`);
+        const childSeg = Math.floor(pieceSeg / 2);
+        if (childSeg < MIN_SEG_TIME || (compressedNames.length + queue.length + 2) > MAX_TOTAL_PARTS) {
+          throw new Error(`A piece is still over 100 MB and cannot be split further — try a shorter clip or a lower-resolution source.`);
+        }
+        setProgress(progressFor(), `Re-splitting an oversized piece...`);
+        const stem = name.replace(/\.mp4$/, '');
+        const aName = `${stem}.a.mp4`, bName = `${stem}.b.mp4`;
+        const r1 = await ff.exec(['-i', name, '-t', String(childSeg), '-c', 'copy', '-map', '0', aName]);
+        const r2 = await ff.exec(['-ss', String(childSeg), '-i', name, '-c', 'copy', '-map', '0', bName]);
+        if (r1 !== 0 || r2 !== 0) throw new Error('Re-splitting an oversized piece failed. Try a shorter clip.');
+        try { await ff.deleteFile(name); } catch (e) {}
+        created.delete(name);
+        created.add(aName); created.add(bName);
+        queue.unshift({ name: aName, segTime: childSeg }, { name: bName, segTime: childSeg });
+        continue;
       }
+      const total = Math.max(doneCount + queue.length + 1, 1);
+      const base = 12 + (doneCount / total) * 70;
+      const label = doneCount + 1;
+      setProgress(base, `Compressing piece ${label} on the server...`);
       const fd = new FormData();
       fd.append('file', new Blob([data], { type: 'video/mp4' }), name);
-      const segBlob = await uploadAndCompress(fd, crfVal, (phase, loaded, total) => {
-        if (phase === 'upload' && total) {
-          const frac = loaded / total;
-          setProgress(base + frac * (70 / segNames.length) * 0.6, `Uploading piece ${i + 1} of ${segNames.length}...`);
+      const segBlob = await uploadAndCompress(fd, crfVal, (phase, loaded, totalBytes) => {
+        if (phase === 'upload' && totalBytes) {
+          const frac = loaded / totalBytes;
+          setProgress(base + frac * (70 / total) * 0.6, `Uploading piece ${label}...`);
         }
       });
       const cName = 'c_' + name;
       await ff.writeFile(cName, new Uint8Array(await segBlob.arrayBuffer()));
       try { await ff.deleteFile(name); } catch (e) {}
+      created.delete(name);
       compressedNames.push(cName);
-      setProgress(12 + ((i + 1) / segNames.length) * 70, `Piece ${i + 1} of ${segNames.length} compressed.`);
+      doneCount++;
+      setProgress(progressFor(), `Piece ${label} compressed.`);
     }
 
+    if (!compressedNames.length) throw new Error('No pieces were produced. Try a file under 100 MB.');
     throwIfAborted();
     setProgress(86, 'Reassembling compressed pieces...');
     const listText = compressedNames.map(n => `file '${n}'`).join('\n');
@@ -455,9 +486,9 @@ async function compressSegmented(file, crfVal) {
     if (concatCode !== 0) throw new Error('Reassembly failed after compression.');
     const out = await ff.readFile('final.mp4');
     setProgress(96, 'Done.');
-    return { blob: new Blob([out], { type: 'video/mp4' }), segments: segNames.length };
+    return { blob: new Blob([out], { type: 'video/mp4' }), segments: compressedNames.length };
   } finally {
-    for (const n of [...segNames, ...compressedNames, 'list.txt', 'final.mp4']) {
+    for (const n of [...created, ...compressedNames, 'list.txt', 'final.mp4']) {
       try { await ff.deleteFile(n); } catch (e) {}
     }
   }
