@@ -32,6 +32,9 @@ const btnAgain             = document.getElementById('btn-again');
 
 // ── State ─────────────────────────────────────────────────
 let selectedFile = null;
+let currentDownloadUrl = null;
+// Must stay in sync with the backend MAX_FILE_SIZE (100 MB in main.py).
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 // ── Toast Helper ──────────────────────────────────────────
 function showToast(message, isError = false) {
@@ -97,6 +100,11 @@ function handleFileSelect(file) {
   const isVideo = file && (file.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|flv|wmv|m4v)$/i.test(file.name));
   if (!isVideo) {
     showToast('Please select a valid video file.', true);
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    showToast(`File is too large (${formatBytes(file.size)}). Maximum supported size is ${formatBytes(MAX_FILE_SIZE)} — try a shorter clip or split it first.`, true);
     return;
   }
 
@@ -217,15 +225,20 @@ btnCompress.addEventListener('click', async () => {
     }
 
     const requestUrl = `${API_URL}?crf=${crfVal}`;
-    const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
+    // 6-minute client timeout: video transcodes are slow, and the free-tier
+    // server/proxy can take minutes or drop the connection. ontimeout/stats-0
+    // handlers above turn that into a helpful message instead of a hang.
+    const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData , signal: activeAbortController?.signal, timeout: 360000 }, __handleProgress);
     if (!response.ok) {
       const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
       throw new Error(errMsg);
     }
 
     const blob = await response.blob();
-    if (btnDownload.href) { URL.revokeObjectURL(btnDownload.href); btnDownload.removeAttribute('href'); }
-    const url = URL.createObjectURL(blob);
+    if (currentDownloadUrl) { URL.revokeObjectURL(currentDownloadUrl); currentDownloadUrl = null; }
+    if (btnDownload.href) { btnDownload.removeAttribute('href'); }
+    currentDownloadUrl = URL.createObjectURL(blob);
+    const url = currentDownloadUrl;
 
     // Update result card
     videoResultPreview.src = url;
@@ -286,6 +299,12 @@ async function doFetchWithProgress(url, options, onProgress) {
       if (e.lengthComputable && onProgress) onProgress('upload', e.loaded, e.total);
     };
     xhr.onload = () => {
+      // status 0 = connection died before any HTTP response (proxy kill,
+      // server sleep, offline). Surface a helpful message, not a bare code.
+      if (xhr.status === 0) {
+        reject(new Error('Connection to the server was lost. The file may be too large or the server timed out — try a smaller/shorter video and try again.'));
+        return;
+      }
       const response = {
         ok: xhr.status >= 200 && xhr.status < 300,
         status: xhr.status,
@@ -296,8 +315,10 @@ async function doFetchWithProgress(url, options, onProgress) {
       };
       resolve(response);
     };
-    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onerror = () => reject(new Error('Connection to the server was lost. The file may be too large or the server timed out — try a smaller/shorter video and try again.'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
+    xhr.ontimeout = () => reject(new Error('The server took too long to respond (timed out). Try a smaller/shorter video and try again.'));
+    if (options.timeout) xhr.timeout = options.timeout;
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });
