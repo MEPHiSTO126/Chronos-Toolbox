@@ -342,27 +342,43 @@ const FFMPEG_CDNS = [
     ffmpeg: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js',
     core: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js',
     wasm: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.wasm'
+  },
+  {
+    name: 'jsdelivr-pinned',
+    ffmpeg: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js',
+    core: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js',
+    wasm: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.wasm'
   }
 ];
 
 async function getFFmpegEngine(onMsg) {
   if (ffmpegEngine) return ffmpegEngine;
+  const attempts = [];
   for (const cdn of FFMPEG_CDNS) {
     try {
       if (onMsg) onMsg(`Loading in-browser video engine via ${cdn.name} (one-time download, ~30 MB)...`);
-      await loadScriptOnce(cdn.ffmpeg);
+      try {
+        await loadScriptOnce(cdn.ffmpeg);
+      } catch (e) {
+        throw new Error(`${cdn.name}: player script download failed (${e.message || 'network blocked?'})`);
+      }
       const NS = window.FFmpegWASM || window.FFmpeg;
       const FFmpegClass = (NS && (NS.FFmpeg || NS.default)) || NS;
-      if (typeof FFmpegClass !== 'function') throw new Error('engine init failed');
+      if (typeof FFmpegClass !== 'function') throw new Error(`${cdn.name}: engine script loaded but api missing`);
       const ff = new FFmpegClass();
-      await ff.load({ coreURL: cdn.core, wasmURL: cdn.wasm });
+      try {
+        await ff.load({ coreURL: cdn.core, wasmURL: cdn.wasm });
+      } catch (e) {
+        throw new Error(`${cdn.name}: core download/start failed (${(e && e.message) || e || 'unknown'})`);
+      }
       ffmpegEngine = ff;
       return ff;
     } catch (e) {
       console.warn(`ffmpeg engine load via ${cdn.name} failed:`, e);
+      attempts.push(e.message);
     }
   }
-  throw new Error('Could not load the in-browser video engine. Check your connection and try again. (Files under 100 MB do not need it.)');
+  throw new Error(`Could not load the in-browser video engine (${attempts.join(' / ') || 'unknown error'}). (Files under 100 MB do not need it.)`);
 }
 
 function getVideoDuration(file) {
