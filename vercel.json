@@ -56,8 +56,5 @@
     { "source": "/qr-to-url", "destination": "/apps/qr-generator/tools/qr-to-url/index.html", "permanent": false },
     { "source": "/vcard-to-qr", "destination": "/apps/qr-generator/tools/vcard-to-qr/index.html", "permanent": false },
     { "source": "/wifi-to-qr", "destination": "/apps/qr-generator/tools/wifi-to-qr/index.html", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/((?!(apps/|packages/|favicon)).*)", "destination": "/apps/404.html" }
   ]
 }
