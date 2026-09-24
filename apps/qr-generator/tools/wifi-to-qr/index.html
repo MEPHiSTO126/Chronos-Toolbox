@@ -44,11 +44,11 @@
       padding: 0.75rem 1rem;
       font-family: var(--font);
       font-size: 0.95rem;
-      transition: border-color var(--tr);
+      transition: border-color var(--transition);
     }
     .text-input:focus, .select-input:focus {
       outline: none;
-      border-color: var(--c-accent);
+      border-color: var(--clr-accent);
     }
     .checkbox-group {
       display: flex;
@@ -60,7 +60,7 @@
     .checkbox-input {
       width: 18px;
       height: 18px;
-      accent-color: var(--c-accent);
+      accent-color: var(--clr-accent);
       cursor: pointer;
     }
     .checkbox-label {
@@ -70,7 +70,7 @@
     }
     .btn-generate {
       width: 100%;
-      background: var(--c-accent);
+      background: var(--clr-accent);
       color: var(--c-bg);
       border: none;
       border-radius: var(--radius-md);
@@ -79,10 +79,10 @@
       font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform var(--tr), background var(--tr);
+      transition: transform var(--transition), background var(--transition);
     }
     .btn-generate:hover {
-      background: var(--c-accent-hover);
+      background: var(--color-accent-hover);
       transform: translateY(-1px);
     }
     .qr-preview-card {
@@ -114,13 +114,13 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      background: var(--c-accent);
+      background: var(--clr-accent);
       color: var(--c-bg);
       text-decoration: none;
       font-weight: 700;
       border-radius: var(--radius-md);
       padding: 0.8rem 1.5rem;
-      transition: transform var(--tr);
+      transition: transform var(--transition);
       font-size: 0.9rem;
     }
     .btn-download:hover {
@@ -204,3 +204,4 @@
   <script src="js/main.js"></script>
 </body>
 </html>
+

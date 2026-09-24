@@ -96,7 +96,7 @@
       padding: 0.75rem 1rem;
       background: var(--clr-surface); border: 1px solid var(--clr-border);
       border-radius: var(--radius-md); cursor: grab;
-      transition: border-color var(--tr), background var(--tr);
+      transition: border-color var(--transition), background var(--transition);
       animation: fadeUp 0.25s ease both;
     }
     .pdf-file-item:active { cursor: grabbing; }
@@ -112,7 +112,7 @@
     .pdf-file-item__remove {
       background: none; border: none; color: var(--clr-text-muted);
       cursor: pointer; font-size: 0.9rem; padding: 0.1rem 0.25rem;
-      transition: color var(--tr);
+      transition: color var(--transition);
     }
     .pdf-file-item__remove:hover { color: var(--clr-danger); }
   </style>
@@ -120,3 +120,4 @@
   <script src="js/main.js"></script>
 </body>
 </html>
+

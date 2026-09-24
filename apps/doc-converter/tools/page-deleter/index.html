@@ -15,15 +15,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     .page-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:1rem; margin-top:1.5rem; }
-    .page-thumb { position:relative; background:var(--clr-surface); border:2px solid var(--clr-border); border-radius:var(--radius-md); overflow:hidden; cursor:pointer; transition:border-color var(--tr); animation:fadeUp .3s ease both; user-select:none; }
+    .page-thumb { position:relative; background:var(--clr-surface); border:2px solid var(--clr-border); border-radius:var(--radius-md); overflow:hidden; cursor:pointer; transition:border-color var(--transition); animation:fadeUp .3s ease both; user-select:none; }
     .page-thumb canvas { width:100%; display:block; background:#fff; }
     .page-thumb.selected { border-color:#c0524a; }
-    .page-thumb__overlay { position:absolute; inset:0; background:rgba(192,82,74,.45); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity var(--tr); font-size:2rem; }
+    .page-thumb__overlay { position:absolute; inset:0; background:rgba(192,82,74,.45); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity var(--transition); font-size:2rem; }
     .page-thumb.selected .page-thumb__overlay { opacity:1; }
     .page-thumb__footer { padding:.35rem .5rem; background:var(--clr-surface-2); font-size:.7rem; color:var(--clr-text-muted); font-weight:600; }
     .toolbar { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-top:1.5rem; }
     .tool-hint { font-size:.82rem; color:var(--c-steel); flex:1; }
-    .toolbar-btn { font-family:var(--font); font-size:.82rem; font-weight:600; padding:.45rem 1rem; background:var(--clr-surface); color:var(--clr-text-sub); border:1px solid var(--clr-border); border-radius:var(--radius-sm); cursor:pointer; transition:color var(--tr),border-color var(--tr); }
+    .toolbar-btn { font-family:var(--font); font-size:.82rem; font-weight:600; padding:.45rem 1rem; background:var(--clr-surface); color:var(--clr-text-sub); border:1px solid var(--clr-border); border-radius:var(--radius-sm); cursor:pointer; transition:color var(--transition),border-color var(--transition); }
     .toolbar-btn:hover { color:var(--c-rose); border-color:var(--c-rose); }
   </style>
 </head>
@@ -95,3 +95,4 @@
   <script src="js/main.js"></script>
 </body>
 </html>
+

@@ -15,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     .page-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:1rem; margin-top:1.5rem; }
-    .page-thumb { background:var(--clr-surface); border:2px solid var(--clr-border); border-radius:var(--radius-md); overflow:hidden; cursor:grab; transition:border-color var(--tr),opacity var(--tr); animation:fadeUp .3s ease both; user-select:none; }
+    .page-thumb { background:var(--clr-surface); border:2px solid var(--clr-border); border-radius:var(--radius-md); overflow:hidden; cursor:grab; transition:border-color var(--transition),opacity var(--transition); animation:fadeUp .3s ease both; user-select:none; }
     .page-thumb:active { cursor:grabbing; }
     .page-thumb.dragging { opacity:.3; }
     .page-thumb.drag-target { border-color:var(--c-rose); box-shadow:0 0 0 2px rgba(224,180,178,.3); }
@@ -92,3 +92,4 @@
   <script src="js/main.js"></script>
 </body>
 </html>
+
