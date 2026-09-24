@@ -34,7 +34,10 @@ const btnAgain             = document.getElementById('btn-again');
 let selectedFile = null;
 let currentDownloadUrl = null;
 // Must stay in sync with the backend MAX_FILE_SIZE (100 MB in main.py).
+// Files above it are split in the browser and compressed piece by piece.
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
+// Hard ceiling for the segmented path (browser memory limit).
+const ABSOLUTE_MAX_FILE_SIZE = 1024 * 1024 * 1024;
 
 // ── Toast Helper ──────────────────────────────────────────
 function showToast(message, isError = false) {
@@ -103,9 +106,13 @@ function handleFileSelect(file) {
     return;
   }
 
-  if (file.size > MAX_FILE_SIZE) {
-    showToast(`File is too large (${formatBytes(file.size)}). Maximum supported size is ${formatBytes(MAX_FILE_SIZE)} — try a shorter clip or split it first.`, true);
+  if (file.size > ABSOLUTE_MAX_FILE_SIZE) {
+    showToast(`File is too large (${formatBytes(file.size)}). Files up to ${formatBytes(ABSOLUTE_MAX_FILE_SIZE)} are supported.`, true);
     return;
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    showToast(`Large file (${formatBytes(file.size)}): it will be split in your browser and compressed piece by piece, then reassembled. This takes longer and needs a one-time engine download.`, false);
   }
 
   selectedFile = file;
@@ -215,26 +222,26 @@ btnCompress.addEventListener('click', async () => {
     }
   };
 
-  const formData = new FormData();
-  formData.append('file', selectedFile);
-
   try {
     const awake = await ensureBackendAwake({ signal: activeAbortController?.signal });
     if (!awake) {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const requestUrl = `${API_URL}?crf=${crfVal}`;
-    // 6-minute client timeout: video transcodes are slow, and the free-tier
-    // server/proxy can take minutes or drop the connection. ontimeout/stats-0
-    // handlers above turn that into a helpful message instead of a hang.
-    const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData , signal: activeAbortController?.signal, timeout: 360000 }, __handleProgress);
-    if (!response.ok) {
-      const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
-      throw new Error(errMsg);
+    // Small files go straight to the server. Large files are split in the
+    // browser (ffmpeg.wasm, lossless copy), compressed piece by piece, then
+    // reassembled — the backend never receives more than MAX_FILE_SIZE at once.
+    let blob, segmentNote = '';
+    if (selectedFile.size <= MAX_FILE_SIZE) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      blob = await uploadAndCompress(formData, crfVal, __handleProgress);
+    } else {
+      if (progressInterval) clearInterval(progressInterval);
+      const out = await compressSegmented(selectedFile, crfVal);
+      blob = out.blob;
+      segmentNote = ` · ${out.segments} segments`;
     }
-
-    const blob = await response.blob();
     if (currentDownloadUrl) { URL.revokeObjectURL(currentDownloadUrl); currentDownloadUrl = null; }
     if (btnDownload.href) { btnDownload.removeAttribute('href'); }
     currentDownloadUrl = URL.createObjectURL(blob);
@@ -248,7 +255,7 @@ btnCompress.addEventListener('click', async () => {
     // Show original vs compressed percentage savings
     const diffPct = Math.round((1 - (blob.size / selectedFile.size)) * 100);
     const savingsLabel = diffPct > 0 ? ` · Saved ${diffPct}%` : '';
-    resultMeta.textContent = `Original: ${formatBytes(selectedFile.size)} · Compressed: ${formatBytes(blob.size)}${savingsLabel}`;
+    resultMeta.textContent = `Original: ${formatBytes(selectedFile.size)} · Compressed: ${formatBytes(blob.size)}${savingsLabel}${segmentNote}`;
 
     clearInterval(progressInterval);
     progressBar.style.width = '100%';
@@ -277,6 +284,177 @@ btnCompress.addEventListener('click', async () => {
     btnRemove.disabled = false;
   }
 });
+
+// ── Shared upload helper (single request, 6-min client timeout) ──
+async function uploadAndCompress(formData, crfVal, onProgress) {
+  const requestUrl = `${API_URL}?crf=${crfVal}`;
+  // 6-minute client timeout: video transcodes are slow, and the free-tier
+  // server/proxy can take minutes or drop the connection. ontimeout/status-0
+  // handlers in doFetchWithProgress turn that into a helpful message.
+  const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData, signal: activeAbortController?.signal, timeout: 360000 }, onProgress);
+  if (!response.ok) {
+    const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
+    throw new Error(errMsg);
+  }
+  return response.blob();
+}
+
+// ── Determinate progress (segmented flow) ────────────────────
+function setProgress(pct, msg) {
+  const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
+  const pPct = document.getElementById('progress-pct');
+  const pTxt = document.getElementById('progress-text');
+  if (pBar) pBar.style.width = `${pct}%`;
+  if (pPct) pPct.textContent = `${Math.round(pct)}%`;
+  if (pTxt) pTxt.textContent = msg;
+}
+
+function throwIfAborted() {
+  if (activeAbortController?.signal.aborted) throw new DOMException('Operation aborted by user', 'AbortError');
+}
+
+// ── In-browser engine (ffmpeg.wasm) for splitting large files ─
+let ffmpegEngine = null;
+
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[data-ffsrc="${src}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.dataset.ffsrc = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+// Single-thread core needs no cross-origin-isolation headers, so this works
+// on plain static hosting. jsdelivr mirrors unpkg if it is unreachable.
+const FFMPEG_CDNS = [
+  {
+    name: 'unpkg',
+    ffmpeg: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js',
+    core: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js',
+    wasm: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.wasm'
+  },
+  {
+    name: 'jsdelivr',
+    ffmpeg: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js',
+    core: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js',
+    wasm: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.wasm'
+  }
+];
+
+async function getFFmpegEngine(onMsg) {
+  if (ffmpegEngine) return ffmpegEngine;
+  for (const cdn of FFMPEG_CDNS) {
+    try {
+      if (onMsg) onMsg(`Loading in-browser video engine via ${cdn.name} (one-time download, ~30 MB)...`);
+      await loadScriptOnce(cdn.ffmpeg);
+      const NS = window.FFmpegWASM || window.FFmpeg;
+      const FFmpegClass = (NS && (NS.FFmpeg || NS.default)) || NS;
+      if (typeof FFmpegClass !== 'function') throw new Error('engine init failed');
+      const ff = new FFmpegClass();
+      await ff.load({ coreURL: cdn.core, wasmURL: cdn.wasm });
+      ffmpegEngine = ff;
+      return ff;
+    } catch (e) {
+      console.warn(`ffmpeg engine load via ${cdn.name} failed:`, e);
+    }
+  }
+  throw new Error('Could not load the in-browser video engine. Check your connection and try again. (Files under 100 MB do not need it.)');
+}
+
+function getVideoDuration(file) {
+  return new Promise((resolve, reject) => {
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    const done = (fn) => { URL.revokeObjectURL(v.src); fn(); };
+    v.onloadedmetadata = () => done(() => resolve(v.duration));
+    v.onerror = () => done(() => reject(new Error('unreadable')));
+    v.src = URL.createObjectURL(file);
+    setTimeout(() => reject(new Error('timeout')), 15000);
+  });
+}
+
+// ── Segmented compression for files over MAX_FILE_SIZE ───────
+async function compressSegmented(file, crfVal) {
+  const ff = await getFFmpegEngine((m) => setProgress(3, m));
+  throwIfAborted();
+
+  const ext = ((file.name.match(/\.[^/.]+$/) || ['.mp4'])[0]).toLowerCase();
+  const inName = 'input' + ext;
+  setProgress(5, 'Reading video into the browser engine...');
+  await ff.writeFile(inName, new Uint8Array(await file.arrayBuffer()));
+
+  let duration = 0;
+  try { duration = await getVideoDuration(file); } catch (e) { /* handled below */ }
+  if (!duration || !isFinite(duration) || duration <= 0) {
+    try { await ff.deleteFile(inName); } catch (e) {}
+    throw new Error('Could not read this video\u2019s duration, so it cannot be split. Try a file under 100 MB.');
+  }
+
+  // Aim for ~70 MB pieces (safely under the 100 MB request cap).
+  const TARGET_SEG = 70 * 1024 * 1024;
+  const MAX_PARTS = 12;
+  let segTime = Math.max(10, Math.floor(TARGET_SEG / (file.size / duration)));
+  let parts = Math.ceil(duration / segTime);
+  if (parts > MAX_PARTS) {
+    segTime = Math.ceil(duration / MAX_PARTS);
+    parts = Math.ceil(duration / segTime);
+  }
+
+  setProgress(8, `Splitting into ${parts} pieces (lossless, no quality loss)...`);
+  const splitCode = await ff.exec(['-i', inName, '-c', 'copy', '-map', '0', '-f', 'segment', '-segment_time', String(segTime), '-reset_timestamps', '1', 'seg%03d.mp4']);
+  try { await ff.deleteFile(inName); } catch (e) {}
+  if (splitCode !== 0) throw new Error('Splitting the video failed. Try a file under 100 MB.');
+  throwIfAborted();
+
+  const entries = await ff.listDir('/');
+  const segNames = entries.map(e => e.name).filter(n => /^seg\d+\.mp4$/.test(n)).sort();
+  if (!segNames.length) throw new Error('Splitting produced no pieces. Try a file under 100 MB.');
+
+  const compressedNames = [];
+  try {
+    for (let i = 0; i < segNames.length; i++) {
+      throwIfAborted();
+      const name = segNames[i];
+      const base = 12 + (i / segNames.length) * 70;
+      setProgress(base, `Compressing piece ${i + 1} of ${segNames.length} on the server...`);
+      const data = await ff.readFile(name);
+      if (data.length > MAX_FILE_SIZE) {
+        throw new Error(`Piece ${i + 1} is still over 100 MB — this video\u2019s bitrate is too high to split safely. Try a shorter clip.`);
+      }
+      const fd = new FormData();
+      fd.append('file', new Blob([data], { type: 'video/mp4' }), name);
+      const segBlob = await uploadAndCompress(fd, crfVal, (phase, loaded, total) => {
+        if (phase === 'upload' && total) {
+          const frac = loaded / total;
+          setProgress(base + frac * (70 / segNames.length) * 0.6, `Uploading piece ${i + 1} of ${segNames.length}...`);
+        }
+      });
+      const cName = 'c_' + name;
+      await ff.writeFile(cName, new Uint8Array(await segBlob.arrayBuffer()));
+      try { await ff.deleteFile(name); } catch (e) {}
+      compressedNames.push(cName);
+      setProgress(12 + ((i + 1) / segNames.length) * 70, `Piece ${i + 1} of ${segNames.length} compressed.`);
+    }
+
+    throwIfAborted();
+    setProgress(86, 'Reassembling compressed pieces...');
+    const listText = compressedNames.map(n => `file '${n}'`).join('\n');
+    await ff.writeFile('list.txt', new TextEncoder().encode(listText));
+    const concatCode = await ff.exec(['-f', 'concat', '-safe', '0', '-i', 'list.txt', '-c', 'copy', 'final.mp4']);
+    if (concatCode !== 0) throw new Error('Reassembly failed after compression.');
+    const out = await ff.readFile('final.mp4');
+    setProgress(96, 'Done.');
+    return { blob: new Blob([out], { type: 'video/mp4' }), segments: segNames.length };
+  } finally {
+    for (const n of [...segNames, ...compressedNames, 'list.txt', 'final.mp4']) {
+      try { await ff.deleteFile(n); } catch (e) {}
+    }
+  }
+}
 
 // ── XHR Progress Wrapper ───────────────────────────────────────
 async function doFetchWithProgress(url, options, onProgress) {
