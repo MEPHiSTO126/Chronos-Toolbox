@@ -2,7 +2,7 @@ let activeAbortController = null;
 'use strict';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-76dc.onrender.com';
+const BASE_URL = isLocal ? 'http://localhost:8000' : 'https://toolbox-backend-ayd8.onrender.com';
 const API_URL = `${BASE_URL}/convert/compress-pptx`;
 
 const dropzone    = document.getElementById('dropzone');
@@ -253,3 +253,4 @@ async function doFetchWithProgress(url, options, onProgress) {
     xhr.send(options.body);
   });
 }
+

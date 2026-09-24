@@ -57,7 +57,7 @@
    */
   async function ensureBackendAwake(options = {}) {
     const config = window.CHRONOS_CONFIG || {};
-    const defaultBase = config.API_BASE || 'https://toolbox-backend-76dc.onrender.com';
+    const defaultBase = config.API_BASE || 'https://toolbox-backend-ayd8.onrender.com';
     const baseUrl = options.url || (typeof BASE_URL !== 'undefined' ? BASE_URL : defaultBase);
     const origin = new URL(baseUrl, window.location.href).origin;
     const maxAttempts = options.maxAttempts || 15;
@@ -126,4 +126,5 @@
     bindCancelButton
   };
 })();
+
 
