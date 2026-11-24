@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <!-- CropperJS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
@@ -80,79 +79,71 @@
 
     <!-- Edit Section (Shown after upload) -->
     <div id="editor-section" style="display:none; margin-top:2rem;">
-      <div style="display:grid; grid-template-columns: 1fr; gap:2rem; max-width:960px;">
+      <div class="editor-grid--single">
         
         <!-- Cropper Box -->
-        <div style="width:100%; display:flex; justify-content:center;">
-          <div style="width:100%; max-height:480px; position:relative; overflow:hidden;">
-            <img id="image-to-edit" style="max-width:100%; max-height:480px; display:block;" alt="Upload Preview" />
-          </div>
+        <div class="editor-canvas-wrapper">
+          <img id="image-to-edit" alt="Upload Preview" />
         </div>
 
         <!-- Controls panel -->
-        <div class="options-panel" style="margin-top:0;">
-          <p class="options-panel__title" style="margin-bottom:1rem;">Adjustment Options</p>
+        <div class="options-panel options-panel--compact">
+          <p class="options-panel__title">Adjustment Options</p>
           
-          <div style="display:flex; flex-direction:column; gap:1.25rem;">
-            
-            <!-- Crop aspect ratios -->
-            <div>
-              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Crop Aspect Ratio</label>
-              <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-                <button class="filter-btn active" data-ratio="NaN" id="ratio-free">Free</button>
-                <button class="filter-btn" data-ratio="1" id="ratio-1-1">1:1 Square</button>
-                <button class="filter-btn" data-ratio="1.3333" id="ratio-4-3">4:3 Standard</button>
-                <button class="filter-btn" data-ratio="1.7777" id="ratio-16-9">16:9 Widescreen</button>
-                <button class="filter-btn" data-ratio="0.5625" id="ratio-9-16">9:16 Portrait</button>
-              </div>
+          <div class="control-row">
+            <label>Crop Aspect Ratio</label>
+            <div class="filter-btn-group">
+              <button class="filter-btn active" data-ratio="NaN" id="ratio-free">Free</button>
+              <button class="filter-btn" data-ratio="1" id="ratio-1-1">1:1 Square</button>
+              <button class="filter-btn" data-ratio="1.3333" id="ratio-4-3">4:3 Standard</button>
+              <button class="filter-btn" data-ratio="1.7777" id="ratio-16-9">16:9 Widescreen</button>
+              <button class="filter-btn" data-ratio="0.5625" id="ratio-9-16">9:16 Portrait</button>
             </div>
-
-            <!-- Resize inputs -->
-            <div>
-              <label style="display:block; margin-bottom:0.5rem; font-size:0.82rem; font-weight:600; color:var(--clr-text-sub);">Resize Dimensions (Pixels)</label>
-              <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-                <div style="display:flex; align-items:center; gap:0.4rem;">
-                  <span style="font-size:0.8rem; color:var(--clr-text-muted);">W:</span>
-                  <input type="number" id="resize-w" placeholder="Width" style="width:90px; font-family:inherit; font-size:0.85rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.45rem 0.6rem; outline:none;" />
-                </div>
-                <div style="display:flex; align-items:center; gap:0.4rem;">
-                  <span style="font-size:0.8rem; color:var(--clr-text-muted);">H:</span>
-                  <input type="number" id="resize-h" placeholder="Height" style="width:90px; font-family:inherit; font-size:0.85rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.45rem 0.6rem; outline:none;" />
-                </div>
-                <label style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:var(--clr-text-sub); cursor:pointer; user-select:none;">
-                  <input type="checkbox" id="resize-aspect" checked style="accent-color:var(--c-rose); cursor:pointer;" /> Lock Aspect Ratio
-                </label>
-              </div>
-            </div>
-
-            <!-- Output settings -->
-            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; border-top:1px solid var(--clr-border); padding-top:1rem;">
-              <div style="flex:1; min-width:140px;">
-                <label for="opt-format" style="display:block; margin-bottom:0.4rem; font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Format</label>
-                <select id="opt-format" style="width:100%; font-family:inherit; font-size:0.82rem; background:var(--clr-surface-2); color:var(--clr-text-primary); border:1px solid var(--clr-border); border-radius:var(--radius-sm); padding:0.4rem 0.6rem; outline:none;">
-                  <option value="jpeg">JPG</option>
-                  <option value="png" selected>PNG</option>
-                  <option value="webp">WEBP</option>
-                </select>
-              </div>
-              <div style="flex:2; min-width:180px;" id="quality-group">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-                  <label for="opt-quality" style="font-size:0.8rem; font-weight:600; color:var(--clr-text-sub);">Quality</label>
-                  <span id="quality-val" style="font-size:0.8rem; font-weight:700; color:var(--c-rose);">90%</span>
-                </div>
-                <input type="range" id="opt-quality" min="10" max="100" value="90" style="width:100%; accent-color:var(--c-rose); height:4px; border-radius:2px; background:var(--clr-surface-2);" />
-              </div>
-            </div>
-
           </div>
+
+          <div class="control-row">
+            <label>Resize Dimensions (Pixels)</label>
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">W:</span>
+                <input type="number" id="resize-w" placeholder="Width" class="control-row-input" style="width:90px;" />
+              </div>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">H:</span>
+                <input type="number" id="resize-h" placeholder="Height" class="control-row-input" style="width:90px;" />
+              </div>
+              <label style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:var(--color-text-sub); cursor:pointer; user-select:none;">
+                <input type="checkbox" id="resize-aspect" checked style="accent-color:var(--color-accent); cursor:pointer;" /> Lock Aspect Ratio
+              </label>
+            </div>
+          </div>
+
+          <div class="control-row" style="border-top:1px solid var(--color-border); padding-top:1rem;">
+            <div style="flex:1; min-width:140px;">
+              <label for="opt-format">Format</label>
+              <select id="opt-format" class="control-row-input" style="width:100%;">
+                <option value="jpeg">JPG</option>
+                <option value="png" selected>PNG</option>
+                <option value="webp">WEBP</option>
+              </select>
+            </div>
+            <div style="flex:2; min-width:180px;" id="quality-group">
+              <div class="control-row__header">
+                <label for="opt-quality">Quality</label>
+                <span id="quality-val" class="quality-value">90%</span>
+              </div>
+              <input type="range" id="opt-quality" min="10" max="100" value="90" class="control-row-input" />
+            </div>
+          </div>
+
         </div>
 
       </div>
 
       <!-- Action buttons -->
-      <div class="action-bar" style="margin-top:1.5rem; display:flex; align-items:center; gap:0.75rem;">
-        <button class="btn-primary" id="btn-save" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:var(--c-rose); color:var(--c-bg); border:none; cursor:pointer;">Export & Download</button>
-        <button class="btn-secondary" id="btn-clear" style="font-family:inherit; font-weight:600; font-size:0.88rem; border-radius:var(--radius-sm); padding:0.6rem 1.4rem; background:transparent; color:var(--clr-text-sub); border:1px solid var(--clr-border); cursor:pointer;">Clear</button>
+      <div class="action-bar">
+        <button class="btn-primary" id="btn-save">Export & Download</button>
+        <button class="btn-secondary" id="btn-clear">Clear</button>
       </div>
     </div>
 

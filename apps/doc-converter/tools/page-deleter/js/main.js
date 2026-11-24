@@ -60,7 +60,8 @@ async function buildGrid(total) {
 
     const canvas = document.createElement('canvas');
     const overlay = document.createElement('div');
-    overlay.className = 'page-thumb__overlay'; overlay.textContent = '🗑';
+    overlay.className = 'page-thumb__overlay';
+    overlay.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="../../../../packages/ui/icons.svg#icon-trash"/></svg>';
     const footer = document.createElement('div');
     footer.className = 'page-thumb__footer'; footer.textContent = `Page ${i + 1}`;
 

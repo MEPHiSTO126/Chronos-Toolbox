@@ -27,6 +27,8 @@ const progressBar          = document.getElementById('progress-bar');
 const resultArea           = document.getElementById('result-area');
 const resultMeta           = document.getElementById('result-meta');
 const videoResultPreview   = document.getElementById('video-result-preview');
+const sourceVideo          = document.getElementById('source-video');
+const sourcePreview        = document.getElementById('source-preview');
 const btnDownload          = document.getElementById('btn-download');
 const btnAgain             = document.getElementById('btn-again');
 
@@ -104,6 +106,11 @@ function handleFileSelect(file) {
   fileNameEl.textContent = file.name;
   fileSizeEl.textContent = formatBytes(file.size);
 
+  // Show source preview
+  if (sourceVideo.src) URL.revokeObjectURL(sourceVideo.src);
+  sourceVideo.src = URL.createObjectURL(file);
+  sourcePreview.style.display = 'block';
+
   dropzone.style.display = 'none';
   fileMetaContainer.style.display = 'flex';
   optionsPanel.style.display = 'block';
@@ -115,6 +122,10 @@ function resetState() {
   selectedFile = null;
   fileInput.value = '';
   videoResultPreview.src = '';
+  if (sourceVideo.src) {
+    URL.revokeObjectURL(sourceVideo.src);
+    sourceVideo.removeAttribute('src');
+  }
   if (btnDownload.href) {
     URL.revokeObjectURL(btnDownload.href);
     btnDownload.removeAttribute('href');
@@ -124,6 +135,7 @@ function resetState() {
   fileMetaContainer.style.display = 'none';
   optionsPanel.style.display = 'none';
   actionBar.style.display = 'none';
+  sourcePreview.style.display = 'none';
   progressWrap.classList.remove('visible');
   resultArea.classList.remove('visible');
 }
@@ -215,7 +227,7 @@ btnConvert.addEventListener('click', async () => {
     }
 
     const requestUrl = `${API_URL}?format=${targetFormat}`;
-    const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
+    const response = await doFetchWithProgress(requestUrl, { method: 'POST', body: formData, signal: activeAbortController?.signal, timeout: 600000 }, __handleProgress);
     if (!response.ok) {
       const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
       throw new Error(errMsg);
@@ -292,6 +304,11 @@ async function doFetchWithProgress(url, options, onProgress) {
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
+    // Timeout support
+    if (options.timeout) {
+      xhr.timeout = options.timeout;
+      xhr.ontimeout = () => reject(new Error('Request timed out. The server took too long to respond.'));
+    }
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });

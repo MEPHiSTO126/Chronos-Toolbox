@@ -175,7 +175,9 @@ function renderPageCard({ pageNum, canvas, url, ext }) {
   card.innerHTML = `
     <div class="page-card__footer">
       <span class="page-card__num">Page ${pageNum}</span>
-      <a class="page-card__dl" href="${url}" download="${state.fileName}-page-${pageNum}.${ext}">⬇ Save</a>
+      <a class="page-card__dl" href="${url}" download="${state.fileName}-page-${pageNum}.${ext}">
+        <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Save
+      </a>
     </div>
   `;
   card.insertBefore(displayCanvas, card.firstChild);

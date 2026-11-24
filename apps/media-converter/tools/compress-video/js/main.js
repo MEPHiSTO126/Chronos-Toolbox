@@ -27,6 +27,8 @@ const progressBar          = document.getElementById('progress-bar');
 const resultArea           = document.getElementById('result-area');
 const resultMeta           = document.getElementById('result-meta');
 const videoResultPreview   = document.getElementById('video-result-preview');
+const sourceVideo          = document.getElementById('source-video');
+const sourcePreview        = document.getElementById('source-preview');
 const btnDownload          = document.getElementById('btn-download');
 const btnAgain             = document.getElementById('btn-again');
 
@@ -119,6 +121,11 @@ function handleFileSelect(file) {
   fileNameEl.textContent = file.name;
   fileSizeEl.textContent = formatBytes(file.size);
 
+  // Show source preview
+  if (sourceVideo.src) URL.revokeObjectURL(sourceVideo.src);
+  sourceVideo.src = URL.createObjectURL(file);
+  sourcePreview.style.display = 'block';
+
   dropzone.style.display = 'none';
   fileMetaContainer.style.display = 'flex';
   optionsPanel.style.display = 'block';
@@ -130,10 +137,16 @@ function resetState() {
   selectedFile = null;
   fileInput.value = '';
   
+  if (sourceVideo.src) {
+    URL.revokeObjectURL(sourceVideo.src);
+    sourceVideo.removeAttribute('src');
+  }
+  
   dropzone.style.display = 'flex';
   fileMetaContainer.style.display = 'none';
   optionsPanel.style.display = 'none';
   actionBar.style.display = 'none';
+  sourcePreview.style.display = 'none';
   progressWrap.classList.remove('visible');
   resultArea.classList.remove('visible');
   
@@ -337,8 +350,8 @@ const FFMPEG_CDNS = [
   {
     name: 'built-in',
     ffmpeg: '../../../../packages/vendor/ffmpeg/ffmpeg.js',
-    core: '/packages/vendor/ffmpeg/ffmpeg-core.js',
-    wasm: '/packages/vendor/ffmpeg/ffmpeg-core.wasm'
+    core: '../../../../packages/vendor/ffmpeg/ffmpeg-core.js',
+    wasm: '../../../../packages/vendor/ffmpeg/ffmpeg-core.wasm'
   }
 ];
 

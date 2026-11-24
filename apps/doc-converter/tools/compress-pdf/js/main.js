@@ -170,7 +170,7 @@ btnConvert.addEventListener('click', async () => {
 
     btnDownload.href = currentObjectURL;
     btnDownload.download = fname;
-    btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'Compressed PDF File'}`;
+    btnDownload.textContent = `<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ${selectedFiles.length > 1 ? 'ZIP' : 'Compressed PDF File'}`;
     const saved = originalSize - blob.size;
     const pct = originalSize > 0 ? Math.round((saved / originalSize) * 100) : 0;
     if (saved > 0) {

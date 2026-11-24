@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     .audio-preview-wrap {
       margin-top: 1rem;
@@ -141,7 +140,7 @@
         <span id="progress-text">Applying effects...</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
     </div>
 
     <!-- Result Area -->
@@ -154,7 +153,7 @@
           <p style="font-size: 0.78rem; font-weight: 600; color: var(--clr-text-sub);">Result Preview:</p>
           <audio class="audio-player-element" id="audio-result-preview" controls></audio>
         </div>
-        <a class="btn-download" id="btn-download" download="manipulated_audio.wav">⬇ Download WAV File</a>
+        <a class="btn-download" id="btn-download" download="manipulated_audio.wav"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download WAV File</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Edit another file</button>
       </div>

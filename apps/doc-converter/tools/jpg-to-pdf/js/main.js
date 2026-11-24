@@ -90,7 +90,7 @@ function renderPreviews() {
       <span class="preview-item__num">${idx + 1}</span>
       <img src="${item.dataUrl}" alt="${item.file.name}" loading="lazy" />
       <div class="preview-item__footer">${truncate(item.file.name, 18)}</div>
-      <button class="preview-item__remove" data-id="${item.id}" title="Remove" aria-label="Remove ${item.file.name}">✕</button>
+      <button class="preview-item__remove" data-id="${item.id}" title="Remove" aria-label="Remove ${item.file.name}"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-x"/></svg></button>
     `;
 
     // Drag-to-reorder

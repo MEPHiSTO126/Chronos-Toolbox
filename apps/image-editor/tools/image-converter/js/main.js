@@ -200,7 +200,7 @@ async function convertAll() {
 
   outputLabel.textContent = `Converted Files (${state.outputs.length})`;
   outputArea.style.display = 'block';
-  btnDlAll.textContent = state.outputs.length === 1 ? '⬇ Download File' : '⬇ Download ZIP';
+  btnDlAll.textContent = state.outputs.length === 1 ? <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download File : <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ZIP;
   outputArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -210,7 +210,9 @@ function renderOutputCard(name, url, bytes, w, h) {
   card.style.cursor = 'default';
   card.innerHTML = `
     <img src="${url}" alt="Converted" />
-    <a class="preview-item__remove" href="${url}" download="${name}" title="Download individual file" style="background:var(--c-rose); color:var(--c-bg); display:flex; align-items:center; justify-content:center; text-decoration:none; font-weight:bold; font-size:1.1rem;">⬇</a>
+    <a class="preview-item__remove" href="${url}" download="${name}" title="Download individual file" style="background:var(--color-accent); color:var(--color-bg); display:flex; align-items:center; justify-content:center; text-decoration:none; font-weight:bold; font-size:1.1rem;">
+      <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg>
+    </a>
     <div class="preview-item__footer" style="line-height: 1.3; height:auto; padding: 0.5rem;">
       <div style="font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${name}</div>
       <div style="font-size:0.65rem; opacity:0.75;">${w}×${h} · ${formatSize(bytes)}</div>

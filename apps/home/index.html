@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Chronos Toolbox — a suite of fast, clean, everyday web-based utility tools. Convert documents, edit images, generate QR codes and more." />
+  <meta name="theme-color" content="#0E1D21" />
+  <meta property="og:title" content="Chronos Toolbox" />
+  <meta property="og:description" content="Fast, private, browser-based utilities: documents, images, media, QR." />
+  <meta property="og:type" content="website" />
   <title>Chronos Toolbox</title>
   <link rel="icon" type="image/png" href="../../packages/images/title-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,12 +23,16 @@
   <!-- ── Header ─────────────────────────────────────────── -->
   <header class="site-header">
     <div class="header-inner header-inner--wide">
-      <a href="#" class="logo" id="logo-home" aria-label="Chronos Toolbox home">
+      <a href="./" class="logo" id="logo-home" aria-label="Chronos Toolbox home">
         <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
         </svg>
         <span class="logo__text">Chronos <strong>Toolbox</strong></span>
       </a>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Home</span>
+      </nav>
       <nav class="header-nav" aria-label="Site navigation">
         <a href="#tools" class="nav-link" id="nav-tools">Tools</a>
         <a href="https://ilugbaroo.vercel.app" target="_blank" rel="noopener noreferrer" class="nav-link nav-link--portfolio" id="portfolio-link">
@@ -48,8 +56,8 @@
       A growing suite of clean, fast, browser-based utilities. No sign-ups. No installs. Just tools that work.
     </p>
     <div class="search-container" id="search-container">
-      <div id="curved-search"></div>
     </div>
+    <noscript><p class="hero-sub">Search needs JavaScript. <a href="#tools">Browse all tools below</a>.</p></noscript>
     <a href="#tools" class="hero-cta" id="explore-tools-btn">
       Browse tools
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -60,12 +68,12 @@
   <main id="tools" class="tools-section" aria-labelledby="tools-heading">
     <div class="section-header">
       <h2 id="tools-heading" class="section-title">All Tools</h2>
-      <span class="section-count">4 tools</span>
+      <span class="section-count">4 suites</span>
     </div>
-    <div class="tools-grid tools-grid--home" role="list">
+    <div class="tools-grid tools-grid--home">
 
       <!-- Doc Converter -->
-      <a class="tool-card" href="../doc-converter/index.html" role="listitem" id="card-doc-converter" aria-label="Open Doc Converter">
+      <a class="tool-card" href="../doc-converter/index.html" id="card-doc-converter" aria-label="Open Doc Converter">
         <div class="tool-card__icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
@@ -75,14 +83,14 @@
           <span class="tag">Audio</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">Doc Converter</p>
+          <h3 class="tool-card__title">Doc Converter</h3>
           <p class="tool-card__desc">Convert between PDF, Word, JPG and audio formats — with local PDF processing and secure temporary conversions.</p>
         </div>
-        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Image Editor -->
-      <a class="tool-card" href="../image-editor/index.html" role="listitem" id="card-image-editor" aria-label="Open Image Editor">
+      <a class="tool-card" href="../image-editor/index.html" id="card-image-editor" aria-label="Open Image Editor">
         <div class="tool-card__icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><polyline points="21 15 16 10 5 21"/></svg>
         </div>
@@ -92,14 +100,14 @@
           <span class="tag">Effects</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">Image Editor</p>
+          <h3 class="tool-card__title">Image Editor</h3>
           <p class="tool-card__desc">Batch convert formats (including HEIC), crop, resize, rotate. Apply filters, frames, round cuts, watermarks, and build collages.</p>
         </div>
-        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Media Converter -->
-      <a class="tool-card" href="../media-converter/index.html" role="listitem" id="card-media-converter" aria-label="Open Media Converter">
+      <a class="tool-card" href="../media-converter/index.html" id="card-media-converter" aria-label="Open Media Converter">
         <div class="tool-card__icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 13 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
         </div>
@@ -109,14 +117,14 @@
           <span class="tag">Speech</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">Media Converter</p>
+          <h3 class="tool-card__title">Media Converter</h3>
           <p class="tool-card__desc">Extract audio, loop tracks, transcribe voice, split instrumentals, compress video, and convert media formats.</p>
         </div>
-        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- QR Generator -->
-      <a class="tool-card" href="../qr-generator/index.html" role="listitem" id="card-qr-generator" aria-label="Open QR Generator">
+      <a class="tool-card" href="../qr-generator/index.html" id="card-qr-generator" aria-label="Open QR Generator">
         <div class="tool-card__icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         </div>
@@ -126,20 +134,20 @@
           <span class="tag">Export</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">QR Generator</p>
+          <h3 class="tool-card__title">QR Generator</h3>
           <p class="tool-card__desc">Turn any URL, text or contact info into a scannable QR code. Export as PNG or SVG.</p>
         </div>
-        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open Tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- Coming soon -->
-      <div class="tool-card tool-card--soon" role="listitem" id="card-coming-soon" aria-label="More tools coming soon">
+      <div class="tool-card tool-card--soon" id="card-coming-soon" aria-label="More tools coming soon">
         <div class="tool-card__icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </div>
         <div class="tool-card__tags"><span class="tag">Coming Soon</span></div>
         <div class="tool-card__body">
-          <p class="tool-card__title">More tools on the way</p>
+          <h3 class="tool-card__title">More tools on the way</h3>
           <p class="tool-card__desc">The toolbox is always growing. Check back for new utilities regularly.</p>
         </div>
       </div>

@@ -69,7 +69,7 @@ function makeDraggableThumb(position, origPage) {
   const canvas  = document.createElement('canvas');
   const footer  = document.createElement('div');
   footer.className = 'page-thumb__footer';
-  footer.innerHTML = `<span class="drag-icon">⠿</span> <span>pg ${origPage + 1}</span>`;
+  footer.innerHTML = `<span class="drag-icon"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-grip"/></svg></span> <span>pg ${origPage + 1}</span>`;
 
   thumb.append(canvas, footer);
 

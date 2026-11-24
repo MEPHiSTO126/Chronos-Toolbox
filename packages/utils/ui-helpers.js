@@ -32,6 +32,16 @@
     if (!dropzoneEl.hasAttribute('role')) {
       dropzoneEl.setAttribute('role', 'button');
     }
+    // Click anywhere on the zone forwards to the hidden input,
+    // except clicks on nested buttons/links/inputs which keep native behaviour.
+    if (!dropzoneEl.dataset.chronosBound) {
+      dropzoneEl.dataset.chronosBound = '1';
+      dropzoneEl.addEventListener('click', (e) => {
+        const t = e.target.closest && e.target.closest('button, a, input, select, textarea, label');
+        if (t && t !== dropzoneEl) return;
+        if (e.target !== fileInputEl) fileInputEl.click();
+      });
+    }
     dropzoneEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();

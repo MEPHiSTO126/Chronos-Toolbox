@@ -257,13 +257,13 @@ if (btnExport) {
           state.pageBlobs[cacheKey] = blob;
         } catch (err) {
           toast('Export failed: ' + err.message, true);
-          btnExport.textContent = '⬇ Export Audio';
+          btnExport.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Export Audio';
           return;
         }
       }
 
       downloadBlob(blob, `speech-page${state.currentPage + 1}.mp3`);
-      btnExport.textContent = '⬇ Export Audio';
+      btnExport.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Export Audio';
       toast('Audio downloaded');
 
     } else {
@@ -301,7 +301,7 @@ if (btnExport) {
       } catch (err) {
         toast('Export failed: ' + err.message, true);
       }
-      btnExport.textContent = '⬇ Export Audio';
+      btnExport.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Export Audio';
     }
   });
 }
@@ -463,7 +463,7 @@ function updateUI() {
   const n = state.pages.length; const i = state.currentPage;
   playerInfo.textContent = `Page ${i+1} of ${n}`;
   playerBar.style.width  = n > 1 ? ((i / (n-1)) * 100) + '%' : '0%';
-  btnPlay.textContent    = state.isPlaying ? '⏸' : '▶';
+  btnPlay.textContent    = state.isPlaying ? '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-pause"/></svg>' : '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-play"/></svg>';
   btnPrev.disabled       = i === 0;
   btnNext.disabled       = i === n - 1;
   // Queue display

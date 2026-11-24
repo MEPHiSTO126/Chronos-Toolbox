@@ -192,7 +192,7 @@ btnConvert.addEventListener('click', async () => {
 
     btnDownload.href = currentObjectURL;
     btnDownload.download = fname;
-    btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF File'}`;
+    btnDownload.textContent = `<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF File'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;
     
     clearInterval(progressInterval);

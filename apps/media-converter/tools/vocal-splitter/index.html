@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     .audio-preview-wrap {
       margin-top: 1rem;
@@ -82,7 +81,7 @@
 
     <!-- File Meta Container -->
     <div class="file-meta-container" id="file-meta-container" style="display: none;">
-      <span class="file-meta-icon">🔊</span>
+      <span class="file-meta-icon"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-audio"/></svg></span>
       <div class="file-meta-details">
         <p class="file-meta-name" id="file-name">song.mp3</p>
         <p class="file-meta-size" id="file-size">0.0 MB</p>
@@ -105,7 +104,7 @@
         <span id="progress-text">Processing request...</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
           <div class="progress-actions">
         <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
       </div>
@@ -124,7 +123,7 @@
           <li><strong>instrumental.wav</strong>: Accompaniment / center-canceled stereo backing track.</li>
         </ul>
 
-        <a class="btn-download" id="btn-download">⬇ Download split_tracks.zip</a>
+        <a class="btn-download" id="btn-download"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download split_tracks.zip</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Process another file</button>
       </div>

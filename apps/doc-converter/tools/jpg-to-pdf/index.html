@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <!-- jsPDF via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -109,7 +108,7 @@
         <span id="progress-text">Processing…</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
     </div>
 
     <!-- Result -->
@@ -119,7 +118,7 @@
         <p class="result-card__title">Your PDF is ready!</p>
         <p class="result-card__meta" id="result-meta"></p>
         <a class="btn-download" id="btn-download" download="chronos-converted.pdf">
-          ⬇ Download PDF
+          <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download PDF
         </a>
         <br />
         <button class="btn-convert-again" id="btn-again">Convert another batch</button>

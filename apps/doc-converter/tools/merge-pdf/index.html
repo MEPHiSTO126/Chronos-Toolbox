@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
 <body>
@@ -51,10 +50,10 @@
     <div class="preview-area" id="preview-area" style="display:none;">
       <div class="preview-area__header">
         <span class="preview-area__title" id="preview-label">0 files · drag to reorder</span>
-        <button class="btn-secondary" id="btn-add-more" style="padding:0.4rem 1rem;font-size:0.82rem;">+ Add More</button>
+        <button class="btn-secondary" id="btn-add-more">+ Add More</button>
         <input type="file" id="add-more-input" accept="application/pdf" multiple style="display:none;" aria-label="Add more PDFs" />
       </div>
-      <div class="pdf-file-list" id="pdf-file-list" role="list" aria-label="PDF files to merge"></div>
+      <div class="file-list" id="pdf-file-list" role="list" aria-label="PDF files to merge"></div>
     </div>
 
     <div class="action-bar" id="action-bar" style="display:none;">
@@ -68,7 +67,7 @@
         <span id="progress-text">Merging…</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
     </div>
 
     <div class="result-area" id="result-area">
@@ -76,7 +75,10 @@
         <span class="result-card__icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
         <p class="result-card__title">Merged PDF ready!</p>
         <p class="result-card__meta" id="result-meta"></p>
-        <a class="btn-download" id="btn-download" download="merged.pdf">⬇ Download PDF</a>
+        <a class="btn-download" id="btn-download" download="merged.pdf">
+  <svg aria-hidden="true" focusable="false"><use href="../../../../packages/ui/icons.svg#icon-download"/></svg>
+  Download PDF
+</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Merge another batch</button>
       </div>
@@ -88,34 +90,6 @@
     <img class="footer-logo" src="../../../../packages/images/white-logo.png" alt="Chronos Toolbox" />
     <p class="footer-text">Part of <a href="../../../home/index.html">Chronos Toolbox</a> &nbsp;·&nbsp; Nothing is uploaded — all processing is local.</p>
   </footer>
-
-  <style>
-    .pdf-file-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
-    .pdf-file-item {
-      display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: var(--clr-surface); border: 1px solid var(--clr-border);
-      border-radius: var(--radius-md); cursor: grab;
-      transition: border-color var(--transition), background var(--transition);
-      animation: fadeUp 0.25s ease both;
-    }
-    .pdf-file-item:active { cursor: grabbing; }
-    .pdf-file-item.dragging { opacity: 0.35; }
-    .pdf-file-item.drag-target { border-color: var(--c-rose); background: rgba(224,180,178,0.04); }
-    .pdf-file-item__drag { color: var(--clr-text-muted); font-size: 1rem; user-select: none; }
-    .pdf-file-item__num {
-      font-size: 0.7rem; font-weight: 700; color: var(--c-rose);
-      width: 20px; text-align: center; flex-shrink: 0;
-    }
-    .pdf-file-item__name { flex: 1; font-size: 0.85rem; color: var(--clr-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pdf-file-item__size { font-size: 0.75rem; color: var(--clr-text-muted); flex-shrink: 0; }
-    .pdf-file-item__remove {
-      background: none; border: none; color: var(--clr-text-muted);
-      cursor: pointer; font-size: 0.9rem; padding: 0.1rem 0.25rem;
-      transition: color var(--transition);
-    }
-    .pdf-file-item__remove:hover { color: var(--clr-danger); }
-  </style>
 
   <script src="js/main.js"></script>
 </body>

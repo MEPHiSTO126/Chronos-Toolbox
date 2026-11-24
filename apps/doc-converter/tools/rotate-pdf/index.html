@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -54,9 +53,9 @@
         <span class="select-hint" id="select-hint">Click thumbnails to select · 0 selected</span>
         <button class="rot-btn" id="btn-select-all">Select All</button>
         <button class="rot-btn" id="btn-deselect">Deselect</button>
-        <button class="rot-btn" id="btn-cw">↻ 90° CW</button>
-        <button class="rot-btn" id="btn-180">↕ 180°</button>
-        <button class="rot-btn" id="btn-ccw">↺ 90° CCW</button>
+        <button class="rot-btn" id="btn-cw"><svg aria-hidden="true" focusable="false"><use href="../../../../packages/ui/icons.svg#icon-rotate"/></svg> 90° CW</button>
+        <button class="rot-btn" id="btn-180"><svg aria-hidden="true" focusable="false"><use href="../../../../packages/ui/icons.svg#icon-rotate"/></svg> 180°</button>
+        <button class="rot-btn" id="btn-ccw"><svg aria-hidden="true" focusable="false"><use href="../../../../packages/ui/icons.svg#icon-rotate"/></svg> 90° CCW</button>
       </div>
       <div class="page-grid" id="page-grid" role="list"></div>
     </div>
@@ -72,7 +71,7 @@
         <span id="progress-text">Applying rotations…</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
     </div>
 
     <div class="result-area" id="result-area">
@@ -80,7 +79,7 @@
         <span class="result-card__icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
         <p class="result-card__title">Rotated PDF ready!</p>
         <p class="result-card__meta" id="result-meta"></p>
-        <a class="btn-download" id="btn-download" download="rotated.pdf">⬇ Download PDF</a><br />
+        <a class="btn-download" id="btn-download" download="rotated.pdf"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download PDF</a><br />
         <button class="btn-convert-again" id="btn-again">Rotate another PDF</button>
       </div>
     </div>

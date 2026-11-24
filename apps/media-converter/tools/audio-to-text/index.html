@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     .audio-preview-wrap {
       margin-top: 1rem;
@@ -101,7 +100,7 @@
 
     <!-- File Meta Container -->
     <div class="file-meta-container" id="file-meta-container" style="display: none;">
-      <span class="file-meta-icon">🔊</span>
+      <span class="file-meta-icon"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-audio"/></svg></span>
       <div class="file-meta-details">
         <p class="file-meta-name" id="file-name">filename.mp3</p>
         <p class="file-meta-size" id="file-size">0.0 MB</p>
@@ -124,7 +123,7 @@
         <span id="progress-text">Processing request...</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
           <div class="progress-actions">
         <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
       </div>
@@ -147,7 +146,7 @@
             </svg>
             Copy Text
           </button>
-          <a class="btn-download" id="btn-download" download="transcript.txt" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; border-radius: var(--radius-sm);">⬇ Download TXT</a>
+          <a class="btn-download" id="btn-download" download="transcript.txt" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; border-radius: var(--radius-sm);"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download TXT</a>
         </div>
         
         <div style="text-align: center;">

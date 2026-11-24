@@ -5,18 +5,24 @@
  */
 
 // Smooth scroll for in-page anchor links
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelectorAll('a[href^="#"]').forEach(a => {
+  const href = a.getAttribute('href');
+  if (!href || href.length < 2) return;
+  let target = null;
+  try { target = document.querySelector(href); } catch (e) { return; }
+  if (!target) return;
   a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    e.preventDefault();
+    target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+    if (target.hasAttribute('tabindex') === false) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
   });
 });
 
 // ── Search Functionality ──────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof SearchBar === 'undefined' || typeof ToolSearch === 'undefined') return;
   SearchBar.create('#search-container', {
     tools: ToolSearch.allTools,
     placeholder: 'Search all tools...',

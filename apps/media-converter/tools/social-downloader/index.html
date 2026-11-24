@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     .url-card {
       background: var(--clr-surface);
@@ -99,7 +98,7 @@
   <main class="workspace">
     <!-- URL Input Card -->
     <div class="url-card" id="url-card">
-      <span style="font-size: 2.5rem;" aria-hidden="true">🔗</span>
+      <span style="font-size: 2.5rem;" aria-hidden="true"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-link"/></svg></span>
       <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.5rem;">Download Video from Link</h3>
       <div class="url-input-wrapper">
         <input type="url" class="url-input" id="video-url" placeholder="Paste video link here..." required />
@@ -108,7 +107,7 @@
       <p class="url-hint">Supports: YouTube, TikTok, Instagram, X (Twitter), Facebook, etc.</p>
       <div id="platform-hint" style="font-size: 0.75rem; color: var(--clr-text-muted); margin-top: 0.75rem; display: none;"></div>
       <p class="url-hint" style="font-size: 0.72rem; margin-top: 1rem; color: var(--c-steel);">
-        ⚠️ Facebook share links (<code>facebook.com/share/v/...</code>) may not work. Use direct video URLs (<code>facebook.com/watch/?v=ID</code>).
+        <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-warning"/></svg> Facebook share links (<code>facebook.com/share/v/...</code>) may not work. Use direct video URLs (<code>facebook.com/watch/?v=ID</code>).
         <br>Age-restricted, private, or login-required videos cannot be downloaded <strong>without cookies</strong>.
       </p>
       
@@ -134,7 +133,7 @@
         <span id="progress-text">Processing request...</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
           <div class="progress-actions">
         <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
       </div>
@@ -152,7 +151,7 @@
           <video class="video-preview-element" id="video-result-preview" controls></video>
         </div>
 
-        <a class="btn-download" id="btn-download" download="downloaded_video.mp4">⬇ Download MP4 File</a>
+        <a class="btn-download" id="btn-download" download="downloaded_video.mp4"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download MP4 File</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Download another link</button>
       </div>

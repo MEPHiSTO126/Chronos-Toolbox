@@ -40,7 +40,7 @@ const SearchBar = (() => {
             <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
           </svg>
         </span>
-        <input class="search-bar__input" type="text" placeholder="${placeholder}" autocomplete="off" spellcheck="false" aria-label="Search tools" />
+        <input class="search-bar__input" type="text" placeholder="${placeholder}" autocomplete="off" spellcheck="false" aria-label="Search tools" role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list" />
         <button class="search-bar__btn" type="button" aria-label="Search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"></circle>
@@ -48,7 +48,7 @@ const SearchBar = (() => {
           </svg>
         </button>
       </div>
-      <div class="search-bar__results"></div>
+      <div class="search-bar__results" id="search-results" role="listbox" aria-live="polite"></div>
     `;
 
     const input   = root.querySelector('.search-bar__input');
@@ -111,7 +111,7 @@ const SearchBar = (() => {
           const title = highlight(tool.title, query);
           return `
             <a class="search-bar__item${i === activeIdx ? ' active' : ''}" href="${tool.url}" data-idx="${i}" role="option">
-              <div class="search-bar__item-icon">${tool.emoji || '🔧'}</div>
+              <div class="search-bar__item-icon"><svg aria-hidden="true"><use href="/packages/ui/icons.svg#icon-toolbox"/></svg></div>
               <div class="search-bar__item-body">
                 <div class="search-bar__item-title">${title}</div>
                 <div class="search-bar__item-desc">${escapeHtml(tool.description || '')}</div>
@@ -128,10 +128,13 @@ const SearchBar = (() => {
         results.innerHTML = html;
       }
       results.classList.add('visible');
+      input.setAttribute('aria-expanded', 'true');
     }
 
     function hide() {
       results.classList.remove('visible');
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
       currentResults = [];
       activeIdx = -1;
     }
@@ -150,7 +153,11 @@ const SearchBar = (() => {
     }
 
     // ── Events ─────────────────────────────────────────────
-    input.addEventListener('input', () => doSearch(input.value));
+    let debounceTimer = null;
+    input.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => doSearch(input.value), 120);
+    });
 
     input.addEventListener('keydown', (e) => {
       const items = results.querySelectorAll('.search-bar__item');
@@ -165,7 +172,16 @@ const SearchBar = (() => {
         updateActive(items);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        activeIdx = Math.max(activeIdx - 1, 0);
+        activeIdx = Math.max(activeIdx - 1, -1);
+        updateActive(items);
+        if (activeIdx === -1) input.setAttribute('aria-activedescendant', '');
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        activeIdx = 0;
+        updateActive(items);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        activeIdx = items.length - 1;
         updateActive(items);
       } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -200,7 +216,12 @@ const SearchBar = (() => {
     function updateActive(items) {
       items.forEach((el, i) => {
         el.classList.toggle('active', i === activeIdx);
-        if (i === activeIdx) el.scrollIntoView({ block: 'nearest' });
+        el.setAttribute('aria-selected', i === activeIdx ? 'true' : 'false');
+        if (!el.id) el.id = `search-option-${i}`;
+        if (i === activeIdx) {
+          input.setAttribute('aria-activedescendant', el.id);
+          el.scrollIntoView({ block: 'nearest' });
+        }
       });
     }
 

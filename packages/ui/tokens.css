@@ -71,7 +71,7 @@
   --clr-border:       var(--color-border);
   --clr-border-hover: var(--color-steel);
   --clr-accent:       var(--color-accent);
-  --clr-accent-dim:   var(--color-steel);
+  --clr-accent-dim:   var(--color-accent-soft);
   --clr-text-primary: var(--color-text);
   --clr-text-sub:     var(--color-text-sub);
   --clr-text-muted:   var(--color-text-muted);

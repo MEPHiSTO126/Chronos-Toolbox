@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     .player-card {
@@ -107,7 +106,7 @@
         <span id="extract-text">Extracting text…</span>
         <span id="extract-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="extract-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="extract-bar"></div></div>
     </div>
 
     <!-- Player UI (hidden until PDF loaded) -->
@@ -118,10 +117,10 @@
         <p class="player-page-info" id="player-page-info">Page 1 of 1</p>
 
         <div class="player-controls">
-          <button class="ctrl-btn" id="btn-prev" title="Previous page" aria-label="Previous page">⏮</button>
-          <button class="ctrl-btn ctrl-btn--play" id="btn-play" title="Play / Pause" aria-label="Play">▶</button>
-          <button class="ctrl-btn" id="btn-stop" title="Stop" aria-label="Stop">⏹</button>
-          <button class="ctrl-btn" id="btn-next" title="Next page" aria-label="Next page">⏭</button>
+          <button class="ctrl-btn" id="btn-prev" title="Previous page" aria-label="Previous page"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-skip-back"/></svg></button>
+          <button class="ctrl-btn ctrl-btn--play" id="btn-play" title="Play / Pause" aria-label="Play"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-play"/></svg></button>
+          <button class="ctrl-btn" id="btn-stop" title="Stop" aria-label="Stop"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-stop"/></svg></button>
+          <button class="ctrl-btn" id="btn-next" title="Next page" aria-label="Next page"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-skip-forward"/></svg></button>
         </div>
 
         <div class="player-options">
@@ -154,8 +153,10 @@
       </div>
 
       <div style="margin-top:1rem; text-align:center; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-        <button class="btn-convert-again" id="btn-export">⬇ Export Audio</button>
-        <button class="btn-convert-again" id="btn-next-file" style="display:none;">⏭ Skip to Next PDF</button>
+        <button class="btn-convert-again" id="btn-export">
+  <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Export Audio
+</button>
+        <button class="btn-convert-again" id="btn-next-file" style="display:none;"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-skip-forward"/></svg> Skip to Next PDF</button>
         <button class="btn-convert-again" id="btn-new-file">Load different PDFs</button>
       </div>
     </div>

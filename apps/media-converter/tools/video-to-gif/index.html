@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
   <style>
     .media-preview-wrap {
       margin-top: 1.5rem;
@@ -76,12 +75,19 @@
 
     <!-- File Meta Container -->
     <div class="file-meta-container" id="file-meta-container" style="display: none;">
-      <span class="file-meta-icon" id="meta-icon">🎞️</span>
+      <span class="file-meta-icon" id="meta-icon"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-film"/></svg></span>
       <div class="file-meta-details">
         <p class="file-meta-name" id="file-name">video.mp4</p>
         <p class="file-meta-size" id="file-size">0.0 MB</p>
       </div>
       <button class="btn-remove-file" id="btn-remove">Remove</button>
+    </div>
+
+    <!-- Source Preview -->
+    <div class="media-preview-wrap" id="source-preview" style="display:none;">
+      <p class="preview-area__title">Source Preview</p>
+      <video class="video-preview-element" id="source-video" controls style="display:none;"></video>
+      <img class="gif-preview-element" id="source-gif" style="display:none;" alt="Source GIF" />
     </div>
 
     <!-- Action Bar -->
@@ -95,7 +101,7 @@
         <span id="progress-text">Processing request...</span>
         <span id="progress-pct">0%</span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
           <div class="progress-actions">
         <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
       </div>
@@ -114,7 +120,7 @@
           <img class="gif-preview-element" id="gif-result-preview" alt="Converted GIF" style="display: none;" />
         </div>
 
-        <a class="btn-download" id="btn-download">⬇ Download Converted File</a>
+        <a class="btn-download" id="btn-download"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download Converted File</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Convert another file</button>
       </div>

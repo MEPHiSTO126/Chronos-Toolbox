@@ -27,6 +27,9 @@ const resultArea           = document.getElementById('result-area');
 const resultMeta           = document.getElementById('result-meta');
 const videoResultPreview   = document.getElementById('video-result-preview');
 const gifResultPreview     = document.getElementById('gif-result-preview');
+const sourceVideo          = document.getElementById('source-video');
+const sourceGif            = document.getElementById('source-gif');
+const sourcePreview        = document.getElementById('source-preview');
 const btnDownload          = document.getElementById('btn-download');
 const btnAgain             = document.getElementById('btn-again');
 
@@ -107,12 +110,21 @@ function handleFileSelect(file) {
   fileSizeEl.textContent = formatBytes(file.size);
 
   if (isGif) {
-    metaIcon.textContent = '🖼️';
+    metaIcon.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-image"/></svg>';
     btnConvert.textContent = 'Convert GIF to MP4';
+    if (sourceGif.src) URL.revokeObjectURL(sourceGif.src);
+    sourceGif.src = URL.createObjectURL(file);
+    sourceGif.style.display = 'block';
+    sourceVideo.style.display = 'none';
   } else {
-    metaIcon.textContent = '🎞️';
+    metaIcon.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-film"/></svg>';
     btnConvert.textContent = 'Convert Video to GIF';
+    if (sourceVideo.src) URL.revokeObjectURL(sourceVideo.src);
+    sourceVideo.src = URL.createObjectURL(file);
+    sourceVideo.style.display = 'block';
+    sourceGif.style.display = 'none';
   }
+  sourcePreview.style.display = 'block';
 
   dropzone.style.display = 'none';
   fileMetaContainer.style.display = 'flex';
@@ -127,6 +139,17 @@ function resetState() {
   gifResultPreview.src = '';
   videoResultPreview.style.display = 'none';
   gifResultPreview.style.display = 'none';
+  if (sourceVideo.src) {
+    URL.revokeObjectURL(sourceVideo.src);
+    sourceVideo.removeAttribute('src');
+  }
+  if (sourceGif.src) {
+    URL.revokeObjectURL(sourceGif.src);
+    sourceGif.removeAttribute('src');
+  }
+  sourceVideo.style.display = 'none';
+  sourceGif.style.display = 'none';
+  sourcePreview.style.display = 'none';
   if (btnDownload.href) {
     URL.revokeObjectURL(btnDownload.href);
     btnDownload.removeAttribute('href');
@@ -226,7 +249,7 @@ btnConvert.addEventListener('click', async () => {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
+    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData, signal: activeAbortController?.signal , timeout: 600000 }, __handleProgress);
     if (!response.ok) {
       const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
       throw new Error(errMsg);
@@ -312,6 +335,11 @@ async function doFetchWithProgress(url, options, onProgress) {
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
+    // Timeout support
+    if (options.timeout) {
+      xhr.timeout = options.timeout;
+      xhr.ontimeout = () => reject(new Error('Request timed out. The server took too long to respond.'));
+    }
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });

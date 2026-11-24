@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../../../packages/ui/tokens.css" />
   <link rel="stylesheet" href="../../../../packages/ui/shared.css" />
-  <link rel="stylesheet" href="../tool-shared.css" />
 </head>
 <body>
   <header class="site-header">
@@ -36,7 +35,7 @@
   <section class="tool-hero">
     <h1 class="tool-hero__title">PDF to <span>Word</span></h1>
     <p class="tool-hero__subtitle">Convert one or more PDF files into editable Word documents.</p>
-    <p class="tool-hero__note">⚠️ Conversion accuracy depends on the source PDF's structure. Text-heavy, non-scanned PDFs convert best. Minor spacing or formatting differences may occur.</p>
+    <p class="tool-hero__note"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-warning"/></svg> Conversion accuracy depends on the source PDF's structure. Text-heavy, non-scanned PDFs convert best. Minor spacing or formatting differences may occur.</p>
   </section>
 
   <main class="workspace">
@@ -57,7 +56,7 @@
         <span id="progress-text">Uploading and converting...</span>
         <span id="progress-pct"></span>
       </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
           <div class="progress-actions">
         <button type="button" class="btn-progress-cancel" id="btn-cancel">Cancel</button>
       </div>
@@ -68,7 +67,7 @@
         <span class="result-card__icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
         <p class="result-card__title">Conversion complete!</p>
         <p class="result-card__meta" id="result-meta"></p>
-        <a class="btn-download" id="btn-download">⬇ Download Word File</a>
+        <a class="btn-download" id="btn-download"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download Word File</a>
         <br />
         <button class="btn-convert-again" id="btn-again">Convert another file</button>
       </div>

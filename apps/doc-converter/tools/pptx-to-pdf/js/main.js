@@ -134,7 +134,7 @@ btnConvert.addEventListener('click', async () => {
     let fname = cd.match(/filename="?([^"]+)"?/)?.[1];
     if (!fname) fname = selectedFiles.length === 1 ? selectedFiles[0].name.replace(/\.pptx?$/i, '.pdf') : 'converted_presentations.zip';
     btnDownload.href = currentObjectURL; btnDownload.download = fname;
-    btnDownload.textContent = `⬇ Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF'}`;
+    btnDownload.textContent = `<svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ${selectedFiles.length > 1 ? 'ZIP' : 'PDF'}`;
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;
     
     clearInterval(progressInterval);

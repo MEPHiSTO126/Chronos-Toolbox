@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Chronos QR Code Generator and Scanner — create QR codes for URLs, WiFi configurations, and contact cards, or scan images to read them. Fast, private, browser-based." />
+  <meta name="theme-color" content="#0E1D21" />
+  <meta property="og:title" content="QR Generator & Scanner · Chronos Toolbox" />
+  <meta property="og:description" content="Generate WiFi, vCard, Text, and URL QR codes, or scan and decode QR code images instantly." />
+  <meta property="og:type" content="website" />
   <title>QR Generator & Scanner · Chronos Toolbox</title>
   <link rel="icon" type="image/png" href="../../packages/images/white-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,10 +27,12 @@
         <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
         <span class="logo__text">Chronos <strong>Toolbox</strong></span>
       </a>
-      <div class="breadcrumb" aria-label="Breadcrumb">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb__sep">/</span>
+        <a href="../home/index.html">Home</a>
         <span class="breadcrumb__sep">/</span>
         <span class="breadcrumb__current">QR Code Tools</span>
-      </div>
+      </nav>
       <a href="../home/index.html" class="btn-back" id="btn-all-tools">
         <svg class="btn-back__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
         All Tools
@@ -45,16 +51,16 @@
     
     <!-- Search Bar -->
     <div class="search-container" id="search-container">
-      <div id="curved-search"></div>
     </div>
+    <noscript><p class="hero-subtitle">Search needs JavaScript.</p></noscript>
   </section>
 
   <!-- Tools grid -->
   <main class="tools-section" aria-label="Available QR tools">
-    <div class="tools-grid" id="tools-grid" role="list">
+    <div class="tools-grid" id="tools-grid">
 
       <!-- URL to QR -->
-      <a class="tool-card" href="tools/url-to-qr/index.html" role="listitem" id="card-url-to-qr">
+      <a class="tool-card" href="tools/url-to-qr/index.html" id="card-url-to-qr" aria-label="Open URL to QR">
         <div class="tool-card__icon-wrap">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -67,14 +73,14 @@
           <span class="badge badge--qr">QR Code</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">URL / Text to QR</p>
+          <h3 class="tool-card__title">URL / Text to QR</h3>
           <p class="tool-card__desc">Convert any URL, text string, or message into a high-quality QR code image.</p>
         </div>
-        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- QR to URL -->
-      <a class="tool-card" href="tools/qr-to-url/index.html" role="listitem" id="card-qr-to-url">
+      <a class="tool-card" href="tools/qr-to-url/index.html" id="card-qr-to-url" aria-label="Open QR to URL">
         <div class="tool-card__icon-wrap">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -90,14 +96,14 @@
           <span class="badge badge--url">URL/TEXT</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">Scan / Decode QR</p>
+          <h3 class="tool-card__title">Scan / Decode QR</h3>
           <p class="tool-card__desc">Upload an image of a QR code to read, copy, or open its embedded text or link.</p>
         </div>
-        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- WiFi to QR -->
-      <a class="tool-card" href="tools/wifi-to-qr/index.html" role="listitem" id="card-wifi-to-qr">
+      <a class="tool-card" href="tools/wifi-to-qr/index.html" id="card-wifi-to-qr" aria-label="Open WiFi QR Generator">
         <div class="tool-card__icon-wrap">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12.55a11 11 0 0 1 14.08 0" />
@@ -112,14 +118,14 @@
           <span class="badge badge--qr">QR Code</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">WiFi QR Generator</p>
+          <h3 class="tool-card__title">WiFi QR Generator</h3>
           <p class="tool-card__desc">Generate a QR code allowing guests to scan and connect directly to your wireless network.</p>
         </div>
-        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
       <!-- vCard to QR -->
-      <a class="tool-card" href="tools/vcard-to-qr/index.html" role="listitem" id="card-vcard-to-qr">
+      <a class="tool-card" href="tools/vcard-to-qr/index.html" id="card-vcard-to-qr" aria-label="Open vCard QR Generator">
         <div class="tool-card__icon-wrap">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -134,10 +140,10 @@
           <span class="badge badge--qr">QR Code</span>
         </div>
         <div class="tool-card__body">
-          <p class="tool-card__title">vCard QR Generator</p>
+          <h3 class="tool-card__title">vCard QR Generator</h3>
           <p class="tool-card__desc">Convert contact details (name, phone, email) into a QR code that scans into address books.</p>
         </div>
-        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></span>
+        <span class="tool-card__cta">Open tool <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></span>
       </a>
 
     </div>

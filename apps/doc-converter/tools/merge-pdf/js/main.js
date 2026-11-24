@@ -48,15 +48,15 @@ function render() {
   fileList.innerHTML = '';
   state.files.forEach((file, i) => {
     const item = document.createElement('div');
-    item.className = 'pdf-file-item';
+    item.className = 'file-list-item';
     item.draggable = true;
     item.dataset.idx = i;
     item.innerHTML = `
-      <span class="pdf-file-item__drag" aria-hidden="true">⠿</span>
-      <span class="pdf-file-item__num">${i + 1}</span>
-      <span class="pdf-file-item__name" title="${file.name}">${file.name}</span>
-      <span class="pdf-file-item__size">${fmt(file.size)}</span>
-      <button class="pdf-file-item__remove" data-idx="${i}" title="Remove" aria-label="Remove ${file.name}">✕</button>
+      <span class="file-list-item__drag" aria-hidden="true"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-grip"/></svg></span>
+      <span class="file-list-item__num">${i + 1}</span>
+      <span class="file-list-item__name" title="${file.name}">${file.name}</span>
+      <span class="file-list-item__size">${fmt(file.size)}</span>
+      <button class="file-list-item__remove" data-idx="${i}" title="Remove" aria-label="Remove ${file.name}"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-x"/></svg></button>
     `;
     item.addEventListener('dragstart', () => { state.dragSrcIdx = i; item.classList.add('dragging'); });
     item.addEventListener('dragend',   () => item.classList.remove('dragging'));
@@ -71,7 +71,7 @@ function render() {
     });
     fileList.appendChild(item);
   });
-  fileList.querySelectorAll('.pdf-file-item__remove').forEach(btn => {
+  fileList.querySelectorAll('.file-list-item__remove').forEach(btn => {
     btn.addEventListener('click', () => {
       state.files.splice(+btn.dataset.idx, 1);
       if (!state.files.length) { clearAll(); return; }
@@ -138,6 +138,7 @@ function clearAll() {
 
 function setProgress(pct, label) {
   progressBar.style.width = pct + '%';
+  progressBar.setAttribute('aria-valuenow', pct);
   progressText.textContent = label;
   progressPct.textContent  = pct + '%';
 }

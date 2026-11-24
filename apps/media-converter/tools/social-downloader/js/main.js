@@ -137,6 +137,14 @@ async function ensureBackendAwake(options = {}) {
 
 // ── Download Button Handler ──────────────────────────────────
 btnSubmit.addEventListener('click', async () => {
+  if (activeAbortController) activeAbortController.abort();
+  activeAbortController = new AbortController();
+  const cancelBtn = document.getElementById('btn-cancel');
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (activeAbortController) activeAbortController.abort();
+    };
+  }
   const urlVal = videoUrlInput.value.trim();
   if (!urlVal) {
     showToast('Please enter a video URL first.', true);
@@ -203,7 +211,8 @@ btnSubmit.addEventListener('click', async () => {
     const response = await doFetchWithProgress(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: urlVal, cookies })
+      body: JSON.stringify({ url: urlVal, cookies }),
+      timeout: 600000
     }, __handleProgress);
 
     if (!response.ok) {
@@ -303,6 +312,11 @@ async function doFetchWithProgress(url, options, onProgress) {
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
+    // Timeout support
+    if (options.timeout) {
+      xhr.timeout = options.timeout;
+      xhr.ontimeout = () => reject(new Error('Request timed out. The server took too long to respond.'));
+    }
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });

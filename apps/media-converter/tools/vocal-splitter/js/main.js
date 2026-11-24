@@ -163,6 +163,14 @@ async function ensureBackendAwake(options = {}) {
 
 // ── Split Button Handler ──────────────────────────────────
 btnSplit.addEventListener('click', async () => {
+  if (activeAbortController) activeAbortController.abort();
+  activeAbortController = new AbortController();
+  const cancelBtn = document.getElementById('btn-cancel');
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (activeAbortController) activeAbortController.abort();
+    };
+  }
   if (!selectedFile) return;
 
   actionBar.style.display = 'none';
@@ -202,7 +210,7 @@ btnSplit.addEventListener('click', async () => {
       throw new Error('Backend server did not wake up in time.');
     }
 
-    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData , signal: activeAbortController?.signal }, __handleProgress);
+    const response = await doFetchWithProgress(API_URL, { method: 'POST', body: formData, signal: activeAbortController?.signal , timeout: 600000 }, __handleProgress);
     if (!response.ok) {
       const errMsg = window.CHRONOS_API?.parseErrorResponse ? await window.CHRONOS_API.parseErrorResponse(response) : await response.text();
       throw new Error(errMsg);
@@ -278,6 +286,11 @@ async function doFetchWithProgress(url, options, onProgress) {
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.onabort = () => reject(new DOMException('Operation aborted by user', 'AbortError'));
+    // Timeout support
+    if (options.timeout) {
+      xhr.timeout = options.timeout;
+      xhr.ontimeout = () => reject(new Error('Request timed out. The server took too long to respond.'));
+    }
     xhr.responseType = 'blob';
     xhr.send(options.body);
   });
