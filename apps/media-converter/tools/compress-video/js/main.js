@@ -185,13 +185,8 @@ async function ensureBackendAwake(options = {}) {
   return false;
 }
 
-// Initial preemptive wake trigger on page load
-(async () => {
-  try {
-    const origin = typeof BASE_URL !== 'undefined' ? BASE_URL : new URL(API_URL).origin;
-    await fetch(`${origin}/`, { method: 'GET' });
-  } catch (e) {}
-})();
+// NOTE: the backend is woken lazily by ensureBackendAwake() when the user
+// actually clicks Compress. No network request is made just by loading the page.
 
 // ── Compress Button Handler ──────────────────────────────────
 btnCompress.addEventListener('click', async () => {
@@ -213,9 +208,11 @@ btnCompress.addEventListener('click', async () => {
 
   let progressInterval = null;
   const __handleProgress = (phase, loaded, total) => {
-    const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
-    const pPct = document.getElementById('progress-pct');
-    const pTxt = document.getElementById('progress-text');
+    // Use the cached element refs declared at the top of the file instead of
+    // re-querying the DOM on every progress event.
+    const pBar = progressBar || document.querySelector('.progress-bar-fill');
+    const pPct = progressPct;
+    const pTxt = progressText;
     if (phase === 'upload') {
       const pct = (loaded / total) * 50;
       if (pBar) pBar.style.width = `${pct}%`;
@@ -314,9 +311,9 @@ async function uploadAndCompress(formData, crfVal, onProgress) {
 
 // ── Determinate progress (segmented flow) ────────────────────
 function setProgress(pct, msg) {
-  const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
-  const pPct = document.getElementById('progress-pct');
-  const pTxt = document.getElementById('progress-text');
+  const pBar = progressBar || document.querySelector('.progress-bar-fill');
+  const pPct = progressPct;
+  const pTxt = progressText;
   if (pBar) pBar.style.width = `${pct}%`;
   if (pPct) pPct.textContent = `${Math.round(pct)}%`;
   if (pTxt) pTxt.textContent = msg;
@@ -389,11 +386,16 @@ function getVideoDuration(file) {
   return new Promise((resolve, reject) => {
     const v = document.createElement('video');
     v.preload = 'metadata';
-    const done = (fn) => { URL.revokeObjectURL(v.src); fn(); };
+    let timer = null;
+    const done = (fn) => {
+      if (timer !== null) { clearTimeout(timer); timer = null; }
+      URL.revokeObjectURL(v.src);
+      fn();
+    };
     v.onloadedmetadata = () => done(() => resolve(v.duration));
     v.onerror = () => done(() => reject(new Error('unreadable')));
     v.src = URL.createObjectURL(file);
-    setTimeout(() => reject(new Error('timeout')), 15000);
+    timer = setTimeout(() => done(() => reject(new Error('timeout'))), 15000);
   });
 }
 

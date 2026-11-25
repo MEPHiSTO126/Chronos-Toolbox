@@ -1,4 +1,9 @@
 let activeAbortController = null;
+
+// Cached progress refs (avoid re-querying the DOM on every progress event)
+const progressBar = document.getElementById('progress-bar');
+const progressPct = document.getElementById('progress-pct');
+const progressText = document.getElementById('progress-text');
 'use strict';
 
 // Change to your deployed backend URL in production
@@ -129,9 +134,9 @@ btnConvert.addEventListener('click', async () => {
 
   let progressInterval = null;
   const __handleProgress = (phase, loaded, total) => {
-    const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
-    const pPct = document.getElementById('progress-pct');
-    const pTxt = document.getElementById('progress-text');
+    const pBar = progressBar || document.querySelector('.progress-bar-fill');
+    const pPct = progressPct;
+    const pTxt = progressText;
     if (phase === 'upload') {
       const pct = (loaded / total) * 50;
       if (pBar) pBar.style.width = `${pct}%`;
@@ -196,8 +201,8 @@ btnConvert.addEventListener('click', async () => {
     resultMeta.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} processed · ${fmt(blob.size)}`;
     
     clearInterval(progressInterval);
-    document.getElementById('progress-bar').style.width = '100%';
-    document.getElementById('progress-pct').textContent = '100%';
+    progressBar.style.width = '100%';
+    progressPct.textContent = '100%';
     await new Promise(r => setTimeout(r, 400));
     
     progressWrap.classList.remove('visible');

@@ -179,9 +179,9 @@ btnSplit.addEventListener('click', async () => {
 
   let progressInterval = null;
   const __handleProgress = (phase, loaded, total) => {
-    const pBar = document.getElementById('progress-bar') || document.querySelector('.progress-bar-fill');
-    const pPct = document.getElementById('progress-pct');
-    const pTxt = document.getElementById('progress-text');
+    const pBar = progressBar || document.querySelector('.progress-bar-fill');
+    const pPct = progressPct;
+    const pTxt = progressText;
     if (phase === 'upload') {
       const pct = (loaded / total) * 50;
       if (pBar) pBar.style.width = `${pct}%`;

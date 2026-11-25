@@ -11,6 +11,7 @@ const state = {
   fileName: 'upscaled-image',
   imgUrl: null,
   imgElement: null,
+  resultUrl: null,
   isProcessing: false
 };
 
@@ -140,8 +141,11 @@ async function upscaleImage() {
     // Convert to blob and display
     canvas.toBlob(blob => {
       if (blob) {
-        const resultUrl = URL.createObjectURL(blob);
-        previewResult.src = resultUrl;
+        // Revoke the previous result before replacing it so re-upscaling
+        // does not leak a full-size PNG blob for every run.
+        if (state.resultUrl) URL.revokeObjectURL(state.resultUrl);
+        state.resultUrl = URL.createObjectURL(blob);
+        previewResult.src = state.resultUrl;
         resultArea.style.display = 'block';
         statusText.textContent = `Upscaled to ${newWidth}×${newHeight}`;
         state.resultBlob = blob;
@@ -180,6 +184,10 @@ function clearAll() {
   if (state.imgUrl) {
     URL.revokeObjectURL(state.imgUrl);
     state.imgUrl = null;
+  }
+  if (state.resultUrl) {
+    URL.revokeObjectURL(state.resultUrl);
+    state.resultUrl = null;
   }
   state.file = null;
   state.imgElement = null;

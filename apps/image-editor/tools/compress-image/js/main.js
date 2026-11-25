@@ -14,7 +14,8 @@ const state = {
   compressedBlob:   null,
   compressedUrl:    null,
   isProcessing:     false,
-  needsReRun:       false
+  needsReRun:       false,
+  recalcTimer:      null
 };
 
 // ── DOM refs ───────────────────────────────────────────────
@@ -80,13 +81,19 @@ function loadFile(file) {
 }
 
 // ── Compression Pipeline ───────────────────────────────────
+// Debounce: dragging the quality slider fires many input events; a full
+// canvas encode per tick is expensive, so coalesce them into one recalc.
 function scheduleRecalc() {
-  if (state.isProcessing) {
-    state.needsReRun = true;
-    return;
-  }
-  state.isProcessing = true;
-  runRecalcLoop();
+  if (state.recalcTimer) clearTimeout(state.recalcTimer);
+  state.recalcTimer = setTimeout(() => {
+    state.recalcTimer = null;
+    if (state.isProcessing) {
+      state.needsReRun = true;
+      return;
+    }
+    state.isProcessing = true;
+    runRecalcLoop();
+  }, 120);
 }
 
 async function runRecalcLoop() {
@@ -168,6 +175,10 @@ function saveImage() {
 
 // ── Clear / Reset ──────────────────────────────────────────
 function clearAll() {
+  if (state.recalcTimer) {
+    clearTimeout(state.recalcTimer);
+    state.recalcTimer = null;
+  }
   if (state.compressedUrl) {
     URL.revokeObjectURL(state.compressedUrl);
     state.compressedUrl = null;

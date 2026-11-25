@@ -56,5 +56,19 @@
     { "source": "/qr-to-url", "destination": "/apps/qr-generator/tools/qr-to-url/index.html", "permanent": false },
     { "source": "/vcard-to-qr", "destination": "/apps/qr-generator/tools/vcard-to-qr/index.html", "permanent": false },
     { "source": "/wifi-to-qr", "destination": "/apps/qr-generator/tools/wifi-to-qr/index.html", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/packages/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/apps/(.*)/js/(.*).js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
   ]
 }
