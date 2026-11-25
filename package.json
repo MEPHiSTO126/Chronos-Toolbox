@@ -13,6 +13,12 @@
     "dev:doc-converter": "npx serve . --listen 3001",
     "dev:image-editor": "npx serve . --listen 3002",
     "dev:qr-generator": "npx serve . --listen 3003",
-    "dev:media-converter": "npx serve . --listen 3004"
+    "dev:media-converter": "npx serve . --listen 3004",
+    "test:e2e": "playwright test",
+    "test:fixtures": "playwright test tests/e2e/fixtures.spec.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "playwright": "^1.50.0"
   }
 }

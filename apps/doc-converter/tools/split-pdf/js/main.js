@@ -95,7 +95,7 @@ async function split() {
       currentObjectURL = URL.createObjectURL(blob);
       btnDownload.href = currentObjectURL;
       btnDownload.download = pageSets[0].name;
-      btnDownload.textContent = <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download PDF;
+      btnDownload.textContent = 'Download PDF';
       resultMeta.textContent = `${pageSets[0].indices.length} page${pageSets[0].indices.length !== 1 ? 's' : ''} · ${fmt(blob.size)}`;
     } else {
       // Multiple pages → ZIP
@@ -115,7 +115,7 @@ async function split() {
       currentObjectURL = URL.createObjectURL(zipBlob);
       btnDownload.href = currentObjectURL;
       btnDownload.download = `${state.file.name.replace('.pdf', '')}_pages.zip`;
-      btnDownload.textContent = <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ZIP;
+      btnDownload.textContent = 'Download ZIP';
       resultMeta.textContent = `${pageSets.length} pages · ${fmt(zipBlob.size)}`;
     }
 

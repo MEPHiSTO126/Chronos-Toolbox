@@ -177,7 +177,7 @@ async function convertAll() {
 
   outputLabel.textContent = `Converted Files (${state.outputs.length})`;
   outputArea.style.display = 'block';
-  btnDlAll.textContent = state.outputs.length === 1 ? <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download JPG : <svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-download"/></svg> Download ZIP;
+  btnDlAll.textContent = state.outputs.length === 1 ? 'Download JPG' : 'Download ZIP';
   outputArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
