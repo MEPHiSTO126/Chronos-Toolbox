@@ -53,6 +53,10 @@ async function loadFile(file) {
 
 async function buildGrid(total) {
   pageGrid.innerHTML = '';
+  // Build all thumbnails up front, then fetch+render pages concurrently with
+  // bounded parallelism (previously each getPage awaited serially and the
+  // render promise was ignored).
+  const thumbs = [];
   for (let i = 0; i < total; i++) {
     const thumb = document.createElement('div');
     thumb.className = 'page-thumb'; thumb.dataset.idx = i;
@@ -67,18 +71,32 @@ async function buildGrid(total) {
 
     thumb.append(canvas, overlay, footer);
     pageGrid.appendChild(thumb);
-
-    // Render page thumbnail
-    const page = await state.pdfJsDoc.getPage(i + 1);
-    const vp   = page.getViewport({ scale: 0.4 });
-    canvas.width  = vp.width; canvas.height = vp.height;
-    page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+    thumbs.push(thumb);
 
     thumb.addEventListener('click', () => {
       if (state.selected.has(i)) state.selected.delete(i); else state.selected.add(i);
       updateGrid();
     });
   }
+
+  const CONCURRENCY = 4;
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < total) {
+      const i = cursor++;
+      try {
+        const page = await state.pdfJsDoc.getPage(i + 1);
+        const vp = page.getViewport({ scale: 0.4 });
+        const canvas = thumbs[i].querySelector('canvas');
+        canvas.width = vp.width; canvas.height = vp.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      } catch (e) {
+        // Leave the thumbnail blank rather than breaking the whole grid.
+        console.warn('Thumbnail render failed for page', i + 1, e);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, total) }, worker));
 }
 
 function updateGrid() {

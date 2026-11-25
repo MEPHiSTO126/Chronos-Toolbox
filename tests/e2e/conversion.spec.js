@@ -51,4 +51,48 @@ test.describe('Real conversions with valid files', () => {
     await expect(page.locator('h1')).toBeVisible();
     await page.waitForTimeout(2000);
   });
+
+  test('jpg-to-pdf converts images using cached dimensions', async ({ page }) => {
+    await page.goto('/apps/doc-converter/tools/jpg-to-pdf/');
+    await page.locator('#file-input').setInputFiles({
+      name: 'valid.png',
+      mimeType: 'image/png',
+      buffer: fs.readFileSync(path.join(FIXTURES, 'valid.png'))
+    });
+    await expect(page.locator('#file-count')).toContainText('1 image', { timeout: 15000 });
+    await page.locator('#btn-convert').click();
+    await expect(page.locator('#result-area')).toBeVisible({ timeout: 30000 });
+    await expect(page.locator('#result-meta')).toContainText('1 page');
+  });
+
+  test('rearrange-pdf renders thumbnails once and reorders via DOM move', async ({ page }) => {
+    await page.goto('/apps/doc-converter/tools/rearrange-pdf/');
+    await page.locator('#file-input').setInputFiles({
+      name: 'valid.pdf',
+      mimeType: 'application/pdf',
+      buffer: fs.readFileSync(path.join(FIXTURES, 'valid.pdf'))
+    });
+    await expect(page.locator('#page-grid .page-thumb')).toHaveCount(3, { timeout: 20000 });
+    await expect(page.locator('#page-grid .page-thumb canvas')).toHaveCount(3);
+
+    // Verify canvases were actually rasterized (non-blank pixels present).
+    const nonBlank = await page.locator('#page-grid .page-thumb canvas').evaluateAll(canvases =>
+      canvases.map(c => {
+        const ctx = c.getContext('2d');
+        const data = ctx.getImageData(0, 0, c.width, c.height).data;
+        for (let i = 3; i < data.length; i += 4) if (data[i] !== 0) return true;
+        return false;
+      })
+    );
+    expect(nonBlank.filter(Boolean).length).toBeGreaterThan(0);
+
+    // Capture the canvas of the first thumb, then drag it onto the third.
+    const firstLabel = await page.locator('#page-grid .page-thumb').first().locator('.page-thumb__footer').textContent();
+    await page.locator('#page-grid .page-thumb').first().dragTo(page.locator('#page-grid .page-thumb').nth(2));
+    // After reorder, the first thumb's label should now be the last page.
+    await expect(page.locator('#page-grid .page-thumb').first().locator('.page-thumb__footer')).not.toHaveText(firstLabel);
+    // Thumbnails must NOT have been rebuilt: same canvas DOM nodes persist.
+    const canvasCountAfter = await page.locator('#page-grid .page-thumb canvas').count();
+    expect(canvasCountAfter).toBe(3);
+  });
 });

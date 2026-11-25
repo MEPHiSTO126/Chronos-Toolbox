@@ -12,6 +12,8 @@ test('generate valid.pdf and valid.png fixtures', async ({ page }) => {
     const mod = await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
     const pdfDoc = await mod.PDFDocument.create();
     pdfDoc.addPage([612, 792]);
+    pdfDoc.addPage([612, 792]);
+    pdfDoc.addPage([612, 792]);
     pdfDoc.setTitle('Chronos Test PDF');
     const bytes = await pdfDoc.save();
     let binary = '';

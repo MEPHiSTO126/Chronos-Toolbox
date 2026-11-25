@@ -178,6 +178,7 @@ async function clientSideRemoval(file, tolerance = 40) {
       // 2D visited map for flood fill starting strictly from borders
       const visited = new Uint8Array(width * height);
       const queue = new Int32Array(width * height);
+      const dist = new Float32Array(width * height); // cache color distance — was computed twice per pixel
       let head = 0;
       let tail = 0;
 
@@ -187,6 +188,7 @@ async function clientSideRemoval(file, tolerance = 40) {
         const d = colorDist(pIndex * 4);
         if (d <= tolerance * 1.35) {
           visited[pIndex] = 1;
+          dist[pIndex] = d;
           queue[tail++] = pIndex;
         }
       }
@@ -209,7 +211,7 @@ async function clientSideRemoval(file, tolerance = 40) {
         const pIndex = queue[head++];
         const px = pIndex % width;
         const py = Math.floor(pIndex / width);
-        const d = colorDist(pIndex * 4);
+        const d = dist[pIndex];
 
         // Alpha calculation: transparent for core background, feathered on borders
         if (d <= tolerance) {

@@ -9,7 +9,7 @@
 let currentObjectURL = null;
 
 const state = {
-  files: [],        // { file: File, dataUrl: string, id: string }
+  files: [],        // { file: File, url: string, width: number, height: number, id: string }
   dragSrcId: null,
 };
 
@@ -59,71 +59,91 @@ function handleFiles(files) {
   const valid = files.filter(f => f.type.startsWith('image/'));
   if (!valid.length) { toast('Please upload image files (JPG, PNG, WebP).', true); return; }
 
-  const readers = valid.map(file => new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => resolve({ file, dataUrl: e.target.result, id: crypto.randomUUID() });
-    reader.readAsDataURL(file);
+  // Object URLs avoid the ~33% memory/bandwidth overhead of data URLs, and we
+  // decode each image's dimensions once here rather than again at conversion.
+  const loaders = valid.map(file => new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ file, url, width: img.naturalWidth, height: img.naturalHeight, id: crypto.randomUUID() });
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
   }));
 
-  Promise.all(readers).then(items => {
-    state.files.push(...items);
+  Promise.all(loaders).then(items => {
+    const loaded = items.filter(Boolean);
+    if (!loaded.length) { toast('Could not read those images.', true); return; }
+    state.files.push(...loaded);
     renderPreviews();
     showWorkspace();
   });
 }
 
 // ── Render preview grid ────────────────────────────────────
+// Builds one node per file with its listeners attached. Full rebuilds only
+// happen on initial load; reorder/remove move or delete a single node.
+function makePreviewNode(item, idx) {
+  const el = document.createElement('div');
+  el.className = 'preview-item';
+  el.dataset.id = item.id;
+  el.setAttribute('draggable', 'true');
+  el.setAttribute('role', 'listitem');
+  el.setAttribute('aria-label', `Image ${idx + 1}: ${item.file.name}`);
+
+  el.innerHTML = `
+    <span class="preview-item__num">${idx + 1}</span>
+    <img src="${item.url}" alt="${item.file.name}" loading="lazy" />
+    <div class="preview-item__footer">${truncate(item.file.name, 18)}</div>
+    <button class="preview-item__remove" data-id="${item.id}" title="Remove" aria-label="Remove ${item.file.name}"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-x"/></svg></button>
+  `;
+
+  el.addEventListener('dragstart', () => { state.dragSrcId = item.id; el.classList.add('dragging'); });
+  el.addEventListener('dragend',   () => el.classList.remove('dragging'));
+  el.addEventListener('dragover',  e => { e.preventDefault(); el.classList.add('drag-target'); });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-target'));
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    el.classList.remove('drag-target');
+    if (state.dragSrcId === item.id) return;
+    const srcIdx = state.files.findIndex(f => f.id === state.dragSrcId);
+    const tgtIdx = state.files.findIndex(f => f.id === item.id);
+    if (srcIdx === -1 || tgtIdx === -1) return;
+    const [moved] = state.files.splice(srcIdx, 1);
+    state.files.splice(tgtIdx, 0, moved);
+    // Move only the affected DOM node; no listener reattachment or re-decode.
+    const srcEl = previewGrid.querySelector(`[data-id="${state.dragSrcId}"]`);
+    if (srcEl) previewGrid.insertBefore(srcEl, el);
+    renumberPreviews();
+    state.dragSrcId = null;
+  });
+
+  el.querySelector('.preview-item__remove').addEventListener('click', e => {
+    e.stopPropagation();
+    const itemEl = previewGrid.querySelector(`[data-id="${item.id}"]`);
+    if (itemEl) itemEl.remove();
+    const idx = state.files.findIndex(f => f.id === item.id);
+    if (idx !== -1) {
+      URL.revokeObjectURL(state.files[idx].url);
+      state.files.splice(idx, 1);
+    }
+    if (!state.files.length) { clearAll(); return; }
+    renumberPreviews();
+    updateCounts();
+  });
+
+  return el;
+}
+
 function renderPreviews() {
   previewGrid.innerHTML = '';
-
-  state.files.forEach((item, idx) => {
-    const el = document.createElement('div');
-  el.setAttribute("role", "status");
-  el.setAttribute("aria-live", "polite");
-    el.className = 'preview-item';
-    el.dataset.id = item.id;
-    el.setAttribute('draggable', 'true');
-    el.setAttribute('role', 'listitem');
-    el.setAttribute('aria-label', `Image ${idx + 1}: ${item.file.name}`);
-
-    el.innerHTML = `
-      <span class="preview-item__num">${idx + 1}</span>
-      <img src="${item.dataUrl}" alt="${item.file.name}" loading="lazy" />
-      <div class="preview-item__footer">${truncate(item.file.name, 18)}</div>
-      <button class="preview-item__remove" data-id="${item.id}" title="Remove" aria-label="Remove ${item.file.name}"><svg aria-hidden="true" focusable="false"><use href="/packages/ui/icons.svg#icon-x"/></svg></button>
-    `;
-
-    // Drag-to-reorder
-    el.addEventListener('dragstart', () => { state.dragSrcId = item.id; el.classList.add('dragging'); });
-    el.addEventListener('dragend',   () => el.classList.remove('dragging'));
-    el.addEventListener('dragover',  e => { e.preventDefault(); el.classList.add('drag-target'); });
-    el.addEventListener('dragleave', () => el.classList.remove('drag-target'));
-    el.addEventListener('drop', e => {
-      e.preventDefault();
-      el.classList.remove('drag-target');
-      if (state.dragSrcId === item.id) return;
-      const srcIdx = state.files.findIndex(f => f.id === state.dragSrcId);
-      const tgtIdx = state.files.findIndex(f => f.id === item.id);
-      const [moved] = state.files.splice(srcIdx, 1);
-      state.files.splice(tgtIdx, 0, moved);
-      renderPreviews();
-    });
-
-    previewGrid.appendChild(el);
-  });
-
-  // Remove buttons
-  previewGrid.querySelectorAll('.preview-item__remove').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      state.files = state.files.filter(f => f.id !== btn.dataset.id);
-      if (!state.files.length) { clearAll(); return; }
-      renderPreviews();
-      updateCounts();
-    });
-  });
-
+  state.files.forEach((item, idx) => previewGrid.appendChild(makePreviewNode(item, idx)));
   updateCounts();
+}
+
+function renumberPreviews() {
+  previewGrid.querySelectorAll('.preview-item').forEach((el, i) => {
+    const num = el.querySelector('.preview-item__num');
+    if (num) num.textContent = i + 1;
+  });
 }
 
 function updateCounts() {
@@ -141,6 +161,7 @@ function showWorkspace() {
 
 function clearAll() {
   if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
+  state.files.forEach(f => URL.revokeObjectURL(f.url));
   state.files = [];
   fileInput.value = '';
   addMoreInput.value = '';
@@ -169,18 +190,15 @@ async function convert() {
 
     setProgress(0, 'Preparing…');
 
-    // Small delay so UI paints before heavy work
-    await sleep(60);
-
     let pdf = null;
 
     for (let i = 0; i < state.files.length; i++) {
-      const { dataUrl, file } = state.files[i];
+      const { url, file, width, height } = state.files[i];
       const pct = Math.round(((i) / state.files.length) * 95);
       setProgress(pct, `Processing image ${i + 1} of ${state.files.length}…`);
 
-      // Get natural image dimensions
-      const dims = await getImageDimensions(dataUrl);
+      // Dimensions were decoded once at ingestion — no second decode here.
+      const dims = { width, height };
 
       let pageOrient = orient;
       if (orient === 'auto') {
@@ -211,13 +229,14 @@ async function convert() {
       const y = margin + (usableH - drawH) / 2;
 
       const fmt = file.type === 'image/png' ? 'PNG' : 'JPEG';
-      pdf.addImage(dataUrl, fmt, x, y, drawW, drawH);
+      pdf.addImage(url, fmt, x, y, drawW, drawH);
 
-      await sleep(10); // allow UI update between heavy iterations
+      // Yield to the browser once per image so the progress UI can paint,
+      // without the old fixed 10 ms sleep on every single iteration.
+      if (i % 4 === 3) await new Promise(r => setTimeout(r, 0));
     }
 
     setProgress(100, 'Done!');
-    await sleep(300);
 
     const pdfBlob = pdf.output('blob');
     if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
@@ -243,21 +262,11 @@ async function convert() {
 }
 
 // ── Helpers ────────────────────────────────────────────────
-function getImageDimensions(dataUrl) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    img.src = dataUrl;
-  });
-}
-
 function setProgress(pct, label) {
   progressBar.style.width = pct + '%';
   progressText.textContent = label;
   progressPct.textContent = pct + '%';
 }
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function truncate(str, n) { return str.length > n ? str.slice(0, n - 1) + '…' : str; }
 

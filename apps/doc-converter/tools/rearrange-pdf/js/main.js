@@ -4,7 +4,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 let currentObjectURL = null;
 
-const state = { srcBytes: null, pdfLibDoc: null, pdfJsDoc: null, order: [], dragSrcIdx: null };
+const state = { srcBytes: null, pdfLibDoc: null, pdfJsDoc: null, order: [], thumbs: [], dragSrcIdx: null };
 
 const dropzone    = document.getElementById('dropzone');
 const fileInput   = document.getElementById('file-input');
@@ -46,19 +46,44 @@ async function loadFile(file) {
   actionBar.style.display  = 'flex';
 }
 
+// Thumbnails are rendered once and cached. Reordering only moves DOM nodes —
+// it never re-decodes or re-rasterizes the PDF (previously O(n) full renders
+// per drag, which was very slow on large documents).
 async function buildGrid() {
   pageGrid.innerHTML = '';
-  for (let i = 0; i < state.order.length; i++) {
-    const origIdx = state.order[i];
-    const thumb   = makeDraggableThumb(i, origIdx);
-    pageGrid.appendChild(thumb);
-    // Render
-    const page = await state.pdfJsDoc.getPage(origIdx + 1);
-    const vp   = page.getViewport({ scale: 0.4 });
-    const canvas = thumb.querySelector('canvas');
-    canvas.width  = vp.width; canvas.height = vp.height;
-    page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
-  }
+  state.thumbs = [];
+  // Fetch + render pages concurrently (independent work), with a bounded
+  // number of in-flight renders to avoid overwhelming large documents.
+  const CONCURRENCY = 4;
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < state.order.length) {
+      const i = cursor++;
+      const origIdx = state.order[i];
+      const thumb = makeDraggableThumb(i, origIdx);
+      pageGrid.appendChild(thumb);
+      state.thumbs[i] = thumb;
+      const page = await state.pdfJsDoc.getPage(origIdx + 1);
+      const vp = page.getViewport({ scale: 0.4 });
+      const canvas = thumb.querySelector('canvas');
+      canvas.width = vp.width; canvas.height = vp.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, state.order.length) }, worker));
+}
+
+// Reorder the cached thumbnails in the DOM to match state.order. No re-render.
+function applyOrderToDOM() {
+  state.order.forEach((origIdx, position) => {
+    const thumb = state.thumbs[position];
+    if (!thumb) return;
+    thumb.dataset.pos = position;
+    thumb.style.animationDelay = (position * 0.03) + 's';
+    const label = thumb.querySelector('.page-thumb__footer span:last-child');
+    if (label) label.textContent = `pg ${origIdx + 1}`;
+    pageGrid.appendChild(thumb); // appendChild moves an existing node
+  });
 }
 
 function makeDraggableThumb(position, origPage) {
@@ -73,17 +98,18 @@ function makeDraggableThumb(position, origPage) {
 
   thumb.append(canvas, footer);
 
-  thumb.addEventListener('dragstart', () => { state.dragSrcIdx = position; setTimeout(() => thumb.classList.add('dragging'), 0); });
+  thumb.addEventListener('dragstart', () => { state.dragSrcIdx = Number(thumb.dataset.pos); setTimeout(() => thumb.classList.add('dragging'), 0); });
   thumb.addEventListener('dragend',   () => thumb.classList.remove('dragging'));
   thumb.addEventListener('dragover',  e => { e.preventDefault(); thumb.classList.add('drag-target'); });
   thumb.addEventListener('dragleave', () => thumb.classList.remove('drag-target'));
   thumb.addEventListener('drop', e => {
     e.preventDefault(); thumb.classList.remove('drag-target');
-    const from = state.dragSrcIdx; const to = position;
-    if (from === to) return;
+    const from = state.dragSrcIdx; const to = Number(thumb.dataset.pos);
+    if (from === null || from === to) return;
     const [moved] = state.order.splice(from, 1);
     state.order.splice(to, 0, moved);
-    buildGrid(); // re-render in new order
+    state.dragSrcIdx = null;
+    applyOrderToDOM(); // cheap DOM move — no PDF decode/render
   });
 
   return thumb;
@@ -120,7 +146,7 @@ async function apply() {
 
 function reset() {
   if (currentObjectURL) { URL.revokeObjectURL(currentObjectURL); currentObjectURL = null; }
-  Object.assign(state, { srcBytes:null, pdfLibDoc:null, pdfJsDoc:null, order:[], dragSrcIdx:null });
+  Object.assign(state, { srcBytes:null, pdfLibDoc:null, pdfJsDoc:null, order:[], thumbs:[], dragSrcIdx:null });
   fileInput.value = ''; pageGrid.innerHTML = '';
   dropzone.style.display='block'; editorArea.style.display='none';
   actionBar.style.display='none'; progressWrap.classList.remove('visible'); resultArea.classList.remove('visible');
