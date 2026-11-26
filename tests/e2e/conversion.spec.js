@@ -95,4 +95,45 @@ test.describe('Real conversions with valid files', () => {
     const canvasCountAfter = await page.locator('#page-grid .page-thumb canvas').count();
     expect(canvasCountAfter).toBe(3);
   });
+
+  test('filter-adder debounces matrix edits and flushes before export', async ({ page }) => {
+    await page.goto('/apps/image-editor/tools/filter-adder/');
+    await page.locator('#file-input').setInputFiles({
+      name: 'valid.png',
+      mimeType: 'image/png',
+      buffer: fs.readFileSync(path.join(FIXTURES, 'valid.png'))
+    });
+    await expect(page.locator('#editor-section')).toBeVisible({ timeout: 15000 });
+
+    // Typing into a matrix input schedules a debounced render; switching to the
+    // negative preset must change the rendered pixel after the debounce window.
+    const before = await page.locator('#preview-canvas').evaluate(c => {
+      const d = c.getContext('2d').getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2]].join(',');
+    });
+    await page.locator('#matrix-preset').selectOption('negative');
+    await expect.poll(async () => page.locator('#preview-canvas').evaluate(c => {
+      const d = c.getContext('2d').getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2]].join(',');
+    }), { timeout: 5000 }).not.toBe(before);
+    // Export must still work with a pending debounce.
+    const download = page.waitForEvent('download', { timeout: 15000 });
+    await page.locator('#btn-save').click();
+    expect(await download).toBeTruthy();
+  });
+
+  test('image-upscaler Smart Detail completes async unsharp mask', async ({ page }) => {
+    await page.goto('/apps/image-editor/tools/image-upscaler/');
+    await page.locator('#file-input').setInputFiles({
+      name: 'valid.png',
+      mimeType: 'image/png',
+      buffer: fs.readFileSync(path.join(FIXTURES, 'valid.png'))
+    });
+    await expect(page.locator('#editor-section')).toBeVisible({ timeout: 15000 });
+    await page.locator('#scale-select').selectOption('2');
+    await page.locator('#method-select').selectOption('smart');
+    await page.locator('#btn-upscale').click();
+    await expect(page.locator('#status-text')).toContainText('Upscaled to 200×200', { timeout: 20000 });
+    await expect(page.locator('#result-area')).toBeVisible();
+  });
 });

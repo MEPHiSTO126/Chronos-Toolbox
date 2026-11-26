@@ -135,23 +135,19 @@ async function upscaleImage() {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(state.imgElement, 0, 0, newWidth, newHeight);
-      applyUnsharpMask(ctx, newWidth, newHeight);
+      await applyUnsharpMask(ctx, newWidth, newHeight);
     }
 
-    // Convert to blob and display
-    canvas.toBlob(blob => {
-      if (blob) {
-        // Revoke the previous result before replacing it so re-upscaling
-        // does not leak a full-size PNG blob for every run.
-        if (state.resultUrl) URL.revokeObjectURL(state.resultUrl);
-        state.resultUrl = URL.createObjectURL(blob);
-        previewResult.src = state.resultUrl;
-        resultArea.style.display = 'block';
-        statusText.textContent = `Upscaled to ${newWidth}×${newHeight}`;
-        state.resultBlob = blob;
-        toast('Image upscaled with enhanced clarity!');
-      }
-    }, 'image/png');
+    // Convert to blob and display (await so status/button state is accurate)
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('Could not encode the upscaled image');
+    if (state.resultUrl) URL.revokeObjectURL(state.resultUrl);
+    state.resultUrl = URL.createObjectURL(blob);
+    previewResult.src = state.resultUrl;
+    resultArea.style.display = 'block';
+    statusText.textContent = `Upscaled to ${newWidth}×${newHeight}`;
+    state.resultBlob = blob;
+    toast('Image upscaled with enhanced clarity!');
 
   } catch (err) {
     console.error('Upscale Error:', err);
@@ -220,14 +216,17 @@ function toast(msg, isError = false) {
   }, 3500);
 }
 
-// ── Unsharp Masking Kernel (Edge Enhancement) ─────────────
-function applyUnsharpMask(ctx, width, height, amount = 0.3) {
+// Unsharp masking kernel (edge enhancement). Processes a bounded batch of
+// rows per task so a 4096×4096 image (16M channel ops) doesn't freeze the
+// UI thread; yields between batches and bails out cleanly on error.
+async function applyUnsharpMask(ctx, width, height, amount = 0.3) {
   try {
     const imgData = ctx.getImageData(0, 0, width, height);
     const data = imgData.data;
     const copy = new Uint8ClampedArray(data);
     const a = amount;
     const center = 1 + 4 * a;
+    const ROWS_PER_CHUNK = 96;
 
     for (let y = 1; y < height - 1; y++) {
       const rowOffset = y * width * 4;
@@ -243,8 +242,13 @@ function applyUnsharpMask(ctx, width, height, amount = 0.3) {
                  copy[nextRowOffset + x * 4 + c] +
                  copy[rowOffset + (x - 1) * 4 + c] +
                  copy[rowOffset + (x + 1) * 4 + c]);
-          data[idx + c] = Math.min(255, Math.max(0, val));
+          data[idx + c] = val < 0 ? 0 : val > 255 ? 255 : val;
         }
+      }
+
+      if (y % ROWS_PER_CHUNK === 0) {
+        statusText.textContent = `Enhancing detail... ${Math.round((y / height) * 100)}%`;
+        await new Promise(r => setTimeout(r, 0));
       }
     }
     ctx.putImageData(imgData, 0, 0);

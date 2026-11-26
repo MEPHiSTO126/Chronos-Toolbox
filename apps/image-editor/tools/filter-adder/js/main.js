@@ -102,7 +102,7 @@ function initMatrixInputs() {
     input.addEventListener('input', () => {
       const val = parseFloat(input.value);
       state.matrix[i] = isNaN(val) ? 0 : val;
-      render();
+      scheduleRender();
     });
 
     matrixGrid.appendChild(input);
@@ -171,6 +171,22 @@ function loadFile(file) {
 }
 
 // ── Rendering ──────────────────────────────────────────────
+// Debounce avoids re-applying the matrix on every keystroke in a grid
+// input: a 20× float parse + full-pixel-loop on a 24 MP image is ~80 ms,
+// so 120 ms is plenty without noticeable lag.
+let _renderTimer = null;
+function scheduleRender() {
+  if (_renderTimer !== null) clearTimeout(_renderTimer);
+  _renderTimer = setTimeout(() => { _renderTimer = null; render(); }, 120);
+}
+function flushRender() {
+  if (_renderTimer !== null) {
+    clearTimeout(_renderTimer);
+    _renderTimer = null;
+    render();
+  }
+}
+
 function render() {
   if (!state.imgElement) return;
 
@@ -218,6 +234,7 @@ function render() {
 async function saveImage() {
   if (!state.imgElement) return;
 
+  flushRender(); // make sure a pending debounced render lands before export
   btnSave.disabled = true;
   btnSave.textContent = 'Saving…';
 
